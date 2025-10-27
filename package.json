@@ -12,11 +12,11 @@
     "migrate:prod": "wrangler d1 migrations apply DB --remote"
   },
   "dependencies": {
-      "@hono/zod-validator": "^0.2.x",
-      "hono": "^4.x",
-      "scrypt-js": "^3.x",
-      "zod": "^3.x"
-    },
+    "@hono/zod-validator": "^0.2.x",
+    "hono": "^4.x",
+    "scrypt-js": "^3.x",
+    "zod": "^3.x"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250617.0",
     "typescript": "^5.x",
