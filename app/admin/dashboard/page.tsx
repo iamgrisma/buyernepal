@@ -1,120 +1,93 @@
-// app/admin/dashboard/page.tsx
-'use client';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import { Loader2, DollarSign, MousePointerClick, Package } from 'lucide-react';
+// app/page.tsx
+import Link from 'next/link';
+import Image from 'next/image';
+import { Product } from '@/lib/types';
+import Header from '@/components/Header'; // Include Header here
 
-// Fetch dashboard summary
-function useAnalyticsSummary() {
-  return useQuery({
-    queryKey: ['adminAnalyticsSummary'],
-    queryFn: async () => {
-      // This hits your GET /api/admin/analytics/summary endpoint
-      // You need to build this endpoint in your Hono API
-      const { data } = await api.get('/api/admin/analytics/summary');
-      return data;
-    },
-  });
+// This is the direct API URL for server-side fetching
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+async function getHomepageData(): Promise<Product[]> {
+  try {
+    const res = await fetch(
+      `${API_URL}/api/public/products?limit=10&status=published`,
+      {
+        next: { revalidate: 600 }, // <-- THIS IS ISR (10 minutes)
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to fetch products: ${res.statusText}`);
+    }
+    return res.json();
+  } catch (error) {
+    console.error('Failed to fetch homepage data:', error);
+    return []; // Return empty array on error
+  }
 }
 
-export default function AdminDashboard() {
-  const { data, isLoading, isError } = useAnalyticsSummary();
-
-  if (isLoading) {
-    return <Loader2 className="h-8 w-8 animate-spin" />;
-  }
-
-  if (isError) {
-    return (
-      <p className="text-red-600">
-        Error loading analytics. Did you build the summary endpoint?
-      </p>
-    );
-  }
-
-  // Mock data if endpoint isn't built yet
-  const summary = data || {
-    totalClicks: 0,
-    topProducts: [],
-    topLinks: [],
-  };
+export default async function HomePage() {
+  const products = await getHomepageData();
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+    <>
+      <Header />
+      <main className="container mx-auto max-w-5xl px-4 py-8">
+        <div className="space-y-12">
+          <section className="rounded-lg bg-white p-8 text-center shadow">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              Find the Best Products in Nepal
+            </h1>
+            <p className="mt-4 text-lg leading-8 text-gray-600">
+              Honest reviews and recommendations you can trust.
+            </p>
+          </section>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <StatCard
-          title="Total Clicks"
-          value={summary.totalClicks}
-          icon={<MousePointerClick className="h-6 w-6 text-blue-600" />}
-        />
-        <StatCard
-          title="Total Products"
-          value={summary.topProducts.length} // Just an example
-          icon={<Package className="h-6 w-6 text-green-600" />}
-        />
-        <StatCard
-          title="Est. Revenue"
-          value="Rs. 0" // You don't have this data yet
-          icon={<DollarSign className="h-6 w-6 text-yellow-600" />}
-        />
-      </div>
-
-      {/* Top Lists */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-lg bg-white p-4 shadow">
-          <h2 className="text-lg font-semibold">Top Products</h2>
-          <ul className="mt-4 space-y-2">
-            {summary.topProducts.map((product: any) => (
-              <li key={product.id} className="flex justify-between">
-                <span>{product.title}</span>
-                <span className="font-medium">{product.click_count} clicks</span>
-              </li>
-            ))}
-            {summary.topProducts.length === 0 && (
-              <p className="text-gray-500">No data yet.</p>
-            )}
-          </ul>
+          <section>
+            <h2 className="text-2xl font-bold">Top Recommendations</h2>
+            <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+              {products.length > 0 ? (
+                products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))
+              ) : (
+                <p>No products found. Check back later.</p>
+              )}
+            </div>
+          </section>
         </div>
-        <div className="rounded-lg bg-white p-4 shadow">
-          <h2 className="text-lg font-semibold">Top Links</h2>
-          <ul className="mt-4 space-y-2">
-            {summary.topLinks.map((link: any) => (
-              <li key={link.id} className="flex justify-between">
-                <code>/refer/{link.slug}</code>
-                <span className="font-medium">{link.click_count} clicks</span>
-              </li>
-            ))}
-            {summary.topLinks.length === 0 && (
-              <p className="text-gray-500">No data yet.</p>
-            )}
-          </ul>
-        </div>
-      </div>
-    </div>
+      </main>
+    </>
   );
 }
 
-function StatCard({
-  title,
-  value,
-  icon,
-}: {
-  title: string;
-  value: string | number;
-  icon: ReactNode;
-}) {
+// Product Card Component
+function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="rounded-lg bg-white p-6 shadow">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className="text-3xl font-bold">{value}</p>
-        </div>
-        <div className="rounded-full bg-gray-100 p-3">{icon}</div>
+    <Link
+      href={`/products/${product.slug}`}
+      className="group relative block rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md"
+    >
+      <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-t-lg bg-gray-200 lg:aspect-none lg:h-80">
+        <Image
+          src={product.image_url} // This MUST be the Cloudflare R2 URL
+          alt={product.title}
+          width={400}
+          height={400}
+          className="h-full w-full object-cover object-center lg:h-full lg:w-full"
+        />
       </div>
-    </div>
+      <div className="p-4">
+        <h3 className="text-lg font-medium text-gray-900">
+          <span aria-hidden="true" className="absolute inset-0" />
+          {product.title}
+        </h3>
+        <p className="mt-1 text-sm text-gray-500">
+          {product.description?.substring(0, 50) || 'View details'}...
+        </p>
+        <p className="mt-2 text-lg font-semibold text-gray-900">
+          Rs. {product.current_price}
+        </p>
+      </div>
+    </Link>
   );
 }
