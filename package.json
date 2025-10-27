@@ -13,11 +13,15 @@
   },
   "dependencies": {
     "hono": "^4.x",
-    "zod": "^3.x"
+    "zod": "^3.x",
+    "@hono/zod-validator": "^0.2.x", // For validating requests with Zod
+    "hono": "^4.x", // Hono JWT middleware
+    "scrypt-js": "^3.x" // Password hashing (Web Crypto compatible)
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250617.0",
     "typescript": "^5.x",
     "wrangler": "^3.x"
-  }
+  },
+  "module": "src/index.ts" // Add this line if missing, helps with module resolution
 }
