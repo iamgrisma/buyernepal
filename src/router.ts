@@ -1,33 +1,71 @@
 import { Hono } from 'hono';
-import { AppEnv } from './index';
+import { AppEnv } from './index'; // Import the type from index.ts
 import { handleGetProducts } from './handlers/products';
 import { handleLogin, handleRegister, handleLogout, handleGetCurrentUser } from './handlers/auth';
-import { handleAdminGetProducts, /* ... other product handlers ... */ } from './handlers/admin_products';
-import { handleAdminGetReferSlugs, /* ... other slug handlers ... */ } from './handlers/refer_slugs';
-import { handleReferRedirect } from './handlers/redirect';
-import { requireAdmin } from './utils/auth';
-// --- NEW IMPORTS ---
-import { handleAdminGetCategories, handleAdminCreateCategory, handleAdminCreateCategoryAction, handleAdminUpdateCategory, handleAdminUpdateCategoryAction, handleAdminDeleteCategory } from './handlers/admin_categories';
-import { handleGetCategories, handleGetCategoryBySlug } from './handlers/categories';
-import { handleAdminGetReviews, handleAdminCreateReview, handleAdminCreateReviewAction, handleAdminUpdateReview, handleAdminUpdateReviewAction, handleAdminDeleteReview } from './handlers/admin_reviews';
-import { handleAdminGetCoupons, handleAdminCreateCoupon, handleAdminCreateCouponAction, handleAdminUpdateCoupon, handleAdminUpdateCouponAction, handleAdminDeleteCoupon } from './handlers/admin_coupons';
-import { handleAdminGetSettings, handleAdminUpdateSettings, handleAdminUpdateSettingsAction } from './handlers/admin_settings';
-import { handleAdminGetScripts, handleAdminCreateScript, handleAdminCreateScriptAction, handleAdminUpdateScript, handleAdminUpdateScriptAction, handleAdminDeleteScript } from './handlers/admin_scripts';
-import { handleAdminGetAnalyticsOverview, handleAdminGetProductAnalytics } from './handlers/admin_analytics';
-import { handleSearch, handleSearchAction } from './handlers/search';
-import { handleTrackEvents, handleTrackEventsAction } from './handlers/tracking';
-import { handleDarazPostback } from './handlers/postback';
-import { cacheMiddleware } from './utils/cache'; // Optional cache middleware
+import { // <<< ENSURE THIS IMPORT BLOCK IS COMPLETE
+    handleAdminGetProducts,
+    handleAdminGetProductById,
+    handleAdminCreateProduct, // <<< Make sure this is imported
+    handleAdminCreateProductAction,
+    handleAdminUpdateProduct, // <<< Make sure this is imported
+    handleAdminUpdateProductAction,
+    handleAdminDeleteProduct
+} from './handlers/admin_products.ts'; // Corrected path
+import { // <<< ENSURE THIS IMPORT BLOCK IS COMPLETE
+    handleAdminGetReferSlugs,
+    handleAdminCreateReferSlug, // <<< Make sure this is imported
+    handleAdminCreateReferSlugAction,
+    handleAdminUpdateReferSlug, // <<< Make sure this is imported
+    handleAdminUpdateReferSlugAction,
+    handleAdminDeleteReferSlug
+} from './handlers/refer_slugs.ts';
+import { handleReferRedirect } from './handlers/redirect'; // Public redirect handler
+import { requireAdmin } from './utils/auth'; // Auth middleware
+// --- IMPORTS FOR MISSING FILES ADDED EARLIER ---
+import {
+    handleAdminGetCategories,
+    handleAdminCreateCategory, handleAdminCreateCategoryAction, // <<< Make sure these are imported
+    handleAdminUpdateCategory, handleAdminUpdateCategoryAction, // <<< Make sure these are imported
+    handleAdminDeleteCategory
+} from './handlers/admin_categories.ts';
+import { handleGetCategories, handleGetCategoryBySlug } from './handlers/categories.ts';
+import {
+    handleAdminGetReviews,
+    handleAdminCreateReview, handleAdminCreateReviewAction, // <<< Make sure these are imported
+    handleAdminUpdateReview, handleAdminUpdateReviewAction, // <<< Make sure these are imported
+    handleAdminDeleteReview
+} from './handlers/admin_reviews.ts';
+import {
+    handleAdminGetCoupons,
+    handleAdminCreateCoupon, handleAdminCreateCouponAction, // <<< Make sure these are imported
+    handleAdminUpdateCoupon, handleAdminUpdateCouponAction, // <<< Make sure these are imported
+    handleAdminDeleteCoupon
+} from './handlers/admin_coupons.ts';
+import {
+    handleAdminGetSettings,
+    handleAdminUpdateSettings, handleAdminUpdateSettingsAction // <<< Make sure these are imported
+} from './handlers/admin_settings.ts';
+import {
+    handleAdminGetScripts,
+    handleAdminCreateScript, handleAdminCreateScriptAction, // <<< Make sure these are imported
+    handleAdminUpdateScript, handleAdminUpdateScriptAction, // <<< Make sure these are imported
+    handleAdminDeleteScript
+} from './handlers/admin_scripts.ts';
+import { handleAdminGetAnalyticsOverview, handleAdminGetProductAnalytics } from './handlers/admin_analytics.ts';
+import { handleSearch, handleSearchAction } from './handlers/search.ts'; // <<< Make sure these are imported
+import { handleTrackEvents, handleTrackEventsAction } from './handlers/tracking.ts'; // <<< Make sure these are imported
+import { handleDarazPostback } from './handlers/postback.ts';
+import { cacheMiddleware } from './utils/cache';
 
 const router = new Hono<AppEnv>();
 
 // --- Public API Routes ---
-router.get('/products', cacheMiddleware('products-list'), handleGetProducts); // Example caching
+router.get('/products', cacheMiddleware('products-list'), handleGetProducts);
 router.get('/categories', cacheMiddleware('categories-list'), handleGetCategories);
 router.get('/categories/:slug', cacheMiddleware('category-detail'), handleGetCategoryBySlug);
 router.get('/search', handleSearch, handleSearchAction);
-router.post('/events', handleTrackEvents, handleTrackEventsAction); // Tracking endpoint
-router.post('/postback/daraz', handleDarazPostback); // Postback endpoint (needs secret protection)
+router.post('/events', handleTrackEvents, handleTrackEventsAction);
+router.post('/postback/daraz', handleDarazPostback);
 
 
 // --- Admin Auth Routes ---
@@ -40,11 +78,11 @@ router.get('/admin/me', requireAdmin, handleGetCurrentUser);
 const adminApi = new Hono<AppEnv>();
 adminApi.use('*', requireAdmin);
 
-// Products
+// Products (Line 45 referenced in error)
 adminApi.get('/products', handleAdminGetProducts);
-adminApi.post('/products', handleAdminCreateProduct, handleAdminCreateProductAction);
+adminApi.post('/products', handleAdminCreateProduct, handleAdminCreateProductAction); // Uses validator + action
 adminApi.get('/products/:id', handleAdminGetProductById);
-adminApi.put('/products/:id', handleAdminUpdateProduct, handleAdminUpdateProductAction);
+adminApi.put('/products/:id', handleAdminUpdateProduct, handleAdminUpdateProductAction); // Uses validator + action
 adminApi.delete('/products/:id', handleAdminDeleteProduct);
 
 // Categories
@@ -90,8 +128,9 @@ adminApi.get('/analytics/products/:id', handleAdminGetProductAnalytics);
 router.route('/admin', adminApi);
 
 
-// --- Public Redirect Route (if separate from /api) ---
-// router.get('/refer/:slug', handleReferRedirect); // Already handled in index.ts if at root
+// --- Public Redirect Route ---
+// Keep this outside /api if defined at root in index.ts
+// router.get('/refer/:slug', handleReferRedirect);
 
 
 export default router;
