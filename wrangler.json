@@ -1,6 +1,8 @@
 {
   "compatibility_date": "2025-10-08",
-  "compatibility_flags": [ "nodejs_compat" ],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "main": "src/index.ts",
   "name": "buyernepal",
   "upload_source_maps": true,
@@ -13,12 +15,12 @@
   ],
   "observability": {
     "enabled": true
-  }
-}
+  },
   "kv_namespaces": [
     {
       "binding": "KV",
       "id": "225894eaeb014e23bd542743aaadf6fa",
-      "preview_id": "<ID_OF_PREVIEW_KV_NAMESPACE_FOR_LOCAL_DEVELOPMENT>"
+      "preview_id": "YOUR_PREVIEW_KV_NAMESPACE_ID"
     }
   ]
+}
