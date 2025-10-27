@@ -14,9 +14,9 @@
   "dependencies": {
     "hono": "^4.x",
     "zod": "^3.x",
-    "@hono/zod-validator": "^0.2.x", // For validating requests with Zod
-    "hono": "^4.x", // Hono JWT middleware
-    "scrypt-js": "^3.x" // Password hashing (Web Crypto compatible)
+    "@hono/zod-validator": "^0.2.x",
+    "hono": "^4.x",
+    "scrypt-js": "^3.x"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250617.0",
