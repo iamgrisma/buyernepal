@@ -15,3 +15,10 @@
     "enabled": true
   }
 }
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "225894eaeb014e23bd542743aaadf6fa",
+      "preview_id": "<ID_OF_PREVIEW_KV_NAMESPACE_FOR_LOCAL_DEVELOPMENT>"
+    }
+  ]
