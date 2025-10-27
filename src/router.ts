@@ -10,15 +10,15 @@ import { // <<< ENSURE THIS IMPORT BLOCK IS COMPLETE
     handleAdminUpdateProduct, // <<< Make sure this is imported
     handleAdminUpdateProductAction,
     handleAdminDeleteProduct
-} from './handlers/admin_products.ts'; // Corrected path
-import { // <<< ENSURE THIS IMPORT BLOCK IS COMPLETE
+} from './handlers/admin_products';
+import {
     handleAdminGetReferSlugs,
-    handleAdminCreateReferSlug, // <<< Make sure this is imported
+    handleAdminCreateReferSlug,
     handleAdminCreateReferSlugAction,
-    handleAdminUpdateReferSlug, // <<< Make sure this is imported
+    handleAdminUpdateReferSlug,
     handleAdminUpdateReferSlugAction,
     handleAdminDeleteReferSlug
-} from './handlers/refer_slugs.ts';
+} from './handlers/refer_slugs';
 import { handleReferRedirect } from './handlers/redirect'; // Public redirect handler
 import { requireAdmin } from './utils/auth'; // Auth middleware
 // --- IMPORTS FOR MISSING FILES ADDED EARLIER ---
@@ -27,34 +27,34 @@ import {
     handleAdminCreateCategory, handleAdminCreateCategoryAction, // <<< Make sure these are imported
     handleAdminUpdateCategory, handleAdminUpdateCategoryAction, // <<< Make sure these are imported
     handleAdminDeleteCategory
-} from './handlers/admin_categories.ts';
-import { handleGetCategories, handleGetCategoryBySlug } from './handlers/categories.ts';
+} from './handlers/admin_categories';
+import { handleGetCategories, handleGetCategoryBySlug } from './handlers/categories';
 import {
     handleAdminGetReviews,
-    handleAdminCreateReview, handleAdminCreateReviewAction, // <<< Make sure these are imported
-    handleAdminUpdateReview, handleAdminUpdateReviewAction, // <<< Make sure these are imported
+    handleAdminCreateReview, handleAdminCreateReviewAction,
+    handleAdminUpdateReview, handleAdminUpdateReviewAction,
     handleAdminDeleteReview
-} from './handlers/admin_reviews.ts';
+} from './handlers/admin_reviews';
 import {
     handleAdminGetCoupons,
-    handleAdminCreateCoupon, handleAdminCreateCouponAction, // <<< Make sure these are imported
-    handleAdminUpdateCoupon, handleAdminUpdateCouponAction, // <<< Make sure these are imported
+    handleAdminCreateCoupon, handleAdminCreateCouponAction,
+    handleAdminUpdateCoupon, handleAdminUpdateCouponAction,
     handleAdminDeleteCoupon
-} from './handlers/admin_coupons.ts';
+} from './handlers/admin_coupons';
 import {
     handleAdminGetSettings,
-    handleAdminUpdateSettings, handleAdminUpdateSettingsAction // <<< Make sure these are imported
-} from './handlers/admin_settings.ts';
+    handleAdminUpdateSettings, handleAdminUpdateSettingsAction
+} from './handlers/admin_settings';
 import {
     handleAdminGetScripts,
-    handleAdminCreateScript, handleAdminCreateScriptAction, // <<< Make sure these are imported
-    handleAdminUpdateScript, handleAdminUpdateScriptAction, // <<< Make sure these are imported
+    handleAdminCreateScript, handleAdminCreateScriptAction,
+    handleAdminUpdateScript, handleAdminUpdateScriptAction,
     handleAdminDeleteScript
-} from './handlers/admin_scripts.ts';
-import { handleAdminGetAnalyticsOverview, handleAdminGetProductAnalytics } from './handlers/admin_analytics.ts';
-import { handleSearch, handleSearchAction } from './handlers/search.ts'; // <<< Make sure these are imported
-import { handleTrackEvents, handleTrackEventsAction } from './handlers/tracking.ts'; // <<< Make sure these are imported
-import { handleDarazPostback } from './handlers/postback.ts';
+} from './handlers/admin_scripts';
+import { handleAdminGetAnalyticsOverview, handleAdminGetProductAnalytics } from './handlers/admin_analytics';
+import { handleSearch, handleSearchAction } from './handlers/search';
+import { handleTrackEvents, handleTrackEventsAction } from './handlers/tracking';
+import { handleDarazPostback } from './handlers/postback';
 import { cacheMiddleware } from './utils/cache';
 
 const router = new Hono<AppEnv>();

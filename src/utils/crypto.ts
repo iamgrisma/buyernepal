@@ -1,5 +1,4 @@
 import { scrypt } from 'scrypt-js';
-import { Buffer } from 'buffer'; // Node.js Buffer polyfill for browsers/workers
 
 // Configure scrypt parameters (adjust N for desired security/performance balance)
 // N must be a power of 2. 16384 is a common default.
@@ -15,12 +14,12 @@ export function generateSalt(length = 16): Uint8Array {
 
 // Hash a password using scrypt
 export async function hashPassword(password: string, salt: Uint8Array): Promise<string> {
-  const passwordBuffer = Buffer.from(password, 'utf8');
+  const passwordBuffer = new TextEncoder().encode(password);
   const derivedKey = await scrypt(passwordBuffer, salt, N, r, p, dkLen);
   // Store salt and hash together, commonly separated by a character like '.' or '$'
   // Store as hex or base64. Hex is simpler here.
-  const saltHex = Buffer.from(salt).toString('hex');
-  const hashHex = Buffer.from(derivedKey).toString('hex');
+  const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = Array.from(derivedKey).map(b => b.toString(16).padStart(2, '0')).join('');
   return `${saltHex}.${hashHex}`;
 }
 
@@ -31,14 +30,19 @@ export async function verifyPassword(password: string, storedHash: string): Prom
     if (!saltHex || !hashHex) {
       return false; // Invalid hash format
     }
-    const salt = Buffer.from(saltHex, 'hex');
-    const storedKey = Buffer.from(hashHex, 'hex');
+    const salt = new Uint8Array(saltHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+    const storedKey = new Uint8Array(hashHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
 
-    const passwordBuffer = Buffer.from(password, 'utf8');
+    const passwordBuffer = new TextEncoder().encode(password);
     const derivedKey = await scrypt(passwordBuffer, salt, N, r, p, dkLen);
 
     // Constant-time comparison is crucial for security
-    return Buffer.from(derivedKey).equals(storedKey);
+    if (derivedKey.length !== storedKey.length) return false;
+    let diff = 0;
+    for (let i = 0; i < derivedKey.length; i++) {
+      diff |= derivedKey[i] ^ storedKey[i];
+    }
+    return diff === 0;
   } catch (error) {
     console.error("Password verification error:", error);
     return false;

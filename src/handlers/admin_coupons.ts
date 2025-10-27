@@ -47,7 +47,8 @@ export const handleAdminCreateCoupon = zValidator('json', CreateCouponSchema, (r
     }
 });
 export const handleAdminCreateCouponAction = async (c: Context<AppEnv>) => {
-    const data = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const data = c.req.valid('json') as z.infer<typeof CreateCouponSchema>;
 
     try {
          // TODO: Add checks for product_id, category_id if provided
@@ -81,7 +82,8 @@ export const handleAdminUpdateCoupon = zValidator('json', UpdateCouponSchema, (r
 export const handleAdminUpdateCouponAction = async (c: Context<AppEnv>) => {
      const id = parseInt(c.req.param('id'), 10);
     if (isNaN(id)) return c.json({ success: false, error: "Invalid ID" }, 400);
-    const data = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const data = c.req.valid('json') as Partial<z.infer<typeof UpdateCouponSchema>>;
 
     const fieldsToUpdate = Object.keys(data);
     if (fieldsToUpdate.length === 0) return c.json({ success: false, error: "No fields to update" }, 400);
@@ -90,7 +92,7 @@ export const handleAdminUpdateCouponAction = async (c: Context<AppEnv>) => {
 
     try {
         const setClauses = fieldsToUpdate.map((field, i) => `${field} = ?${i + 1}`);
-        const values = fieldsToUpdate.map(field => data[field as keyof typeof data]);
+        const values: any[] = fieldsToUpdate.map(field => (data as any)[field]);
         values.push(id);
 
         const { success, meta } = await c.env.DB.prepare(

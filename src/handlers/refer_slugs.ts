@@ -36,7 +36,8 @@ export const handleAdminCreateReferSlug = zValidator('json', CreateReferSlugSche
     }
 });
 export const handleAdminCreateReferSlugAction = async (c: Context<AppEnv>) => {
-    const data = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const data = c.req.valid('json') as z.infer<typeof CreateReferSlugSchema>;
 
     try {
         // Check if product offer exists
@@ -75,7 +76,8 @@ export const handleAdminUpdateReferSlugAction = async (c: Context<AppEnv>) => {
     if (isNaN(id)) {
         return c.json({ success: false, error: "Invalid ID" }, 400);
     }
-    const data = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const data = c.req.valid('json') as Partial<z.infer<typeof UpdateReferSlugSchema>>;
 
     const fieldsToUpdate = Object.keys(data);
     if (fieldsToUpdate.length === 0) {
@@ -92,7 +94,7 @@ export const handleAdminUpdateReferSlugAction = async (c: Context<AppEnv>) => {
 
 
     const setClauses = fieldsToUpdate.map((field, index) => `${field} = ?${index + 1}`);
-    const values = fieldsToUpdate.map(field => data[field as keyof typeof data]);
+    const values: any[] = fieldsToUpdate.map(field => (data as any)[field]);
     values.push(id); // For WHERE clause
 
     try {

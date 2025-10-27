@@ -6,8 +6,9 @@ import { handleReferRedirect } from './handlers/redirect'; // Import directly if
 // Define the Hono app type based on Cloudflare Worker bindings
 export type AppEnv = {
   Bindings: Env & {
-      JWT_SECRET: string; // Add secrets/vars used
-      // Add other bindings like KV, R2 etc. here when needed
+      JWT_SECRET: string;
+      DARAZ_POSTBACK_SECRET?: string;
+      CACHE_KV?: KVNamespace;
   };
   Variables: { // For storing context data like user payload from middleware
       user?: import('./utils/auth').UserPayload;

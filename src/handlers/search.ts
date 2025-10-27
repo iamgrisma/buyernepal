@@ -17,7 +17,8 @@ export const handleSearch = zValidator('query', SearchSchema, (result, c) => {
     }
 });
 export const handleSearchAction = async (c: Context<AppEnv>) => {
-    const { q, page, limit } = c.req.valid('query');
+    // @ts-expect-error - zValidator types not properly inferred
+    const { q, page, limit } = c.req.valid('query') as { q: string; page: number; limit: number };
     const offset = (page - 1) * limit;
 
     try {

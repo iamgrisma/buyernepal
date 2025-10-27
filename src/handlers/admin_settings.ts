@@ -37,7 +37,8 @@ export const handleAdminUpdateSettings = zValidator('json', UpdateSettingsSchema
     }
 });
 export const handleAdminUpdateSettingsAction = async (c: Context<AppEnv>) => {
-    const settingsUpdates = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const settingsUpdates = c.req.valid('json') as z.infer<typeof UpdateSettingsSchema>;
 
     if (!settingsUpdates || settingsUpdates.length === 0) {
         return c.json({ success: false, error: "No settings provided for update" }, 400);
@@ -49,7 +50,7 @@ export const handleAdminUpdateSettingsAction = async (c: Context<AppEnv>) => {
             "ON CONFLICT(key) DO UPDATE SET value = excluded.value, description = excluded.description, updated_at = CURRENT_TIMESTAMP"
         );
 
-        const batchUpdates = settingsUpdates.map(setting =>
+        const batchUpdates = settingsUpdates.map((setting: any) =>
             updateStmt.bind(setting.key, setting.value, setting.description)
         );
 

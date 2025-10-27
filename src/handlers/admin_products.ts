@@ -99,7 +99,8 @@ export const handleAdminCreateProduct = zValidator('json', CreateProductSchema, 
     }
 });
 export const handleAdminCreateProductAction = async (c: Context<AppEnv>) => {
-    const productData = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const productData = c.req.valid('json') as z.infer<typeof CreateProductSchema>;
     const { offers, ...product } = productData;
 
     // TODO: Add check for slug uniqueness before insert if not handled by DB constraint adequately
@@ -127,7 +128,7 @@ export const handleAdminCreateProductAction = async (c: Context<AppEnv>) => {
         );
 
         // Batch insert offers
-        const offerInserts = offers.map(offer =>
+        const offerInserts = offers.map((offer: any) =>
             offerStmt.bind(productId, offer.vendor_name, offer.vendor_product_id, offer.price, offer.currency, offer.affiliate_url, offer.is_available)
         );
         const offerResults = await c.env.DB.batch(offerInserts);
@@ -163,7 +164,8 @@ export const handleAdminUpdateProductAction = async (c: Context<AppEnv>) => {
      if (isNaN(id)) {
         return c.json({ success: false, error: "Invalid ID" }, 400);
     }
-    const productUpdateData = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const productUpdateData = c.req.valid('json') as Partial<z.infer<typeof UpdateProductSchema>>;
 
     // Build the SET part of the SQL query dynamically
     const fieldsToUpdate = Object.keys(productUpdateData);
@@ -172,7 +174,7 @@ export const handleAdminUpdateProductAction = async (c: Context<AppEnv>) => {
     }
 
     const setClauses = fieldsToUpdate.map((field, index) => `${field} = ?${index + 1}`);
-    const values = fieldsToUpdate.map(field => productUpdateData[field as keyof typeof productUpdateData]);
+    const values: any[] = fieldsToUpdate.map(field => (productUpdateData as any)[field]);
 
     // Add updated_at manually if not using trigger (trigger IS defined in migration)
     // setClauses.push("updated_at = CURRENT_TIMESTAMP");

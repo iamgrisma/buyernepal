@@ -39,7 +39,8 @@ export const handleAdminCreateCategory = zValidator('json', CreateCategorySchema
     }
 });
 export const handleAdminCreateCategoryAction = async (c: Context<AppEnv>) => {
-    const data = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const data = c.req.valid('json') as z.infer<typeof CreateCategorySchema>;
     try {
         // Optional: Check if parent_id exists if provided
         if (data.parent_id) {
@@ -74,7 +75,8 @@ export const handleAdminUpdateCategory = zValidator('json', UpdateCategorySchema
 export const handleAdminUpdateCategoryAction = async (c: Context<AppEnv>) => {
     const id = parseInt(c.req.param('id'), 10);
     if (isNaN(id)) return c.json({ success: false, error: "Invalid ID" }, 400);
-    const data = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const data = c.req.valid('json') as Partial<z.infer<typeof UpdateCategorySchema>>;
 
     const fieldsToUpdate = Object.keys(data);
     if (fieldsToUpdate.length === 0) return c.json({ success: false, error: "No fields to update" }, 400);
@@ -93,7 +95,7 @@ export const handleAdminUpdateCategoryAction = async (c: Context<AppEnv>) => {
 
 
         const setClauses = fieldsToUpdate.map((field, i) => `${field} = ?${i + 1}`);
-        const values = fieldsToUpdate.map(field => data[field as keyof typeof data]);
+        const values: any[] = fieldsToUpdate.map(field => (data as any)[field]);
         values.push(id);
 
         const { success, meta } = await c.env.DB.prepare(

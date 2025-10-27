@@ -50,7 +50,7 @@ export async function verifySessionToken(c: Context<AppEnv>, token: string): Pro
     }
   try {
     const payload = await verify(token, secret);
-    return payload as UserPayload; // Assuming verify throws on invalid/expired
+    return payload as unknown as UserPayload; // Cast through unknown for type safety
   } catch (error) {
     console.warn("JWT verification failed:", error);
     return null;

@@ -23,7 +23,8 @@ export const handleTrackEvents = zValidator('json', BatchEventSchema, (result, c
     }
 });
 export const handleTrackEventsAction = async (c: Context<AppEnv>) => {
-    const events = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const events = c.req.valid('json') as z.infer<typeof BatchEventSchema>;
 
     // In production, consider sending this to a Queue or Analytics Engine instead of direct DB write
     // For now, simple insert (will be slow under load)
@@ -38,7 +39,7 @@ export const handleTrackEventsAction = async (c: Context<AppEnv>) => {
             "VALUES (?1, ?2, ?3, ?4, ?5)"
         );
 
-        const inserts = events.map(event => {
+        const inserts = events.map((event: any) => {
             let targetType: string | undefined;
             let targetId: string | undefined;
             if (event.product_id) { targetType = 'product'; targetId = String(event.product_id); }

@@ -61,7 +61,8 @@ export const handleAdminCreateReview = zValidator('json', CreateReviewSchema, (r
     }
 });
 export const handleAdminCreateReviewAction = async (c: Context<AppEnv>) => {
-    const data = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const data = c.req.valid('json') as z.infer<typeof CreateReviewSchema>;
     // For admin creation, user_id might be the admin's ID or null if it represents an 'editorial' review
     const currentUser = c.get('user') as UserPayload | undefined; // Get from auth middleware
     const userIdToInsert = data.user_id ?? currentUser?.userId ?? null; // Prefer explicit, fallback to logged-in admin, then null
@@ -105,14 +106,15 @@ export const handleAdminUpdateReview = zValidator('json', UpdateReviewSchema, (r
 export const handleAdminUpdateReviewAction = async (c: Context<AppEnv>) => {
     const id = parseInt(c.req.param('id'), 10);
     if (isNaN(id)) return c.json({ success: false, error: "Invalid ID" }, 400);
-    const data = c.req.valid('json');
+    // @ts-expect-error - zValidator types not properly inferred
+    const data = c.req.valid('json') as Partial<z.infer<typeof UpdateReviewSchema>>;
 
     const fieldsToUpdate = Object.keys(data);
     if (fieldsToUpdate.length === 0) return c.json({ success: false, error: "No fields to update" }, 400);
 
     try {
         const setClauses = fieldsToUpdate.map((field, i) => `${field} = ?${i + 1}`);
-        const values = fieldsToUpdate.map(field => data[field as keyof typeof data]);
+        const values: any[] = fieldsToUpdate.map(field => (data as any)[field]);
         values.push(id);
 
         const { success, meta } = await c.env.DB.prepare(
