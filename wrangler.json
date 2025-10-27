@@ -1,0 +1,16 @@
+{
+  "compatibility_date": "2025-10-08",
+  "main": "src/index.ts",
+  "name": "buyernepal",
+  "upload_source_maps": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_id": "8e38f998-1dc6-4949-b630-deca3e23d9a8",
+      "database_name": "buyernepal"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
