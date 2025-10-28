@@ -21,9 +21,66 @@ const app = new Hono<AppEnv>();
 app.use('*', logger());
 
 // --- Public Routes ---
-app.get('/', (c) => c.text('BuyerNepal API Root'));
-// If you want /refer/:slug at the root level:
+import { renderLandingPage } from './views/landing';
+import { renderProductPage } from './views/product';
+import { renderCategoryPage } from './views/category';
+import { renderReferralInterstitial } from './views/refer';
+import { renderSearchResultsPage } from './views/search';
+
+app.get('/', renderLandingPage);
+app.get('/p/:slug', renderProductPage);
+app.get('/c/:slug', renderCategoryPage);
 app.get('/refer/:slug', handleReferRedirect);
+app.get('/r/:slug', renderReferralInterstitial);
+app.get('/search', renderSearchResultsPage);
+
+// PWA and SEO files
+app.get('/manifest.json', async (c) => {
+  const settings = await c.env.DB.prepare("SELECT * FROM site_settings WHERE id = 1").first();
+  return c.json({
+    name: settings?.site_name || "BuyerNepal",
+    short_name: "BuyerNepal",
+    description: settings?.tagline || "Honest tech reviews in Nepal",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#ffffff",
+    theme_color: "#3b82f6",
+    icons: [
+      { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { src: "/icon-512.png", sizes: "512x512", type: "image/png" }
+    ]
+  });
+});
+
+app.get('/robots.txt', (c) => {
+  return c.text(`User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+Sitemap: ${new URL('/sitemap.xml', c.req.url).href}`);
+});
+
+app.get('/sitemap.xml', async (c) => {
+  const products = await c.env.DB.prepare("SELECT slug, updated_at FROM products WHERE status = 'active' LIMIT 500").all();
+  const categories = await c.env.DB.prepare("SELECT slug, name FROM categories LIMIT 50").all();
+  
+  const baseUrl = new URL(c.req.url).origin;
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>${baseUrl}/</loc><priority>1.0</priority></url>`;
+  
+  products.results?.forEach((p: any) => {
+    xml += `<url><loc>${baseUrl}/p/${p.slug}</loc><lastmod>${p.updated_at}</lastmod><priority>0.8</priority></url>`;
+  });
+  
+  categories.results?.forEach((c: any) => {
+    xml += `<url><loc>${baseUrl}/c/${c.slug}</loc><priority>0.6</priority></url>`;
+  });
+  
+  xml += `</urlset>`;
+  return c.text(xml, 200, { 'Content-Type': 'application/xml' });
+});
 
 // --- API Routes ---
 app.route('/api', apiRouter); // Mount the main API router under /api
