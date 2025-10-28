@@ -13,8 +13,20 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.2.x",
+    "@tanstack/react-query": "^5.90.5",
+    "@types/node": "^24.9.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react-swc": "^4.2.0",
+    "autoprefixer": "^10.4.21",
     "hono": "^4.x",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.4",
     "scrypt-js": "^3.x",
+    "tailwindcss": "^4.1.16",
+    "tailwindcss-animate": "^1.0.7",
+    "vite": "^7.1.12",
     "zod": "^3.x"
   },
   "devDependencies": {
