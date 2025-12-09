@@ -27,5 +27,15 @@
     "dev": "pnpm seedLocalD1 && wrangler dev",
     "predeploy": "wrangler d1 migrations apply DB --remote",
     "seedLocalD1": "wrangler d1 migrations apply DB --local"
+  },
+  "dependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "autoprefixer": "^10.4.22",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-router-dom": "^7.10.1",
+    "tailwindcss": "^4.1.17"
   }
 }
