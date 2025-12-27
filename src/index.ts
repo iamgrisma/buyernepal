@@ -8,6 +8,7 @@ export default {
     return new Response(renderHtml(JSON.stringify(results, null, 2)), {
       headers: {
         "content-type": "text/html",
+        "Cache-Control": "public, max-age=60, s-maxage=60",
       },
     });
   },
