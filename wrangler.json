@@ -3,6 +3,10 @@
   "main": "src/index.ts",
   "name": "buyernepal",
   "upload_source_maps": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
   "d1_databases": [
     {
       "binding": "DB",

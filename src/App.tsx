@@ -15,6 +15,9 @@ import AdminAnalytics from './pages/admin/AdminAnalytics';
 import NotFound from './pages/NotFound';
 
 function App() {
+  // Log application start
+  console.log("BuyerNepal Application Started");
+
   return (
     <>
       <Routes>
