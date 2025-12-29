@@ -52,6 +52,14 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip Link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 btn btn-primary"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -82,7 +90,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary/10 via-background to-accent/10 py-16">
+      <section id="main-content" className="bg-gradient-to-br from-primary/10 via-background to-accent/10 py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             {settings.site_title || 'Welcome to BuyerNepal'}
@@ -146,6 +154,7 @@ export default function HomePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-primary btn-sm"
+                      aria-label={`Buy ${product.name} now`}
                     >
                       Buy Now
                     </a>
