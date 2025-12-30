@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Loading from '../components/ui/Loading';
 
 interface Settings {
   site_title?: string;
@@ -33,7 +34,7 @@ export default function HomePage() {
       fetch('/api/categories').then((r) => r.json()),
       fetch('/api/products').then((r) => r.json()),
     ])
-      .then(([settingsData, categoriesData, productsData]) => {
+      .then(([settingsData, categoriesData, productsData]: any[]) => {
         setSettings(settingsData.settings || {});
         setCategories(categoriesData.categories || []);
         setProducts(productsData.products || []);
@@ -43,11 +44,7 @@ export default function HomePage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
