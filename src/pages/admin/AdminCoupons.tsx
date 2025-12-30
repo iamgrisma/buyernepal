@@ -37,7 +37,7 @@ export default function AdminCoupons() {
   const loadCoupons = async () => {
     try {
       const res = await fetch('/api/admin/coupons', { credentials: 'include' });
-      const data = await res.json();
+      const data: any = await res.json();
       setCoupons(data.coupons || []);
     } catch (error) {
       toast('Failed to load coupons', 'error');

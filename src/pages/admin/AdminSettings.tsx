@@ -32,7 +32,7 @@ export default function AdminSettings() {
   const loadSettings = async () => {
     try {
       const res = await fetch('/api/admin/settings', { credentials: 'include' });
-      const data = await res.json();
+      const data: any = await res.json();
       const settingsMap: Settings = {};
       (data.settings || []).forEach((s: { key: string; value: string }) => {
         settingsMap[s.key] = s.value;

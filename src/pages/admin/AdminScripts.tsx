@@ -31,7 +31,7 @@ export default function AdminScripts() {
   const loadScripts = async () => {
     try {
       const res = await fetch('/api/admin/scripts', { credentials: 'include' });
-      const data = await res.json();
+      const data: any = await res.json();
       setScripts(data.scripts || []);
     } catch (error) {
       toast('Failed to load scripts', 'error');
