@@ -1,0 +1,3 @@
+## 2024-05-23 - Accessibility Improvements
+**Learning:** Adding a "Skip to main content" link requires handling both the visual hiding (via `sr-only`) and the visibility on focus (via `focus:not-sr-only`). Crucially, when testing this with Playwright in a React app, one must wait for the initial loading state (spinner) to complete before attempting to interact with the page, otherwise the skip link (or any content) won't be in the DOM yet.
+**Action:** When implementing skip links, always ensure the focus styles are correct and verify with a script that waits for the main content to load. Also, check that the target ID (`#main-content`) actually exists.
