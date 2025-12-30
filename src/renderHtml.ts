@@ -13,6 +13,8 @@ export function renderHtml(content: string) {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>D1</title>
+        <link rel="preconnect" href="https://static.integrations.cloudflare.com">
+        <link rel="preconnect" href="https://imagedelivery.net">
         <link rel="stylesheet" type="text/css" href="https://static.integrations.cloudflare.com/styles.css">
       </head>
     
@@ -20,6 +22,9 @@ export function renderHtml(content: string) {
         <header>
           <img
             src="https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/30e0d3f6-6076-40f8-7abb-8a7676f83c00/public"
+            alt="Cloudflare D1 Logo"
+            width="226"
+            height="226"
           />
           <h1>🎉 Successfully connected d1-template to D1</h1>
         </header>
