@@ -44,8 +44,8 @@ export default function AdminProducts() {
         fetch('/api/admin/products', { credentials: 'include' }),
         fetch('/api/admin/categories', { credentials: 'include' }),
       ]);
-      const productsData = await productsRes.json();
-      const categoriesData = await categoriesRes.json();
+      const productsData: any = await productsRes.json();
+      const categoriesData: any = await categoriesRes.json();
       setProducts(productsData.products || []);
       setCategories(categoriesData.categories || []);
     } catch (error) {

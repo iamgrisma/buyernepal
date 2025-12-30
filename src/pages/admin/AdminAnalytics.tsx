@@ -30,7 +30,7 @@ export default function AdminAnalytics() {
     try {
       const res = await fetch(`/api/admin/analytics?days=${dateRange}`, { credentials: 'include' });
       const result = await res.json();
-      setData(result);
+      setData(result as AnalyticsData);
     } catch (error) {
       toast('Failed to load analytics', 'error');
     } finally {

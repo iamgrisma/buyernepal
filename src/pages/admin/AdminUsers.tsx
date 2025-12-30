@@ -36,8 +36,8 @@ export default function AdminUsers() {
         fetch('/api/admin/users', { credentials: 'include' }),
         fetch('/api/admin/user-roles', { credentials: 'include' }),
       ]);
-      const usersData = await usersRes.json();
-      const rolesData = await rolesRes.json();
+      const usersData: any = await usersRes.json();
+      const rolesData: any = await rolesRes.json();
       setUsers(usersData.users || []);
       setRoles(rolesData.roles || []);
     } catch (error) {
@@ -63,7 +63,7 @@ export default function AdminUsers() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const data: any = await res.json();
         throw new Error(data.error || 'Failed to create user');
       }
 

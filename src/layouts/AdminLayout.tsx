@@ -33,7 +33,7 @@ export default function AdminLayout() {
         if (!r.ok) throw new Error('Not authenticated');
         return r.json();
       })
-      .then((data) => setUser(data.user))
+      .then((data: any) => setUser(data.user))
       .catch(() => navigate('/admin/login'))
       .finally(() => setLoading(false));
   }, [navigate]);

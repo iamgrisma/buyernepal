@@ -23,7 +23,7 @@ export default function AdminReviews() {
   const loadReviews = async () => {
     try {
       const res = await fetch('/api/admin/reviews', { credentials: 'include' });
-      const data = await res.json();
+      const data: any = await res.json();
       setReviews(data.reviews || []);
     } catch (error) {
       toast('Failed to load reviews', 'error');

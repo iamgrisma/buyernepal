@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetch('/api/admin/analytics/stats', { credentials: 'include' })
       .then((r) => r.json())
-      .then((data) => setStats(data.stats))
+      .then((data: any) => setStats(data.stats))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);

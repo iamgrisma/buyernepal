@@ -30,7 +30,7 @@ export default function AdminCategories() {
   const loadCategories = async () => {
     try {
       const res = await fetch('/api/admin/categories', { credentials: 'include' });
-      const data = await res.json();
+      const data: any = await res.json();
       setCategories(data.categories || []);
     } catch (error) {
       toast('Failed to load categories', 'error');
