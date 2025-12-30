@@ -29,9 +29,9 @@ export default function HomePage() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/settings').then((r) => r.json()),
-      fetch('/api/categories').then((r) => r.json()),
-      fetch('/api/products').then((r) => r.json()),
+      fetch('/api/settings').then((r) => r.json() as Promise<{ settings?: Settings }>),
+      fetch('/api/categories').then((r) => r.json() as Promise<{ categories?: Category[] }>),
+      fetch('/api/products').then((r) => r.json() as Promise<{ products?: Product[] }>),
     ])
       .then(([settingsData, categoriesData, productsData]) => {
         setSettings(settingsData.settings || {});
@@ -52,6 +52,13 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground focus:border focus:border-input focus:top-4 focus:left-4 focus:shadow-lg focus:rounded-md"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -81,8 +88,9 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary/10 via-background to-accent/10 py-16">
+      <main id="main-content">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-br from-primary/10 via-background to-accent/10 py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             {settings.site_title || 'Welcome to BuyerNepal'}
@@ -146,8 +154,10 @@ export default function HomePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-primary btn-sm"
+                      aria-label={`Buy ${product.name} now (opens in a new tab)`}
                     >
                       Buy Now
+                      <span className="sr-only"> (opens in a new tab)</span>
                     </a>
                   </div>
                 </div>
@@ -156,6 +166,7 @@ export default function HomePage() {
           </div>
         </section>
       )}
+      </main>
 
       {/* Footer */}
       <footer className="border-t bg-card mt-12">
