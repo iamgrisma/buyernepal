@@ -1,5 +1,13 @@
 import { renderHtml } from "./renderHtml";
 
+const SECURITY_HEADERS = {
+  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+};
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -12,6 +20,7 @@ export default {
         headers: {
           "content-type": "text/html",
           "Cache-Control": "public, max-age=60, s-maxage=60",
+          // Use a stricter CSP for the API endpoint as it doesn't need React scripts
           "Content-Security-Policy": "default-src 'none'; style-src https://static.integrations.cloudflare.com 'unsafe-inline'; img-src https://imagedelivery.net; script-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;",
           "X-Content-Type-Options": "nosniff",
           "X-Frame-Options": "DENY",
@@ -29,6 +38,16 @@ export default {
        asset = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
     }
 
-    return asset;
+    // Apply security headers to static assets
+    const newHeaders = new Headers(asset.headers);
+    Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+      newHeaders.set(key, value);
+    });
+
+    return new Response(asset.body, {
+      status: asset.status,
+      statusText: asset.statusText,
+      headers: newHeaders,
+    });
   },
 } satisfies ExportedHandler<Env>;
