@@ -1,4 +1,5 @@
 import { renderHtml } from "./renderHtml";
+import { applySecurityHeaders, SECURITY_HEADERS } from "./security";
 
 export default {
   async fetch(request, env) {
@@ -8,17 +9,19 @@ export default {
       const stmt = env.DB.prepare("SELECT * FROM comments LIMIT 3");
       const { results } = await stmt.all();
 
-      return new Response(renderHtml(JSON.stringify(results, null, 2)), {
+      // For API responses (currently returning HTML), we can use the common security headers
+      // but override if we want stricter CSP for this specific endpoint.
+      // However, for simplicity and consistency, let's start with the common headers
+      // and ensure content-type is set.
+
+      const response = new Response(renderHtml(JSON.stringify(results, null, 2)), {
         headers: {
           "content-type": "text/html",
           "Cache-Control": "public, max-age=60, s-maxage=60",
-          "Content-Security-Policy": "default-src 'none'; style-src https://static.integrations.cloudflare.com 'unsafe-inline'; img-src https://imagedelivery.net; script-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;",
-          "X-Content-Type-Options": "nosniff",
-          "X-Frame-Options": "DENY",
-          "Referrer-Policy": "strict-origin-when-cross-origin",
-          "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         },
       });
+
+      return applySecurityHeaders(response);
     }
 
     // Try to get static asset
@@ -29,6 +32,6 @@ export default {
        asset = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
     }
 
-    return asset;
+    return applySecurityHeaders(asset);
   },
 } satisfies ExportedHandler<Env>;
