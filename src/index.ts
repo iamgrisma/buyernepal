@@ -1,4 +1,5 @@
 import { renderHtml } from "./renderHtml";
+import { applySecurityHeaders } from "./security";
 
 export default {
   async fetch(request, env) {
@@ -8,17 +9,15 @@ export default {
       const stmt = env.DB.prepare("SELECT * FROM comments LIMIT 3");
       const { results } = await stmt.all();
 
-      return new Response(renderHtml(JSON.stringify(results, null, 2)), {
+      const response = new Response(renderHtml(JSON.stringify(results, null, 2)), {
         headers: {
           "content-type": "text/html",
           "Cache-Control": "public, max-age=60, s-maxage=60",
-          "Content-Security-Policy": "default-src 'none'; style-src https://static.integrations.cloudflare.com 'unsafe-inline'; img-src https://imagedelivery.net; script-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;",
-          "X-Content-Type-Options": "nosniff",
-          "X-Frame-Options": "DENY",
-          "Referrer-Policy": "strict-origin-when-cross-origin",
-          "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         },
       });
+
+      // Apply strict security headers for API
+      return applySecurityHeaders(response, true);
     }
 
     // Try to get static asset
@@ -29,6 +28,7 @@ export default {
        asset = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
     }
 
-    return asset;
+    // Apply standard security headers for App
+    return applySecurityHeaders(asset, false);
   },
 } satisfies ExportedHandler<Env>;
