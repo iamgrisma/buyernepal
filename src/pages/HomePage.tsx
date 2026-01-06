@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Loading from '../components/ui/Loading';
 
 interface Settings {
@@ -64,24 +65,24 @@ export default function HomePage() {
             {settings.site_title || 'BuyerNepal'}
           </h1>
           <nav className="flex items-center gap-6">
-            <a href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
               Home
-            </a>
+            </Link>
             {categories.slice(0, 5).map((cat) => (
-              <a
+              <Link
                 key={cat.id}
-                href={`/category/${cat.slug}`}
+                to={`/category/${cat.slug}`}
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 {cat.name}
-              </a>
+              </Link>
             ))}
-            <a
-              href="/admin/login"
+            <Link
+              to="/admin/login"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               Admin
-            </a>
+            </Link>
           </nav>
         </div>
       </header>
@@ -111,13 +112,13 @@ export default function HomePage() {
           <h3 className="text-2xl font-bold text-foreground mb-6">Browse Categories</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {categories.map((cat) => (
-              <a
+              <Link
                 key={cat.id}
-                href={`/category/${cat.slug}`}
+                to={`/category/${cat.slug}`}
                 className="card p-4 text-center hover:shadow-md transition-shadow"
               >
                 <span className="font-medium text-foreground">{cat.name}</span>
-              </a>
+              </Link>
             ))}
           </div>
         </section>
@@ -128,13 +129,19 @@ export default function HomePage() {
         <section className="container mx-auto px-4 py-12">
           <h3 className="text-2xl font-bold text-foreground mb-6">Featured Products</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
+            {products.map((product, index) => (
               <div key={product.id} className="card overflow-hidden">
                 {product.image_url && (
                   <img
                     src={product.image_url}
                     alt={product.name}
                     className="w-full h-48 object-cover"
+                    // Optimization: Eager load first 4 images (above fold), lazy load rest
+                    loading={index < 4 ? "eager" : "lazy"}
+                    // Optimization: Prioritize fetching LCP images
+                    fetchPriority={index < 4 ? "high" : "auto"}
+                    // Optimization: Decode asynchronously to avoid blocking main thread
+                    decoding="async"
                   />
                 )}
                 <div className="p-4">
