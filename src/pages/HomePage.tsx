@@ -101,7 +101,7 @@ export default function HomePage() {
       {/* Custom Homepage Content */}
       {settings.homepage_html && (
         <section className="container mx-auto px-4 py-8">
-          <div dangerouslySetInnerHTML={{ __html: settings.homepage_html }} />
+          <div dangerouslySetInnerHTML={{ __html: settings.homepage_html || '' }} />
         </section>
       )}
 
