@@ -128,37 +128,44 @@ export default function HomePage() {
         <section className="container mx-auto px-4 py-12">
           <h3 className="text-2xl font-bold text-foreground mb-6">Featured Products</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <div key={product.id} className="card overflow-hidden">
-                {product.image_url && (
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                  />
-                )}
-                <div className="p-4">
-                  <h4 className="font-semibold text-foreground mb-2">{product.name}</h4>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-primary">
-                      ${product.price.toFixed(2)}
-                    </span>
-                    <a
-                      href={product.affiliate_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-primary btn-sm"
-                      aria-label={`Buy ${product.name} now`}
-                    >
-                      Buy Now
-                    </a>
+            {products.map((product, index) => {
+              // Prioritize loading for the first row of images (matches lg:grid-cols-4) to improve LCP
+              const isAboveFold = index < 4;
+              return (
+                <div key={product.id} className="card overflow-hidden">
+                  {product.image_url && (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="w-full h-48 object-cover"
+                      loading={isAboveFold ? "eager" : "lazy"}
+                      fetchPriority={isAboveFold ? "high" : "auto"}
+                      decoding="async"
+                    />
+                  )}
+                  <div className="p-4">
+                    <h4 className="font-semibold text-foreground mb-2">{product.name}</h4>
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      {product.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-primary">
+                        ${product.price.toFixed(2)}
+                      </span>
+                      <a
+                        href={product.affiliate_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary btn-sm"
+                        aria-label={`Buy ${product.name} now`}
+                      >
+                        Buy Now
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}
