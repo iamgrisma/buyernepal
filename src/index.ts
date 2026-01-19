@@ -26,7 +26,12 @@ export default {
 
     if (asset.status === 404 && request.method === 'GET' && !url.pathname.startsWith("/api")) {
        // Fallback to index.html for SPA
-       asset = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
+       // FIX: Do not rely on env.ASSETS.fetch with /index.html if it redirects.
+       // Instead, try fetching / directly or handling it differently.
+       // However, checking previous curl, fetching / returns 200 OK with the HTML content.
+       // fetching /index.html returns 307 to /.
+       // So we should fetch / instead of /index.html
+       asset = await env.ASSETS.fetch(new Request(new URL('/', request.url), request));
     }
 
     return asset;
