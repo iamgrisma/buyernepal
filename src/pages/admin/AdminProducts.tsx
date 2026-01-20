@@ -23,6 +23,7 @@ export default function AdminProducts() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -57,6 +58,7 @@ export default function AdminProducts() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const url = editingProduct
         ? `/api/admin/products/${editingProduct.id}`
@@ -82,6 +84,8 @@ export default function AdminProducts() {
       loadData();
     } catch (error) {
       toast('Failed to save product', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -231,17 +235,28 @@ export default function AdminProducts() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
           <div className="card w-full max-w-lg max-h-[90vh] overflow-auto">
             <div className="p-6 border-b">
-              <h2 className="text-xl font-bold text-foreground">
+              <h2 id="modal-title" className="text-xl font-bold text-foreground">
                 {editingProduct ? 'Edit Product' : 'Add Product'}
               </h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Name</label>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-foreground mb-1"
+                >
+                  Name
+                </label>
                 <input
+                  id="name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -250,8 +265,14 @@ export default function AdminProducts() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Description</label>
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-foreground mb-1"
+                >
+                  Description
+                </label>
                 <textarea
+                  id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="input min-h-[100px]"
@@ -260,8 +281,14 @@ export default function AdminProducts() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Price</label>
+                  <label
+                    htmlFor="price"
+                    className="block text-sm font-medium text-foreground mb-1"
+                  >
+                    Price
+                  </label>
                   <input
+                    id="price"
                     type="number"
                     step="0.01"
                     value={formData.price}
@@ -271,10 +298,18 @@ export default function AdminProducts() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Category</label>
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium text-foreground mb-1"
+                  >
+                    Category
+                  </label>
                   <select
+                    id="category"
                     value={formData.category_id}
-                    onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category_id: e.target.value })
+                    }
                     className="input"
                   >
                     <option value="">Select category</option>
@@ -287,20 +322,36 @@ export default function AdminProducts() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Image URL</label>
+                <label
+                  htmlFor="image_url"
+                  className="block text-sm font-medium text-foreground mb-1"
+                >
+                  Image URL
+                </label>
                 <input
+                  id="image_url"
                   type="url"
                   value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, image_url: e.target.value })
+                  }
                   className="input"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Affiliate URL</label>
+                <label
+                  htmlFor="affiliate_url"
+                  className="block text-sm font-medium text-foreground mb-1"
+                >
+                  Affiliate URL
+                </label>
                 <input
+                  id="affiliate_url"
                   type="url"
                   value={formData.affiliate_url}
-                  onChange={(e) => setFormData({ ...formData, affiliate_url: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, affiliate_url: e.target.value })
+                  }
                   className="input"
                 />
               </div>
@@ -309,17 +360,34 @@ export default function AdminProducts() {
                   type="checkbox"
                   id="is_active"
                   checked={formData.is_active === 1}
-                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked ? 1 : 0 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, is_active: e.target.checked ? 1 : 0 })
+                  }
                   className="rounded border-input"
                 />
-                <label htmlFor="is_active" className="text-sm text-foreground">Active</label>
+                <label htmlFor="is_active" className="text-sm text-foreground">
+                  Active
+                </label>
               </div>
               <div className="flex justify-end gap-3 pt-4">
-                <button type="button" onClick={() => setShowModal(false)} className="btn btn-outline">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="btn btn-outline"
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingProduct ? 'Update' : 'Create'}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? 'Saving...'
+                    : editingProduct
+                    ? 'Update'
+                    : 'Create'}
                 </button>
               </div>
             </form>
