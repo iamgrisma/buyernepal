@@ -128,13 +128,15 @@ export default function HomePage() {
         <section className="container mx-auto px-4 py-12">
           <h3 className="text-2xl font-bold text-foreground mb-6">Featured Products</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
+            {products.map((product, index) => (
               <div key={product.id} className="card overflow-hidden">
                 {product.image_url && (
                   <img
                     src={product.image_url}
                     alt={product.name}
                     className="w-full h-48 object-cover"
+                    loading={index < 4 ? "eager" : "lazy"}
+                    fetchPriority={index < 4 ? "high" : "auto"}
                   />
                 )}
                 <div className="p-4">
@@ -150,10 +152,26 @@ export default function HomePage() {
                       href={product.affiliate_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-primary btn-sm"
-                      aria-label={`Buy ${product.name} now`}
+                      className="btn btn-primary btn-sm items-center gap-1"
+                      aria-label={`Buy ${product.name} now (opens in new tab)`}
                     >
                       Buy Now
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
                     </a>
                   </div>
                 </div>
