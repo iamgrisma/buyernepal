@@ -5,3 +5,7 @@
 ## 2024-05-24 - Toast Notification Accessibility
 **Learning:** Toast notifications often lack ARIA roles (`role="status"`) and dismiss buttons, making them inaccessible to screen readers and frustrating for users who want to clear them. Adding `pointer-events-none` to the container and `pointer-events-auto` to the toasts allows users to click elements behind the empty space of the toast container.
 **Action:** Always include `role="status"` or `role="alert"` for toasts, ensure they are dismissible via keyboard, and manage pointer events to avoid blocking UI.
+
+## 2025-02-14 - Loading State & Form Associations
+**Learning:** Global loading components often miss ARIA roles, rendering them invisible to screen readers. Async forms without disabled states during submission can lead to user confusion and double-submissions.
+**Action:** Add `role="status"` and `sr-only` text to loading spinners. Implement `isSubmitting` state on all forms to disable buttons and update text during async operations.
