@@ -128,13 +128,20 @@ export default function HomePage() {
         <section className="container mx-auto px-4 py-12">
           <h3 className="text-2xl font-bold text-foreground mb-6">Featured Products</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
+            {products.map((product, index) => (
               <div key={product.id} className="card overflow-hidden">
                 {product.image_url && (
                   <img
                     src={product.image_url}
                     alt={product.name}
                     className="w-full h-48 object-cover"
+                    /*
+                      Optimize LCP: Eagerly load the first row (4 items)
+                      and prioritize the very first image for mobile/desktop.
+                    */
+                    loading={index < 4 ? "eager" : "lazy"}
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                    decoding="async"
                   />
                 )}
                 <div className="p-4">
