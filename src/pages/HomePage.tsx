@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Loading from '../components/ui/Loading';
 
 interface Settings {
@@ -64,24 +65,24 @@ export default function HomePage() {
             {settings.site_title || 'BuyerNepal'}
           </h1>
           <nav className="flex items-center gap-6">
-            <a href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
               Home
-            </a>
+            </Link>
             {categories.slice(0, 5).map((cat) => (
-              <a
+              <Link
                 key={cat.id}
-                href={`/category/${cat.slug}`}
+                to={`/category/${cat.slug}`}
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 {cat.name}
-              </a>
+              </Link>
             ))}
-            <a
-              href="/admin/login"
+            <Link
+              to="/admin/login"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               Admin
-            </a>
+            </Link>
           </nav>
         </div>
       </header>
@@ -111,13 +112,13 @@ export default function HomePage() {
           <h3 className="text-2xl font-bold text-foreground mb-6">Browse Categories</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {categories.map((cat) => (
-              <a
+              <Link
                 key={cat.id}
-                href={`/category/${cat.slug}`}
+                to={`/category/${cat.slug}`}
                 className="card p-4 text-center hover:shadow-md transition-shadow"
               >
                 <span className="font-medium text-foreground">{cat.name}</span>
-              </a>
+              </Link>
             ))}
           </div>
         </section>
@@ -150,10 +151,26 @@ export default function HomePage() {
                       href={product.affiliate_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-primary btn-sm"
+                      className="btn btn-primary btn-sm gap-2"
                       aria-label={`Buy ${product.name} now`}
                     >
                       Buy Now
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" x2="21" y1="14" y2="3" />
+                      </svg>
                     </a>
                   </div>
                 </div>
