@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '../../components/ui/Toaster';
 
 export default function AdminLogin() {
@@ -139,9 +139,9 @@ export default function AdminLogin() {
         </div>
 
         <div className="text-center mt-4">
-          <a href="/" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     </div>
