@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from '../../components/ui/Toaster';
+import Loading from '../../components/ui/Loading';
 
 interface Product {
   id: number;
@@ -128,11 +129,7 @@ export default function AdminProducts() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Loading fullScreen={false} className="h-64" />;
   }
 
   return (
