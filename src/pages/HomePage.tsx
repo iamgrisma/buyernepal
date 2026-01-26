@@ -135,6 +135,8 @@ export default function HomePage() {
                     src={product.image_url}
                     alt={product.name}
                     className="w-full h-48 object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                 )}
                 <div className="p-4">
