@@ -1,4 +1,5 @@
 import { renderHtml } from "./renderHtml";
+import { applySecurityHeaders } from "./security";
 
 export default {
   async fetch(request, env) {
@@ -29,6 +30,6 @@ export default {
        asset = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
     }
 
-    return asset;
+    return applySecurityHeaders(asset, 'frontend');
   },
 } satisfies ExportedHandler<Env>;
