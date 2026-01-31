@@ -22,6 +22,7 @@ export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
@@ -57,6 +58,7 @@ export default function AdminProducts() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const url = editingProduct
         ? `/api/admin/products/${editingProduct.id}`
@@ -82,6 +84,8 @@ export default function AdminProducts() {
       loadData();
     } catch (error) {
       toast('Failed to save product', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -240,8 +244,11 @@ export default function AdminProducts() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Name</label>
+                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
+                  Name
+                </label>
                 <input
+                  id="name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -250,8 +257,11 @@ export default function AdminProducts() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Description</label>
+                <label htmlFor="description" className="block text-sm font-medium text-foreground mb-1">
+                  Description
+                </label>
                 <textarea
+                  id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="input min-h-[100px]"
@@ -260,8 +270,11 @@ export default function AdminProducts() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Price</label>
+                  <label htmlFor="price" className="block text-sm font-medium text-foreground mb-1">
+                    Price
+                  </label>
                   <input
+                    id="price"
                     type="number"
                     step="0.01"
                     value={formData.price}
@@ -271,8 +284,11 @@ export default function AdminProducts() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Category</label>
+                  <label htmlFor="category_id" className="block text-sm font-medium text-foreground mb-1">
+                    Category
+                  </label>
                   <select
+                    id="category_id"
                     value={formData.category_id}
                     onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                     className="input"
@@ -287,8 +303,11 @@ export default function AdminProducts() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Image URL</label>
+                <label htmlFor="image_url" className="block text-sm font-medium text-foreground mb-1">
+                  Image URL
+                </label>
                 <input
+                  id="image_url"
                   type="url"
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
@@ -296,8 +315,11 @@ export default function AdminProducts() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Affiliate URL</label>
+                <label htmlFor="affiliate_url" className="block text-sm font-medium text-foreground mb-1">
+                  Affiliate URL
+                </label>
                 <input
+                  id="affiliate_url"
                   type="url"
                   value={formData.affiliate_url}
                   onChange={(e) => setFormData({ ...formData, affiliate_url: e.target.value })}
@@ -309,17 +331,39 @@ export default function AdminProducts() {
                   type="checkbox"
                   id="is_active"
                   checked={formData.is_active === 1}
-                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked ? 1 : 0 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, is_active: e.target.checked ? 1 : 0 })
+                  }
                   className="rounded border-input"
                 />
-                <label htmlFor="is_active" className="text-sm text-foreground">Active</label>
+                <label htmlFor="is_active" className="text-sm text-foreground">
+                  Active
+                </label>
               </div>
               <div className="flex justify-end gap-3 pt-4">
-                <button type="button" onClick={() => setShowModal(false)} className="btn btn-outline">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="btn btn-outline"
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingProduct ? 'Update' : 'Create'}
+                <button
+                  type="submit"
+                  className="btn btn-primary flex items-center"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                      Saving...
+                    </>
+                  ) : editingProduct ? (
+                    'Update'
+                  ) : (
+                    'Create'
+                  )}
                 </button>
               </div>
             </form>
