@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Loading from '../../components/ui/Loading';
 import { toast } from '../../components/ui/Toaster';
 
 interface Category {
@@ -108,11 +109,7 @@ export default function AdminCategories() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Loading className="h-64" />;
   }
 
   return (
