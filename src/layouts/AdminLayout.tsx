@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import Loading from '../components/ui/Loading';
 import { toast } from '../components/ui/Toaster';
 
 interface User {
@@ -45,11 +46,7 @@ export default function AdminLayout() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

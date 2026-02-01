@@ -1,9 +1,20 @@
 import React from 'react';
 
-export default function Loading() {
+interface LoadingProps {
+  className?: string;
+}
+
+export default function Loading({ className = "min-h-screen" }: LoadingProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    <div
+      className={`flex items-center justify-center bg-background ${className}`}
+      role="status"
+    >
+      <div
+        className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"
+        aria-hidden="true"
+      ></div>
+      <span className="sr-only">Loading...</span>
     </div>
   );
 }
