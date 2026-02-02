@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import DOMPurify from 'dompurify';
 import Loading from '../components/ui/Loading';
 
 interface Settings {
@@ -101,7 +102,7 @@ export default function HomePage() {
       {/* Custom Homepage Content */}
       {settings.homepage_html && (
         <section className="container mx-auto px-4 py-8">
-          <div dangerouslySetInnerHTML={{ __html: settings.homepage_html }} />
+          <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(settings.homepage_html) }} />
         </section>
       )}
 
