@@ -29,6 +29,17 @@ export default {
        asset = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
     }
 
-    return asset;
+    const response = new Response(asset.body, asset);
+
+    response.headers.set(
+      "Content-Security-Policy",
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://imagedelivery.net; connect-src 'self'; frame-ancestors 'none'; upgrade-insecure-requests;"
+    );
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+
+    return response;
   },
 } satisfies ExportedHandler<Env>;
