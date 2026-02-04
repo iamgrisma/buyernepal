@@ -13,6 +13,7 @@ interface Category {
 export default function AdminCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({
@@ -41,6 +42,7 @@ export default function AdminCategories() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const url = editingCategory
         ? `/api/admin/categories/${editingCategory.id}`
@@ -65,6 +67,8 @@ export default function AdminCategories() {
       loadCategories();
     } catch (error) {
       toast('Failed to save category', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -174,12 +178,14 @@ export default function AdminCategories() {
                         <button
                           onClick={() => handleEdit(category)}
                           className="btn btn-ghost btn-sm"
+                          aria-label={`Edit ${category.name}`}
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(category.id)}
                           className="btn btn-ghost btn-sm text-destructive"
+                          aria-label={`Delete ${category.name}`}
                         >
                           Delete
                         </button>
@@ -203,8 +209,11 @@ export default function AdminCategories() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Name</label>
+                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
+                  Name
+                </label>
                 <input
+                  id="name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => {
@@ -219,8 +228,11 @@ export default function AdminCategories() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Slug</label>
+                <label htmlFor="slug" className="block text-sm font-medium text-foreground mb-1">
+                  Slug
+                </label>
                 <input
+                  id="slug"
                   type="text"
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
@@ -229,16 +241,22 @@ export default function AdminCategories() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Description</label>
+                <label htmlFor="description" className="block text-sm font-medium text-foreground mb-1">
+                  Description
+                </label>
                 <textarea
+                  id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="input min-h-[80px]"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Parent Category</label>
+                <label htmlFor="parent_id" className="block text-sm font-medium text-foreground mb-1">
+                  Parent Category
+                </label>
                 <select
+                  id="parent_id"
                   value={formData.parent_id}
                   onChange={(e) => setFormData({ ...formData, parent_id: e.target.value })}
                   className="input"
@@ -267,8 +285,8 @@ export default function AdminCategories() {
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-outline">
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingCategory ? 'Update' : 'Create'}
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : editingCategory ? 'Update' : 'Create'}
                 </button>
               </div>
             </form>
