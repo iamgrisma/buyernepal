@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import Loading from '../components/ui/Loading';
 
@@ -65,24 +66,24 @@ export default function HomePage() {
             {settings.site_title || 'BuyerNepal'}
           </h1>
           <nav className="flex items-center gap-6">
-            <a href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
               Home
-            </a>
+            </Link>
             {categories.slice(0, 5).map((cat) => (
-              <a
+              <Link
                 key={cat.id}
-                href={`/category/${cat.slug}`}
+                to={`/category/${cat.slug}`}
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 {cat.name}
-              </a>
+              </Link>
             ))}
-            <a
-              href="/admin/login"
+            <Link
+              to="/admin/login"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               Admin
-            </a>
+            </Link>
           </nav>
         </div>
       </header>
@@ -112,13 +113,13 @@ export default function HomePage() {
           <h3 className="text-2xl font-bold text-foreground mb-6">Browse Categories</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {categories.map((cat) => (
-              <a
+              <Link
                 key={cat.id}
-                href={`/category/${cat.slug}`}
+                to={`/category/${cat.slug}`}
                 className="card p-4 text-center hover:shadow-md transition-shadow"
               >
                 <span className="font-medium text-foreground">{cat.name}</span>
-              </a>
+              </Link>
             ))}
           </div>
         </section>
