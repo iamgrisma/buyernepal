@@ -186,6 +186,8 @@ export default function AdminProducts() {
                             src={product.image_url}
                             alt={product.name}
                             className="w-10 h-10 rounded object-cover"
+                            loading="lazy"
+                            decoding="async"
                           />
                         )}
                         <div>
