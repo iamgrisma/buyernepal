@@ -30,18 +30,24 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/settings').then((r) => r.json()),
-      fetch('/api/categories').then((r) => r.json()),
-      fetch('/api/products').then((r) => r.json()),
-    ])
-      .then(([settingsData, categoriesData, productsData]: any[]) => {
-        setSettings(settingsData.settings || {});
-        setCategories(categoriesData.categories || []);
-        setProducts(productsData.products || []);
-      })
+    // Fetch settings (critical for initial render)
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((data: any) => setSettings(data.settings || {}))
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    // Fetch categories (non-critical)
+    fetch('/api/categories')
+      .then((r) => r.json())
+      .then((data: any) => setCategories(data.categories || []))
+      .catch(console.error);
+
+    // Fetch products (non-critical)
+    fetch('/api/products')
+      .then((r) => r.json())
+      .then((data: any) => setProducts(data.products || []))
+      .catch(console.error);
   }, []);
 
   if (loading) {
