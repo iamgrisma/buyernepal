@@ -1,0 +1,3 @@
+## 2025-10-18 - Decoupled Data Fetching in HomePage
+**Learning:** The `HomePage` was using `Promise.all` to fetch settings, categories, and products, blocking the entire page render until the slowest request finished. This caused unnecessary delay in First Contentful Paint (FCP) as the critical `settings` (site title/hero) were held back by potentially slower product queries.
+**Action:** Decoupled the fetch requests. `settings` now controls the main `loading` state, while `categories` and `products` load asynchronously in the background, updating the UI progressively. This pattern should be applied to other dashboards (e.g., `AdminProducts`) where independent widgets can load separately.
