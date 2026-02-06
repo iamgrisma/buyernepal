@@ -30,18 +30,25 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Critical data for initial render
     Promise.all([
       fetch('/api/settings').then((r) => r.json()),
       fetch('/api/categories').then((r) => r.json()),
-      fetch('/api/products').then((r) => r.json()),
     ])
-      .then(([settingsData, categoriesData, productsData]: any[]) => {
+      .then(([settingsData, categoriesData]: any[]) => {
         setSettings(settingsData.settings || {});
         setCategories(categoriesData.categories || []);
-        setProducts(productsData.products || []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    // Secondary data - load independently
+    fetch('/api/products')
+      .then((r) => r.json())
+      .then((productsData: any) => {
+        setProducts(productsData.products || []);
+      })
+      .catch(console.error);
   }, []);
 
   if (loading) {
