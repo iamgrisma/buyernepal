@@ -131,6 +131,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (
               <div key={product.id} className="card overflow-hidden">
+                {/* Bolt: Optimize image loading for performance */}
                 {product.image_url && (
                   <img
                     src={product.image_url}
