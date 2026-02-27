@@ -132,6 +132,7 @@ export default function HomePage() {
             {products.map((product) => (
               <div key={product.id} className="card overflow-hidden">
                 {product.image_url && (
+                  /* Optimization: Lazy load below-the-fold images */
                   <img
                     src={product.image_url}
                     alt={product.name}
