@@ -15,7 +15,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetch('/api/admin/analytics/stats', { credentials: 'include' })
-      .then((r) => r.ok ? r.json() : Promise.reject(new Error('Failed to load stats')))
+      .then((r) => r.ok ? (r.json() as Promise<{ stats: Stats }>) : Promise.reject(new Error('Failed to load stats')))
       .then((data: { stats: Stats }) => setStats(data.stats))
       .catch(console.error)
       .finally(() => setLoading(false));

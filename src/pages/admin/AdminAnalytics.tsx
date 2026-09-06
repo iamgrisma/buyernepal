@@ -11,7 +11,7 @@ export default function AdminAnalytics() {
   useEffect(() => {
     setLoading(true);
     fetch(`/api/admin/analytics?days=${dateRange}`, { credentials: 'include' })
-      .then((r) => r.ok ? r.json() : Promise.reject(new Error('Failed to load analytics')))
+      .then((r) => r.ok ? (r.json() as Promise<AnalyticsResponse>) : Promise.reject(new Error('Failed to load analytics')))
       .then((result: AnalyticsResponse) => setDays(result.analytics || []))
       .catch(console.error)
       .finally(() => setLoading(false));

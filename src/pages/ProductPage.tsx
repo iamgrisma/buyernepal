@@ -18,9 +18,9 @@ export default function ProductPage() {
   useEffect(() => {
     let alive = true;
     Promise.all([
-      fetch(`/api/products/${encodeURIComponent(id || '')}`).then(async r => { const d=await r.json(); if(!r.ok) throw new Error(d.error||'Product not found'); return d; }),
+      fetch(`/api/products/${encodeURIComponent(id || '')}`).then(async r => { const d: any=await r.json(); if(!r.ok) throw new Error(d?.error||'Product not found'); return d; }),
       fetch('/api/categories').then(r => r.json()),
-    ]).then(([productData, categoryData]) => { if(!alive) return; setProduct(productData.product); setReviews(productData.reviews||[]); setCategories(categoryData.categories||[]); }).catch(e => alive && setError(e instanceof Error ? e.message : 'Product not found')).finally(() => alive && setLoading(false));
+    ]).then(([productData, categoryData]: [any, any]) => { if(!alive) return; setProduct(productData?.product); setReviews(productData?.reviews||[]); setCategories(categoryData?.categories||[]); }).catch(e => alive && setError(e instanceof Error ? e.message : 'Product not found')).finally(() => alive && setLoading(false));
     return () => { alive=false; };
   }, [id]);
 

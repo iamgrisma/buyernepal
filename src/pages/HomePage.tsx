@@ -7,11 +7,11 @@ import ProductCard, { StoreProduct } from '../components/store/ProductCard';
 interface Settings { site_title?: string; site_description?: string; site_logo?: string; homepage_html?: string; footer_html?: string; }
 interface Category { id: number; name: string; slug: string; description?: string; }
 
-async function getJson<T>(url: string): Promise<T> {
-  const response = await fetch(url, { headers: { Accept: 'application/json' } });
-  const data = await response.json();
+async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(url, { headers: { Accept: 'application/json' }, signal });
+  const data: any = await response.json();
   if (!response.ok) throw new Error(data?.error || `Request failed: ${response.status}`);
-  return data;
+  return data as T;
 }
 
 function SkeletonGrid() {
@@ -32,9 +32,9 @@ export default function HomePage() {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 10000);
     Promise.allSettled([
-      getJson<{ settings: Settings }>('/api/settings'),
-      getJson<{ categories: Category[] }>('/api/categories'),
-      getJson<{ products: StoreProduct[] }>('/api/products'),
+      getJson<{ settings: Settings }>('/api/settings', controller.signal),
+      getJson<{ categories: Category[] }>('/api/categories', controller.signal),
+      getJson<{ products: StoreProduct[] }>('/api/products', controller.signal),
     ]).then(([settingsResult, categoriesResult, productsResult]) => {
       if (!alive) return;
       let failures = 0;
@@ -50,13 +50,28 @@ export default function HomePage() {
   }, []);
 
   const filteredProducts = useMemo(() => {
+    const list = Array.isArray(products) ? products : [];
     const needle = query.trim().toLowerCase();
-    return products.filter((product) => {
-      const matchesQuery = !needle || `${product.name} ${product.description}`.toLowerCase().includes(needle);
+    return list.filter((product) => {
+      if (!product) return false;
+      const name = product.name || '';
+      const desc = product.description || '';
+      const matchesQuery = !needle || `${name} ${desc}`.toLowerCase().includes(needle);
       const matchesCategory = !activeCategory || String(product.category_id ?? '') === activeCategory;
       return matchesQuery && matchesCategory;
     });
   }, [products, query, activeCategory]);
+
+  const sanitizedHomepageHtml = useMemo(() => {
+    if (!settings?.homepage_html) return '';
+    try {
+      return typeof DOMPurify?.sanitize === 'function'
+        ? DOMPurify.sanitize(settings.homepage_html)
+        : settings.homepage_html;
+    } catch {
+      return '';
+    }
+  }, [settings?.homepage_html]);
 
   const title = settings.site_title || 'BuyerNepal';
   const description = settings.site_description || "Discover products worth buying in Nepal — curated, compared and easy to shop.";
@@ -94,7 +109,7 @@ export default function HomePage() {
         <div><strong>Shop on the source</strong><span>We send you directly to the seller or store.</span></div>
       </section>
 
-      {settings.homepage_html && <section className="store-shell custom-content" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(settings.homepage_html) }} />}
+      {sanitizedHomepageHtml && <section className="store-shell custom-content" dangerouslySetInnerHTML={{ __html: sanitizedHomepageHtml }} />}
 
       <section className="store-shell category-section">
         <div className="section-heading"><div><span className="section-kicker">EXPLORE</span><h2>Shop by category</h2></div><span className="section-count">{categories.length} categories</span></div>
