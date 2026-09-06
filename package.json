@@ -22,7 +22,7 @@
     "build:css": "pnpm dlx @tailwindcss/cli -i src/app.css -o src/index.css",
     "cf-typegen": "wrangler types",
     "check": "tsc && wrangler deploy --dry-run",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "wrangler deploy",
     "dev": "pnpm build && pnpm build:css && pnpm seedLocalD1 && wrangler dev",
     "predeploy": "wrangler d1 migrations apply DB --remote",
     "seedLocalD1": "wrangler d1 migrations apply DB --local"
