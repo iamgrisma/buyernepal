@@ -1,59 +1,69 @@
-# Worker + D1 Database
+# BuyerNepal
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/d1-template)
+BuyerNepal is a Nepal-focused shopping discovery platform built with React, Vite, Cloudflare Workers and D1. It helps shoppers discover curated products, browse categories, inspect product details and continue to the seller through affiliate/store links.
 
-![Worker + D1 Template Preview](https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/cb7cb0a9-6102-4822-633c-b76b7bb25900/public)
+## Product surface
 
-<!-- dash-content-start -->
+- Responsive storefront with mobile navigation
+- Product search and category filtering
+- Curated product cards with NPR pricing
+- Product detail pages with seller links and approved reviews
+- Category landing pages
+- Admin authentication and management panel
+- Product, category, review, coupon, user, script, settings and analytics management
+- D1-backed API on the same Worker origin
+- Sanitized custom homepage content
+- Loading, empty, error and not-found states
+- Cloudflare Workers Static Assets + D1 deployment
 
-D1 is Cloudflare's native serverless SQL database ([docs](https://developers.cloudflare.com/d1/)). This project demonstrates using a Worker with a D1 binding to execute a SQL statement. A simple frontend displays the result of this query:
+## Stack
 
-```SQL
-SELECT * FROM comments LIMIT 3;
+- React 19 + TypeScript
+- Vite
+- React Router
+- Cloudflare Workers
+- Cloudflare D1
+- DOMPurify
+
+## Local development
+
+```bash
+npm install
+npm run build
+npm run dev
 ```
 
-The D1 database is initialized with a `comments` table and this data:
+The Worker uses the `DB` D1 binding defined in `wrangler.json`. Database migrations live in `migrations/`.
 
-```SQL
-INSERT INTO comments (author, content)
-VALUES
-    ('Kristian', 'Congrats!'),
-    ('Serena', 'Great job!'),
-    ('Max', 'Keep up the good work!')
-;
-```
+## Cloudflare Workers Builds
 
-> [!IMPORTANT]
-> When using C3 to create this project, select "no" when it asks if you want to deploy. You need to follow this project's [setup steps](https://github.com/cloudflare/templates/tree/main/d1-template#setup-steps) before deploying.
+Connect the repository to the `buyernepal` Worker and use:
 
-<!-- dash-content-end -->
+- **Production branch:** `main`
+- **Build command:** leave blank when using the package deploy script
+- **Deploy command:** `npm run deploy`
+- **Root directory:** `/`
 
-## Getting Started
+`npm run deploy` builds the Vite frontend and then runs `wrangler deploy`; its `predeploy` lifecycle also applies remote D1 migrations. Workers Builds does not use the `build` section in `wrangler.json`, so dashboard Build/Deploy settings are authoritative.
 
-Outside of this repo, you can start a new project with this template using [C3](https://developers.cloudflare.com/pages/get-started/c3/) (the `create-cloudflare` CLI):
+If you prefer separate dashboard stages, use **Build command** `npm run build` and **Deploy command** `npx wrangler deploy`; apply D1 migrations separately before the first production deployment.
 
-```
-npm create cloudflare@latest -- --template=cloudflare/templates/d1-template
-```
+## D1
 
-A live public deployment of this template is available at [https://d1-template.templates.workers.dev](https://d1-template.templates.workers.dev)
+The Worker expects:
 
-## Setup Steps
+- Binding: `DB`
+- Database: `buyernepal`
+- Database ID: `8e38f998-1dc6-4949-b630-deca3e23d9a8`
 
-1. Install the project dependencies with a package manager of your choice:
-   ```bash
-   npm install
-   ```
-2. Create a [D1 database](https://developers.cloudflare.com/d1/get-started/) with the name "d1-template-database":
-   ```bash
-   npx wrangler d1 create d1-template-database
-   ```
-   ...and update the `database_id` field in `wrangler.json` with the new database ID.
-3. Run the following db migration to initialize the database (notice the `migrations` directory in this project):
-   ```bash
-   npx wrangler d1 migrations apply --remote d1-template-database
-   ```
-4. Deploy the project!
-   ```bash
-   npx wrangler deploy
-   ```
+Never put database credentials or Cloudflare API tokens in source control.
+
+## Production checklist
+
+1. Confirm the Worker name matches `buyernepal`.
+2. Confirm the `DB` binding points to the production D1 database.
+3. Confirm Workers Builds has a valid API token and the token has not hit the account token quota.
+4. Deploy from `main`.
+5. Confirm the deployment contains Vite-generated `/assets/*.js` files rather than serving `/src/main.tsx` directly.
+6. Open `/`, a category page, a product page and `/admin/login` after deployment.
+7. Apply/verify D1 migrations before expecting catalog or admin data.
