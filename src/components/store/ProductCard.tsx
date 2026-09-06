@@ -16,18 +16,25 @@ function ProductImage({ product }: { product: StoreProduct }) {
 }
 
 export default function ProductCard({ product }: { product: StoreProduct }) {
+  if (!product) return null;
   const price = Number(product.price) || 0;
+  let formattedPrice = String(price);
+  try {
+    formattedPrice = price.toLocaleString('en-NP');
+  } catch {
+    formattedPrice = price.toLocaleString();
+  }
   return (
     <article className="product-card">
-      <Link to={`/product/${product.id}`} className="product-image-link" aria-label={`View ${product.name}`}>
+      <Link to={`/product/${product.id}`} className="product-image-link" aria-label={`View ${product.name || 'product'}`}>
         <ProductImage product={product} />
         <span className="product-badge">Recommended</span>
       </Link>
       <div className="product-card-body">
-        <Link to={`/product/${product.id}`} className="product-name">{product.name}</Link>
+        <Link to={`/product/${product.id}`} className="product-name">{product.name || 'Untitled Product'}</Link>
         <p className="product-description">{product.description || 'Explore product details and current availability.'}</p>
         <div className="product-card-bottom">
-          <div><span className="price-label">Price</span><strong className="product-price">Rs. {price.toLocaleString('en-NP')}</strong></div>
+          <div><span className="price-label">Price</span><strong className="product-price">Rs. {formattedPrice}</strong></div>
           {product.affiliate_url ? <a className="product-buy" href={product.affiliate_url} target="_blank" rel="noopener noreferrer">Shop now <span>↗</span></a> : <Link className="product-buy product-buy-secondary" to={`/product/${product.id}`}>View <span>→</span></Link>}
         </div>
       </div>

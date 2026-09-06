@@ -19,9 +19,9 @@ export default function CategoryPage() {
     let alive=true;
     setLoading(true); setNotFound(false);
     Promise.all([
-      fetch(`/api/categories/${encodeURIComponent(slug)}`).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||'Not found');return d;}),
+      fetch(`/api/categories/${encodeURIComponent(slug)}`).then(async r=>{const d: any=await r.json();if(!r.ok)throw new Error(d?.error||'Not found');return d;}),
       fetch('/api/categories').then(r=>r.json()),
-    ]).then(([data,all])=>{if(!alive)return;setCategory(data.category);setProducts(data.products||[]);setCategories(all.categories||[]);}).catch(()=>alive&&setNotFound(true)).finally(()=>alive&&setLoading(false));
+    ]).then(([data,all]: [any, any])=>{if(!alive)return;setCategory(data?.category);setProducts(data?.products||[]);setCategories(all?.categories||[]);}).catch(()=>alive&&setNotFound(true)).finally(()=>alive&&setLoading(false));
     return ()=>{alive=false;};
   },[slug]);
 
