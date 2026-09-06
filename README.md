@@ -44,7 +44,7 @@ Connect the repository to the `buyernepal` Worker and use:
 - **Deploy command:** `npm run deploy`
 - **Root directory:** `/`
 
-`npm run deploy` builds the Vite frontend and then runs `wrangler deploy`; its `predeploy` lifecycle also applies remote D1 migrations. Workers Builds does not use the `build` section in `wrangler.json`, so dashboard Build/Deploy settings are authoritative.
+`npm run deploy` triggers the `predeploy` migration step and then runs `wrangler deploy`. Wrangler's custom build configuration runs the Vite build before deployment. Workers Builds does not use the `build` section in `wrangler.json`, so the dashboard Build/Deploy settings are authoritative.
 
 If you prefer separate dashboard stages, use **Build command** `npm run build` and **Deploy command** `npx wrangler deploy`; apply D1 migrations separately before the first production deployment.
 
