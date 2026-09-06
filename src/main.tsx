@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 import './store.css';
+import './store-extra.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('BuyerNepal root element is missing');
