@@ -1,10 +1,11 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from './components/ui/Toaster';
 import HomePage from './pages/HomePage';
-import { lazy, Suspense } from 'react';
 import Loading from './components/ui/Loading';
 
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
+const ProductPage = lazy(() => import('./pages/ProductPage'));
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -24,6 +25,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
+        <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
