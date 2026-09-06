@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage';
 import { lazy, Suspense } from 'react';
 import Loading from './components/ui/Loading';
 
-// Lazy load admin pages and NotFound to reduce initial bundle size
+const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -18,30 +18,27 @@ const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
-function App() {
-  return (
-    <>
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="products" element={<AdminProducts />} />
-            <Route path="categories" element={<AdminCategories />} />
-            <Route path="reviews" element={<AdminReviews />} />
-            <Route path="coupons" element={<AdminCoupons />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="scripts" element={<AdminScripts />} />
-            <Route path="settings" element={<AdminSettings />} />
-            <Route path="analytics" element={<AdminAnalytics />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-      <Toaster />
-    </>
-  );
+export default function App() {
+  return <>
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/category/:slug" element={<CategoryPage />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="scripts" element={<AdminScripts />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
+    <Toaster />
+  </>;
 }
-
-export default App;
