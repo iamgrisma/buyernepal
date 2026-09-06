@@ -26,7 +26,7 @@
     "build:css": "pnpm dlx @tailwindcss/cli -i src/app.css -o src/index.css",
     "cf-typegen": "wrangler types",
     "check": "tsc && wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
+    "deploy": "npm run build && wrangler deploy",
     "dev": "pnpm build && pnpm build:css && pnpm seedLocalD1 && wrangler dev",
     "predeploy": "wrangler d1 migrations apply DB --remote",
     "seedLocalD1": "wrangler d1 migrations apply DB --local"
@@ -34,7 +34,6 @@
   "dependencies": {
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.22",
     "dompurify": "^3.3.1",
     "react": "^19.2.1",
