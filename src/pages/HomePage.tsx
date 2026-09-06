@@ -1,177 +1,127 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import DOMPurify from 'dompurify';
-import Loading from '../components/ui/Loading';
+import { Link } from 'react-router-dom';
+import StoreHeader from '../components/store/StoreHeader';
+import ProductCard, { StoreProduct } from '../components/store/ProductCard';
 
-interface Settings {
-  site_title?: string;
-  site_description?: string;
-  homepage_html?: string;
+interface Settings { site_title?: string; site_description?: string; site_logo?: string; homepage_html?: string; footer_html?: string; }
+interface Category { id: number; name: string; slug: string; description?: string; }
+
+async function getJson<T>(url: string): Promise<T> {
+  const response = await fetch(url, { headers: { Accept: 'application/json' } });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data?.error || `Request failed: ${response.status}`);
+  return data;
 }
 
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image_url: string;
-  affiliate_url: string;
+function SkeletonGrid() {
+  return <div className="product-grid">{Array.from({ length: 8 }).map((_, i) => <div className="product-skeleton" key={i}><div className="skeleton-image" /><div className="skeleton-line wide" /><div className="skeleton-line" /><div className="skeleton-line short" /></div>)}</div>;
 }
 
 export default function HomePage() {
   const [settings, setSettings] = useState<Settings>({});
   const [categories, setCategories] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<StoreProduct[]>([]);
+  const [query, setQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/settings').then((r) => r.json()),
-      fetch('/api/categories').then((r) => r.json()),
-      fetch('/api/products').then((r) => r.json()),
-    ])
-      .then(([settingsData, categoriesData, productsData]: any[]) => {
-        setSettings(settingsData.settings || {});
-        setCategories(categoriesData.categories || []);
-        setProducts(productsData.products || []);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    let alive = true;
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 10000);
+    Promise.allSettled([
+      getJson<{ settings: Settings }>('/api/settings'),
+      getJson<{ categories: Category[] }>('/api/categories'),
+      getJson<{ products: StoreProduct[] }>('/api/products'),
+    ]).then(([settingsResult, categoriesResult, productsResult]) => {
+      if (!alive) return;
+      let failures = 0;
+      if (settingsResult.status === 'fulfilled') setSettings(settingsResult.value.settings || {}); else failures++;
+      if (categoriesResult.status === 'fulfilled') setCategories(categoriesResult.value.categories || []); else failures++;
+      if (productsResult.status === 'fulfilled') setProducts(productsResult.value.products || []); else failures++;
+      if (failures === 3) setError('We could not connect to the store right now. Please try again.');
+    }).catch(() => alive && setError('We could not load the store right now.')).finally(() => {
+      window.clearTimeout(timer);
+      if (alive) setLoading(false);
+    });
+    return () => { alive = false; controller.abort(); window.clearTimeout(timer); };
   }, []);
 
-  if (loading) {
-    return <Loading />;
-  }
+  const filteredProducts = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return products.filter((product) => {
+      const matchesQuery = !needle || `${product.name} ${product.description}`.toLowerCase().includes(needle);
+      const matchesCategory = !activeCategory || String(product.category_id ?? '') === activeCategory;
+      return matchesQuery && matchesCategory;
+    });
+  }, [products, query, activeCategory]);
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Skip Link */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 btn btn-primary"
-      >
-        Skip to main content
-      </a>
+  const title = settings.site_title || 'BuyerNepal';
+  const description = settings.site_description || "Discover products worth buying in Nepal — curated, compared and easy to shop.";
 
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground">
-            {settings.site_title || 'BuyerNepal'}
-          </h1>
-          <nav className="flex items-center gap-6">
-            <a href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-              Home
-            </a>
-            {categories.slice(0, 5).map((cat) => (
-              <a
-                key={cat.id}
-                href={`/category/${cat.slug}`}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {cat.name}
-              </a>
-            ))}
-            <a
-              href="/admin/login"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Admin
-            </a>
-          </nav>
-        </div>
-      </header>
+  return <div className="store-page">
+    <a className="skip-link" href="#main-content">Skip to content</a>
+    <StoreHeader title={title} logo={settings.site_logo} categories={categories} />
 
-      {/* Hero Section */}
-      <section id="main-content" className="bg-gradient-to-br from-primary/10 via-background to-accent/10 py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            {settings.site_title || 'Welcome to BuyerNepal'}
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {settings.site_description || 'Discover the best products and deals'}
-          </p>
+    <main id="main-content">
+      <section className="store-hero">
+        <div className="store-shell hero-grid">
+          <div className="hero-copy">
+            <span className="eyebrow">SMART SHOPPING, MADE SIMPLE</span>
+            <h1>Find better products.<br /><em>Buy with confidence.</em></h1>
+            <p>{description}</p>
+            <div className="hero-search">
+              <span aria-hidden="true">⌕</span>
+              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products, brands or categories…" aria-label="Search products" />
+              {query && <button onClick={() => setQuery('')} aria-label="Clear search">×</button>}
+            </div>
+            <div className="hero-points"><span>✓ Curated picks</span><span>✓ Local prices</span><span>✓ Direct shopping links</span></div>
+          </div>
+          <div className="hero-card" aria-hidden="true">
+            <div className="hero-card-glow" />
+            <div className="hero-card-label">BUYERNEPAL</div>
+            <div className="hero-card-title">Less scrolling.<br /><strong>More buying.</strong></div>
+            <div className="hero-mini-grid"><span>01<br /><b>Discover</b></span><span>02<br /><b>Compare</b></span><span>03<br /><b>Shop</b></span></div>
+          </div>
         </div>
       </section>
 
-      {/* Custom Homepage Content */}
-      {settings.homepage_html && (
-        <section className="container mx-auto px-4 py-8">
-          <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(settings.homepage_html) }} />
-        </section>
-      )}
+      <section className="store-shell trust-strip">
+        <div><strong>Built for Nepal</strong><span>Prices and shopping links made easy to understand.</span></div>
+        <div><strong>Curated, not crowded</strong><span>Useful products without endless marketplace noise.</span></div>
+        <div><strong>Shop on the source</strong><span>We send you directly to the seller or store.</span></div>
+      </section>
 
-      {/* Categories */}
-      {categories.length > 0 && (
-        <section className="container mx-auto px-4 py-12">
-          <h3 className="text-2xl font-bold text-foreground mb-6">Browse Categories</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {categories.map((cat) => (
-              <a
-                key={cat.id}
-                href={`/category/${cat.slug}`}
-                className="card p-4 text-center hover:shadow-md transition-shadow"
-              >
-                <span className="font-medium text-foreground">{cat.name}</span>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
+      {settings.homepage_html && <section className="store-shell custom-content" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(settings.homepage_html) }} />}
 
-      {/* Products */}
-      {products.length > 0 && (
-        <section className="container mx-auto px-4 py-12">
-          <h3 className="text-2xl font-bold text-foreground mb-6">Featured Products</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <div key={product.id} className="card overflow-hidden">
-                {product.image_url && (
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                )}
-                <div className="p-4">
-                  <h4 className="font-semibold text-foreground mb-2">{product.name}</h4>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-primary">
-                      ${product.price.toFixed(2)}
-                    </span>
-                    <a
-                      href={product.affiliate_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-primary btn-sm"
-                      aria-label={`Buy ${product.name} now`}
-                    >
-                      Buy Now
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Footer */}
-      <footer className="border-t bg-card mt-12">
-        <div className="container mx-auto px-4 py-8 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} {settings.site_title || 'BuyerNepal'}. All rights reserved.</p>
+      <section className="store-shell category-section">
+        <div className="section-heading"><div><span className="section-kicker">EXPLORE</span><h2>Shop by category</h2></div><span className="section-count">{categories.length} categories</span></div>
+        <div className="category-row">
+          <button className={`category-chip ${!activeCategory ? 'active' : ''}`} onClick={() => setActiveCategory('')}>All products</button>
+          {categories.map((category) => <button key={category.id} className={`category-chip ${activeCategory === String(category.id) ? 'active' : ''}`} onClick={() => setActiveCategory(String(category.id))}>{category.name}</button>)}
         </div>
-      </footer>
-    </div>
-  );
+      </section>
+
+      <section className="store-shell products-section">
+        <div className="section-heading"><div><span className="section-kicker">THE SHORTLIST</span><h2>{query || activeCategory ? 'Matching products' : 'Featured products'}</h2></div><span className="section-count">{filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}</span></div>
+        {loading ? <SkeletonGrid /> : error ? <div className="store-empty error-state"><div className="empty-icon">!</div><h3>Store temporarily unavailable</h3><p>{error}</p><button className="primary-action" onClick={() => window.location.reload()}>Try again</button></div> : filteredProducts.length ? <div className="product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div> : <div className="store-empty"><div className="empty-icon">⌕</div><h3>No products found</h3><p>Try a different search or browse all categories.</p><button className="secondary-action" onClick={() => { setQuery(''); setActiveCategory(''); }}>Clear filters</button></div>}
+      </section>
+
+      <section className="store-shell editorial-banner">
+        <div><span className="section-kicker">A BETTER WAY TO SHOP</span><h2>Discover first.<br />Decide faster.</h2><p>BuyerNepal is designed to help you find useful products quickly, understand what they cost, and continue to the store that sells them.</p></div>
+        <div className="editorial-stat"><strong>{products.length || '—'}</strong><span>products currently listed</span></div>
+      </section>
+    </main>
+
+    <footer className="store-footer">
+      <div className="store-shell footer-grid">
+        <div><Link to="/" className="store-brand footer-brand"><span className="store-logo-mark">B</span><span><strong>{title}</strong><small>SHOP SMARTER</small></span></Link><p>{description}</p></div>
+        <div><h3>Explore</h3><Link to="/">Home</Link>{categories.slice(0, 5).map((category) => <Link key={category.id} to={`/category/${category.slug}`}>{category.name}</Link>)}</div>
+        <div><h3>For admins</h3><Link to="/admin/login">Admin login</Link><span className="footer-note">Manage products, categories, reviews, coupons and site settings.</span></div>
+      </div>
+      <div className="store-shell footer-bottom"><span>© {new Date().getFullYear()} {title}. All rights reserved.</span><span>Made for shoppers in Nepal 🇳🇵</span></div>
+    </footer>
+  </div>;
 }
