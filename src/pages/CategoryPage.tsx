@@ -1,45 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import Loading from '../components/ui/Loading';
+import StoreHeader from '../components/store/StoreHeader';
+import ProductCard, { StoreProduct } from '../components/store/ProductCard';
 
 interface Category { id:number; name:string; slug:string; description:string; }
-interface Product { id:number; name:string; description:string; price:number; image_url:string; affiliate_url:string; }
 
 export default function CategoryPage() {
   const { slug } = useParams();
   const [category,setCategory] = useState<Category|null>(null);
-  const [products,setProducts] = useState<Product[]>([]);
+  const [products,setProducts] = useState<StoreProduct[]>([]);
+  const [categories,setCategories] = useState<Category[]>([]);
   const [loading,setLoading] = useState(true);
+  const [query,setQuery] = useState('');
   const [notFound,setNotFound] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
+    let alive=true;
     setLoading(true); setNotFound(false);
-    fetch(`/api/categories/${encodeURIComponent(slug)}`)
-      .then(async r => { const data=await r.json(); if(!r.ok) throw new Error(data.error||'Not found'); return data; })
-      .then(data => { setCategory(data.category); setProducts(data.products || []); })
-      .catch(() => setNotFound(true))
-      .finally(() => setLoading(false));
-  }, [slug]);
+    Promise.all([
+      fetch(`/api/categories/${encodeURIComponent(slug)}`).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||'Not found');return d;}),
+      fetch('/api/categories').then(r=>r.json()),
+    ]).then(([data,all])=>{if(!alive)return;setCategory(data.category);setProducts(data.products||[]);setCategories(all.categories||[]);}).catch(()=>alive&&setNotFound(true)).finally(()=>alive&&setLoading(false));
+    return ()=>{alive=false;};
+  },[slug]);
 
-  if (loading) return <Loading />;
-  if (notFound || !category) return <div className="min-h-screen flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold mb-3">Category not found</h1><Link className="text-primary hover:underline" to="/">Back to home</Link></div></div>;
+  const filtered=useMemo(()=>{const q=query.trim().toLowerCase();return products.filter(p=>!q||`${p.name} ${p.description}`.toLowerCase().includes(q));},[products,query]);
+  if(loading)return <div className="store-page"><StoreHeader categories={categories}/><main className="store-shell product-loading"><div className="product-grid">{[1,2,3,4].map(i=><div className="skeleton-image" key={i}/>)}</div></main></div>;
+  if(notFound||!category)return <div className="store-page"><StoreHeader categories={categories}/><div className="store-shell store-empty"><div className="empty-icon">!</div><h1>Category not found</h1><p>The category may have been removed or is not available.</p><Link to="/" className="primary-action">Back to shopping</Link></div></div>;
 
-  return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card"><div className="container mx-auto px-4 py-4"><Link to="/" className="text-2xl font-bold text-foreground">BuyerNepal</Link></div></header>
-      <main className="container mx-auto px-4 py-12">
-        <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← Home</Link>
-        <h1 className="text-4xl font-bold text-foreground mt-4">{category.name}</h1>
-        {category.description && <p className="text-muted-foreground mt-2 max-w-2xl">{category.description}</p>}
-        {products.length === 0 ? <p className="py-16 text-center text-muted-foreground">No products in this category yet.</p> :
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
-            {products.map(product => <div key={product.id} className="card overflow-hidden">
-              {product.image_url && <img src={product.image_url} alt={product.name} className="w-full h-48 object-cover" loading="lazy" decoding="async" />}
-              <div className="p-4"><h2 className="font-semibold text-foreground mb-2">{product.name}</h2><p className="text-sm text-muted-foreground line-clamp-2 mb-3">{product.description}</p><div className="flex items-center justify-between"><span className="text-lg font-bold text-primary">${Number(product.price).toFixed(2)}</span>{product.affiliate_url && <a href={product.affiliate_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">Buy Now</a>}</div></div>
-            </div>)}
-          </div>}
-      </main>
-    </div>
-  );
+  return <div className="store-page"><StoreHeader categories={categories}/><main className="store-shell category-page-main">
+    <div className="breadcrumbs"><Link to="/">Home</Link><span>›</span><strong>{category.name}</strong></div>
+    <section className="category-hero"><div><span className="eyebrow">CATEGORY</span><h1>{category.name}</h1><p>{category.description||`Explore our curated ${category.name.toLowerCase()} picks.`}</p></div><div className="category-total"><strong>{products.length}</strong><span>listed products</span></div></section>
+    <div className="category-toolbar"><div className="category-search"><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={`Search ${category.name.toLowerCase()}…`} aria-label={`Search ${category.name}`}/></div><span>{filtered.length} results</span></div>
+    {filtered.length?<div className="product-grid">{filtered.map(product=><ProductCard key={product.id} product={product}/>)}</div>:<div className="store-empty"><div className="empty-icon">⌕</div><h3>No matching products</h3><p>Try a different search term.</p><button className="secondary-action" onClick={()=>setQuery('')}>Clear search</button></div>}
+  </main></div>;
 }
