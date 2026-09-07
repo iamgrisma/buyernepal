@@ -1,13 +1,18 @@
 {
-  "compatibility_date": "2025-10-08",
-  "main": "src/index.tsx",
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "buyernepal",
+  "compatibility_date": "2025-10-08",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "pages_build_output_dir": "dist",
   "upload_source_maps": true,
   "d1_databases": [
     {
       "binding": "DB",
+      "database_name": "buyernepal",
       "database_id": "8e38f998-1dc6-4949-b630-deca3e23d9a8",
-      "database_name": "buyernepal"
+      "migrations_dir": "migrations"
     }
   ],
   "observability": {

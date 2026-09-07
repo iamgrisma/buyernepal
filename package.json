@@ -24,8 +24,11 @@
     "check": "tsc --noEmit",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
-    "predeploy": "wrangler d1 migrations apply DB --remote",
-    "seedLocalD1": "wrangler d1 migrations apply DB --local"
+    "predeploy": "wrangler d1 migrations apply buyernepal --remote",
+    "seedLocalD1": "wrangler d1 migrations apply buyernepal --local",
+    "d1:migrate:remote": "wrangler d1 migrations apply buyernepal --remote",
+    "d1:migrate:local": "wrangler d1 migrations apply buyernepal --local",
+    "d1:info": "wrangler d1 info buyernepal"
   },
   "dependencies": {
     "@rollup/wasm-node": "^4.63.1",
