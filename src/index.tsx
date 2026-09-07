@@ -31,6 +31,7 @@ import {
   deleteCoupon,
   getAdminStats,
   seedCatalog,
+  clearCatalog,
   savePriceAlert
 } from './db';
 import { getSession, createSession, clearSession, passwordHash, safeEqual, digest } from './auth';
@@ -326,6 +327,16 @@ app.post('/admin/seed', async (c) => {
   if (!s || s.role !== 'admin') return c.redirect('/admin/login');
 
   const res = await seedCatalog(c.env?.DB);
+  const key = res.success ? 'msg' : 'err';
+  return c.redirect(`/admin?tab=overview&${key}=${encodeURIComponent(res.message)}`);
+});
+
+// Admin Action: Clear/Wipe Catalog in D1
+app.post('/admin/catalog/clear', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  const res = await clearCatalog(c.env?.DB);
   const key = res.success ? 'msg' : 'err';
   return c.redirect(`/admin?tab=overview&${key}=${encodeURIComponent(res.message)}`);
 });

@@ -197,7 +197,7 @@ export const AdminDashboardView: FC<{
               </span>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
               <a href="/" target="_blank" className="primary-action" style={{ background: '#ffffff', color: '#0f172a', border: '1px solid var(--line)' }}>
                 View Storefront ↗
               </a>
@@ -209,6 +209,21 @@ export const AdminDashboardView: FC<{
                   style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)' }}
                 >
                   🌱 Seed Catalog in D1
+                </button>
+              </form>
+              <form
+                method="post"
+                action="/admin/catalog/clear"
+                onsubmit="return confirm('⚠️ ARE YOU SURE? This will permanently wipe all products, categories, coupons, and reviews from D1. Admin user accounts will remain safe.');"
+                style={{ display: 'inline' }}
+              >
+                <button
+                  type="submit"
+                  className="primary-action"
+                  title="Wipe all products, categories, coupons, and reviews from D1"
+                  style={{ background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' }}
+                >
+                  🗑️ Clear Catalog in D1
                 </button>
               </form>
             </div>

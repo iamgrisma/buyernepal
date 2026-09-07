@@ -566,36 +566,32 @@ export async function getCategories(db?: D1Database, onlyActive = true): Promise
       : 'SELECT id, name, slug, description, parent_id, is_active FROM categories ORDER BY id ASC';
     const r = await db.prepare(query).all<Category>();
     const list = r.results || [];
-    if (list.length > 0) {
-      // augment with icons from defaults if not present
-      return list.map((c) => ({
-        ...c,
-        icon: DEFAULT_CATEGORIES.find((dc) => dc.slug === c.slug)?.icon || '🛍️'
-      }));
-    }
-    return DEFAULT_CATEGORIES;
+    return list.map((c) => ({
+      ...c,
+      icon: (c as any).icon || DEFAULT_CATEGORIES.find((dc) => dc.slug === c.slug)?.icon || '🛍️'
+    }));
   } catch {
-    return DEFAULT_CATEGORIES;
+    return [];
   }
 }
 
 export async function getCategoryBySlug(db: D1Database | undefined, slug: string): Promise<Category | null> {
-  const matchDefault = DEFAULT_CATEGORIES.find((c) => c.slug.toLowerCase() === slug.toLowerCase()) || null;
-  if (!db) return matchDefault;
+  if (!db) return DEFAULT_CATEGORIES.find((c) => c.slug.toLowerCase() === slug.toLowerCase()) || null;
   try {
     const c = await db
       .prepare('SELECT id, name, slug, description, parent_id, is_active FROM categories WHERE slug = ? COLLATE NOCASE AND is_active = 1 LIMIT 1')
       .bind(slug)
       .first<Category>();
     if (c) {
+      const matchDefault = DEFAULT_CATEGORIES.find((dc) => dc.slug.toLowerCase() === slug.toLowerCase());
       return {
         ...c,
-        icon: matchDefault?.icon || '🛍️'
+        icon: (c as any).icon || matchDefault?.icon || '🛍️'
       };
     }
-    return matchDefault;
+    return null;
   } catch {
-    return matchDefault;
+    return null;
   }
 }
 
@@ -834,45 +830,20 @@ export async function getProducts(db?: D1Database, categoryId?: number | null, l
       r = await db.prepare(query).bind(limit).all<Product>();
     }
     const list = r.results || [];
-    if (list.length > 0) {
-      return list.map((p) => {
-        const def = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id || dp.name === p.name);
-        return enrichProduct({
-          ...p,
-          original_price: p.original_price || def?.original_price,
-          store_name: p.store_name || def?.store_name,
-          badge: p.badge || def?.badge,
-          rating: p.rating || def?.rating,
-          review_count: p.review_count || def?.review_count,
-          brand: p.brand || def?.brand
-        });
+    return list.map((p) => {
+      const def = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id || dp.name === p.name);
+      return enrichProduct({
+        ...p,
+        original_price: p.original_price || def?.original_price,
+        store_name: p.store_name || def?.store_name,
+        badge: p.badge || def?.badge,
+        rating: p.rating || def?.rating,
+        review_count: p.review_count || def?.review_count,
+        brand: p.brand || def?.brand
       });
-    }
-
-    // Auto-seed if database is fresh and empty
-    if (!categoryId) {
-      await seedCatalog(db);
-      const re = await db.prepare('SELECT p.*, c.name category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.is_active = 1 ORDER BY p.id ASC LIMIT ?').bind(limit).all<Product>();
-      if (re.results && re.results.length > 0) {
-        return re.results.map((p) => {
-          const def = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id || dp.name === p.name);
-          return enrichProduct({
-            ...p,
-            original_price: p.original_price || def?.original_price,
-            store_name: p.store_name || def?.store_name,
-            badge: p.badge || def?.badge,
-            rating: p.rating || def?.rating,
-            review_count: p.review_count || def?.review_count,
-            brand: p.brand || def?.brand
-          });
-        });
-      }
-    }
-    const raw = categoryId ? DEFAULT_PRODUCTS.filter((p) => p.category_id === categoryId) : DEFAULT_PRODUCTS;
-    return raw.map(enrichProduct);
+    });
   } catch {
-    const raw = categoryId ? DEFAULT_PRODUCTS.filter((p) => p.category_id === categoryId) : DEFAULT_PRODUCTS;
-    return raw.map(enrichProduct);
+    return [];
   }
 }
 
@@ -883,35 +854,35 @@ export async function getAllProductsAdmin(db?: D1Database): Promise<Product[]> {
       .prepare('SELECT p.*, c.name category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id ORDER BY p.id ASC LIMIT 200')
       .all<Product>();
     const list = r.results || [];
-    if (list.length > 0) {
-      return list.map((p) => {
-        const def = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id || dp.name === p.name);
-        return enrichProduct({
-          ...p,
-          original_price: p.original_price || def?.original_price,
-          store_name: p.store_name || def?.store_name,
-          badge: p.badge || def?.badge,
-          rating: p.rating || def?.rating,
-          review_count: p.review_count || def?.review_count,
-          brand: p.brand || def?.brand
-        });
+    return list.map((p) => {
+      const def = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id || dp.name === p.name);
+      return enrichProduct({
+        ...p,
+        original_price: p.original_price || def?.original_price,
+        store_name: p.store_name || def?.store_name,
+        badge: p.badge || def?.badge,
+        rating: p.rating || def?.rating,
+        review_count: p.review_count || def?.review_count,
+        brand: p.brand || def?.brand
       });
-    }
-    return DEFAULT_PRODUCTS.map(enrichProduct);
+    });
   } catch {
-    return DEFAULT_PRODUCTS.map(enrichProduct);
+    return [];
   }
 }
 
 export async function getProductById(db: D1Database | undefined, id: number): Promise<Product | null> {
-  const def = DEFAULT_PRODUCTS.find((p) => p.id === id) || null;
-  if (!db) return def ? enrichProduct(def) : null;
+  if (!db) {
+    const def = DEFAULT_PRODUCTS.find((p) => p.id === id) || null;
+    return def ? enrichProduct(def) : null;
+  }
   try {
     const p = await db
       .prepare('SELECT p.*, c.name category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.id = ? AND p.is_active = 1 LIMIT 1')
       .bind(id)
       .first<Product>();
     if (p) {
+      const def = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id || dp.name === p.name);
       return enrichProduct({
         ...p,
         original_price: p.original_price || def?.original_price,
@@ -922,9 +893,9 @@ export async function getProductById(db: D1Database | undefined, id: number): Pr
         brand: p.brand || def?.brand
       });
     }
-    return def ? enrichProduct(def) : null;
+    return null;
   } catch {
-    return def ? enrichProduct(def) : null;
+    return null;
   }
 }
 
@@ -1076,46 +1047,21 @@ export async function getReviews(db: D1Database | undefined, productId: number):
       .prepare("SELECT id, product_id, user_name, rating, comment, status, created_at FROM reviews WHERE product_id = ? AND status = 'approved' ORDER BY created_at DESC LIMIT 50")
       .bind(productId)
       .all<Review>();
-    const list = r.results || [];
-    return list.length > 0 ? list : sampleReviews;
+    return r.results || [];
   } catch {
-    return sampleReviews;
+    return [];
   }
 }
 
 export async function getAllReviewsAdmin(db?: D1Database): Promise<Review[]> {
-  const fallbackReviews: Review[] = [
-    {
-      id: 101,
-      product_id: 1,
-      product_name: 'Apple iPhone 16 Pro Max',
-      user_name: 'Aayush Shrestha',
-      rating: 5,
-      comment: 'Super fast delivery in Kathmandu within 24 hours. Genuine sealed pack!',
-      status: 'approved',
-      created_at: new Date(Date.now() - 86400000 * 2).toISOString()
-    },
-    {
-      id: 103,
-      product_id: 6,
-      product_name: 'Xiaomi Smart Air Fryer Pro 4L',
-      user_name: 'Bikram Thapa',
-      rating: 5,
-      comment: 'Cooks momo and fries with minimal oil. Best appliance for Nepali kitchen!',
-      status: 'pending',
-      created_at: new Date().toISOString()
-    }
-  ];
-
-  if (!db) return fallbackReviews;
+  if (!db) return [];
   try {
     const r = await db
       .prepare('SELECT r.*, p.name product_name FROM reviews r LEFT JOIN products p ON p.id = r.product_id ORDER BY r.created_at DESC LIMIT 100')
       .all<Review>();
-    const list = r.results || [];
-    return list.length > 0 ? list : fallbackReviews;
+    return r.results || [];
   } catch {
-    return fallbackReviews;
+    return [];
   }
 }
 
@@ -1128,10 +1074,6 @@ export async function createReview(
 ): Promise<{ success: boolean; error?: string }> {
   if (!db) return { success: true };
   try {
-    const exists = await db.prepare('SELECT id FROM products WHERE id = ?').bind(productId).first();
-    if (!exists) {
-      await seedCatalog(db);
-    }
     await db
       .prepare('INSERT INTO reviews(product_id, user_name, rating, comment, status) VALUES(?, ?, ?, ?, ?)')
       .bind(productId, userName.trim(), Math.min(5, Math.max(1, rating)), comment.trim(), 'approved')
@@ -1231,10 +1173,9 @@ export async function getCoupons(db?: D1Database): Promise<Coupon[]> {
   if (!db) return DEFAULT_COUPONS;
   try {
     const r = await db.prepare('SELECT * FROM coupons ORDER BY created_at DESC').all<Coupon>();
-    const list = r.results || [];
-    return list.length > 0 ? list : DEFAULT_COUPONS;
+    return r.results || [];
   } catch {
-    return DEFAULT_COUPONS;
+    return [];
   }
 }
 
@@ -1321,13 +1262,21 @@ export async function updateCoupon(
 // Analytics & Stats
 export async function getAdminStats(db?: D1Database) {
   const fallback = {
-    products: DEFAULT_PRODUCTS.length,
-    categories: DEFAULT_CATEGORIES.length,
-    pendingReviews: 1,
-    activeCoupons: DEFAULT_COUPONS.length,
+    products: 0,
+    categories: 0,
+    pendingReviews: 0,
+    activeCoupons: 0,
     users: 1
   };
-  if (!db) return fallback;
+  if (!db) {
+    return {
+      products: DEFAULT_PRODUCTS.length,
+      categories: DEFAULT_CATEGORIES.length,
+      pendingReviews: 0,
+      activeCoupons: DEFAULT_COUPONS.length,
+      users: 1
+    };
+  }
   try {
     const [p, u, r, c, co] = await Promise.all([
       db.prepare('SELECT COUNT(*) count FROM products').first<any>(),
@@ -1337,18 +1286,18 @@ export async function getAdminStats(db?: D1Database) {
       db.prepare('SELECT COUNT(*) count FROM coupons WHERE is_active = 1').first<any>()
     ]);
     return {
-      products: Number(p?.count || fallback.products),
-      users: Number(u?.count || fallback.users),
-      pendingReviews: Number(r?.count || 0),
-      categories: Number(c?.count || fallback.categories),
-      activeCoupons: Number(co?.count || fallback.activeCoupons)
+      products: Number(p?.count ?? 0),
+      users: Number(u?.count ?? 0),
+      pendingReviews: Number(r?.count ?? 0),
+      categories: Number(c?.count ?? 0),
+      activeCoupons: Number(co?.count ?? 0)
     };
   } catch {
     return fallback;
   }
 }
 
-// One-Click Database Seeder for Production Demo Catalog
+// One-Click Database Seeder for Production Demo Catalog (Manual Trigger Only)
 export async function seedCatalog(db: D1Database | undefined): Promise<{ success: boolean; message: string }> {
   if (!db) return { success: false, message: 'Database not connected' };
   try {
@@ -1393,6 +1342,25 @@ export async function seedCatalog(db: D1Database | undefined): Promise<{ success
   }
 }
 
+// One-Click Database Catalog Cleaner / Wiper
+export async function clearCatalog(db: D1Database | undefined): Promise<{ success: boolean; message: string }> {
+  if (!db) return { success: false, message: 'Database not connected' };
+  try {
+    await db.batch([
+      db.prepare('DELETE FROM reviews'),
+      db.prepare('DELETE FROM products'),
+      db.prepare('DELETE FROM categories'),
+      db.prepare('DELETE FROM coupons')
+    ]);
+    return {
+      success: true,
+      message: 'Catalog cleared successfully! All products, categories, coupons, and reviews wiped from D1.'
+    };
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Error clearing catalog' };
+  }
+}
+
 // Price Drop Alerts
 export async function savePriceAlert(
   db: D1Database | undefined,
@@ -1414,17 +1382,12 @@ export async function savePriceAlert(
 }
 
 export async function getPriceAlertsAdmin(db?: D1Database): Promise<any[]> {
-  const fallback = [
-    { id: 1, product_id: 1, product_name: 'Apple iPhone 16 Pro Max', email: 'suresh.k@gmail.com', target_price: 205000, current_price: 214999, created_at: new Date(Date.now() - 86400000).toISOString() },
-    { id: 2, product_id: 3, product_name: 'MacBook Air M3', email: 'anita.tech@gmail.com', target_price: 160000, current_price: 168000, created_at: new Date(Date.now() - 86400000 * 3).toISOString() },
-    { id: 3, product_id: 4, product_name: 'Sony WH-1000XM5', email: 'prashant.n@outlook.com', target_price: 41000, current_price: 44999, created_at: new Date(Date.now() - 86400000 * 4).toISOString() }
-  ];
-  if (!db) return fallback;
+  if (!db) return [];
   try {
     const r = await db.prepare('SELECT * FROM price_alerts ORDER BY created_at DESC LIMIT 50').all<any>();
-    return r.results && r.results.length > 0 ? r.results : fallback;
+    return r.results || [];
   } catch {
-    return fallback;
+    return [];
   }
 }
 
