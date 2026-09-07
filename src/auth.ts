@@ -2,7 +2,7 @@ import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
 import { Context } from 'hono';
 import { Env, Session } from './types';
 
-const PBKDF2_ITERATIONS = 120000;
+const PBKDF2_ITERATIONS = 100000;
 const SESSION_DAYS = 7;
 
 export async function digest(v: string) {
@@ -59,7 +59,7 @@ export async function getSession(c: Context<{ Bindings: Env }>): Promise<Session
     const tokenHash = await digest(token);
     const s = await db
       .prepare(
-        `SELECT s.user_id, s.expires_at, u.username, u.email, u.is_active, COALESCE(r.role, 'user') role
+        `SELECT s.user_id, s.expires_at, u.username, u.email, u.is_active, COALESCE(r.role, u.role, 'user') role
          FROM sessions s
          JOIN users u ON u.id = s.user_id
          LEFT JOIN user_roles r ON r.user_id = u.id
@@ -74,7 +74,7 @@ export async function getSession(c: Context<{ Bindings: Env }>): Promise<Session
   }
 }
 
-export async function createSession(c: Context<{ Bindings: Env }>, userId: number): Promise<string> {
+export async function createSession(c: Context<{ Bindings: Env }>, userId: number | string): Promise<string> {
   const token = crypto.randomUUID().replaceAll('-', '') + crypto.randomUUID().replaceAll('-', '');
   const db = c.env?.DB;
   if (db) {

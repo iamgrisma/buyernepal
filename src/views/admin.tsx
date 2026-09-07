@@ -46,7 +46,7 @@ export const AdminLoginView: FC<{ error?: string; success?: string }> = ({ error
 };
 
 export const AdminDashboardView: FC<{
-  currentUser: { id: number; username: string; email: string; role: string };
+  currentUser: { id: number | string; username: string; email: string; role: string };
   stats: { products: number; categories: number; users: number; pendingReviews: number; activeCoupons: number };
   products: Product[];
   categories: Category[];

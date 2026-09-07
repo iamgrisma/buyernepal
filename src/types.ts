@@ -4,7 +4,7 @@ export interface Env {
 }
 
 export interface Session {
-  user_id: number;
+  user_id: number | string;
   username: string;
   email: string;
   role: 'admin' | 'moderator' | 'user';
@@ -13,7 +13,7 @@ export interface Session {
 }
 
 export interface User {
-  id: number;
+  id: number | string;
   username: string;
   email: string;
   role: 'admin' | 'moderator' | 'user';
