@@ -54,7 +54,8 @@ The Worker expects:
 
 - Binding: `DB`
 - Database: `buyernepal`
-- Database ID: `8e38f998-1dc6-4949-b630-deca3e23d9a8`
+- Database ID: `75ebd0b4-dbae-4889-8ed1-c7a7d669ebe8`
+- Live Worker URL: `https://buyernepal.iamgrisma.workers.dev`
 
 Never put database credentials or Cloudflare API tokens in source control.
 
