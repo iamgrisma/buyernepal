@@ -30,6 +30,7 @@ export interface Category {
   is_active?: number;
   display_order?: number;
   in_menu?: number;
+  icon?: string;
 }
 
 export interface Product {
@@ -37,12 +38,19 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  original_price?: number;
   image_url: string;
   affiliate_url: string;
   category_id?: number | null;
   category_name?: string;
   is_active?: number;
   created_at?: string;
+  store_name?: string;
+  badge?: string;
+  rating?: number;
+  review_count?: number;
+  brand?: string;
+  is_featured?: number;
 }
 
 export interface Review {
@@ -74,6 +82,10 @@ export interface SiteSettings {
   site_logo?: string;
   site_favicon?: string;
   contact_email?: string;
+  contact_phone?: string;
+  whatsapp_number?: string;
+  announcement_text?: string;
+  announcement_active?: string;
   social_facebook?: string;
   social_twitter?: string;
   social_instagram?: string;

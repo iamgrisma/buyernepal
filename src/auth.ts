@@ -59,7 +59,7 @@ export async function getSession(c: Context<{ Bindings: Env }>): Promise<Session
     const tokenHash = await digest(token);
     const s = await db
       .prepare(
-        `SELECT s.user_id, s.expires_at, u.username, u.email, u.is_active, COALESCE(r.role, u.role, 'user') role
+        `SELECT s.user_id, s.expires_at, u.username, u.email, u.is_active, COALESCE(r.role, 'user') role
          FROM sessions s
          JOIN users u ON u.id = s.user_id
          LEFT JOIN user_roles r ON r.user_id = u.id
