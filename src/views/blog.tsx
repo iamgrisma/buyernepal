@@ -285,8 +285,9 @@ export const BlogIndexPage: FC<{
   return (
     <Layout
       title="Tech Guides, Reviews & Buying Advice in Nepal | BuyerNepal Editorial"
-      description="In-depth Nepali tech reviews, smartphone comparisons, laptop buyer guides, MDMS customs regulations, and verified NPR price breakdowns."
+      description="In-depth Nepali tech reviews, smartphone comparisons, laptop buyer guides, verified retailer advice, and NPR price breakdowns."
       url="https://buyernepal.com/blog"
+      settings={settings}
     >
       <div className="store-page blog-page">
         <Header settings={settings} categories={categories} activeSlug="blog" />
@@ -300,7 +301,7 @@ export const BlogIndexPage: FC<{
             Smart Buying Advice & In-Depth Tech Reviews for Nepal
           </h1>
           <p className="magazine-hero-subtitle">
-            Unbiased field testing, verified NPR price comparisons, MDMS regulatory guides, and expert recommendations — tailored specifically for Nepali consumers.
+            Unbiased field testing, verified NPR price comparisons, brand warranty guides, and expert recommendations — tailored specifically for Nepali consumers.
           </p>
 
           {/* Category Filter Pills */}
@@ -420,17 +421,17 @@ export const BlogIndexPage: FC<{
           </div>
         )}
 
-        {/* Nepal Tech Intelligence Banner */}
+        {/* Nepal Verified Retailer Advisory Banner */}
         <div className="nepal-tech-banner">
           <div className="banner-content">
-            <div className="banner-badge">🇳🇵 SMARTPHONE BUYER ADVISORY</div>
-            <h3>Buying a Smartphone in Nepal? Verify NTA MDMS First</h3>
+            <div className="banner-badge">🇳🇵 BUYER ADVISORY</div>
+            <h3>Looking for Verified Nepal Stores &amp; Official Warranty?</h3>
             <p>
-              To protect yourself against gray market imports and network blacklisting, always verify the 15-digit IMEI on the official NTA MDMS portal and request a genuine VAT bill from the retailer.
+              Protect your purchases by buying exclusively from verified Nepal retailers and authorized national distributors offering genuine VAT bills and valid manufacturer warranty.
             </p>
           </div>
-          <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer" className="banner-btn">
-            Check IMEI on NTA Portal ↗
+          <a href="/stores" className="banner-btn">
+            Browse Verified Stores Directory ↗
           </a>
         </div>
         </main>
@@ -489,6 +490,7 @@ export const ArticleDetailPage: FC<{
       image={article.cover_image}
       url={articleUrl}
       type="article"
+      settings={settings}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schemaJson }} />
 
@@ -584,7 +586,7 @@ export const ArticleDetailPage: FC<{
                 <strong>Key Takeaways for Nepali Buyers:</strong>
               </div>
               <ul className="takeaways-list">
-                <li>Always confirm official NTA MDMS IMEI registration before making final payment.</li>
+                <li>Always confirm genuine VAT bill and official distributor warranty before making payment.</li>
                 <li>Compare authorized distributor warranty (GenNext, Samsung Plaza, Oliz) vs third-party retail stores.</li>
                 <li>Prices quoted in this guide reflect genuine authorized retail pricing with 13% VAT bill included.</li>
               </ul>
@@ -659,20 +661,18 @@ export const ArticleDetailPage: FC<{
               </div>
             )}
 
-            {/* MDMS Verification Helper */}
+            {/* Verified Stores Advisory Helper */}
             <div className="sidebar-widget advisory-widget">
-              <div className="advisory-badge">MDMS HELPER</div>
-              <h4>Check Your Phone's Legitimacy</h4>
+              <div className="advisory-badge">BUYER TRUST</div>
+              <h4>Verified Nepal Stores</h4>
               <p>
-                Dial <code>*#06#</code> on your handset and enter the 15-digit IMEI on the Nepal Telecommunications Authority portal to verify tax status.
+                Browse authorized dealers across Nepal offering official manufacturer warranty and transparent VAT invoices.
               </p>
               <a
-                href="https://mdms.nta.gov.np"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/stores"
                 className="widget-cta-btn"
               >
-                Verify on NTA MDMS ↗
+                View Verified Stores ↗
               </a>
             </div>
 

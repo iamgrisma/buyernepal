@@ -93,7 +93,7 @@ VALUES
 -- 6. Seed Leading Brands in Nepal
 INSERT OR IGNORE INTO brands (id, name, slug, logo_url, description, origin_country, warranty_service_center, is_featured)
 VALUES
-(1, 'Apple', 'apple', 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=120&auto=format&fit=crop&q=80', 'World leader in personal computing, iPhones, iPads, and wearables with official NTA MDMS registration in Nepal.', 'USA', 'GenNext Authorized Service Centers: Sherpa Mall Kathmandu, Pokhara, Butwal', 1),
+(1, 'Apple', 'apple', 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=120&auto=format&fit=crop&q=80', 'World leader in personal computing, iPhones, iPads, MacBooks, and wearables with official Nepal warranty.', 'USA', 'GenNext Authorized Service Centers: Sherpa Mall Kathmandu, Pokhara, Butwal', 1),
 (2, 'Samsung', 'samsung', 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=120&auto=format&fit=crop&q=80', 'Global electronics titan with highest market presence in Nepal, backed by official distributor Him Electronics & IMS.', 'South Korea', 'Samsung Authorized Service Plaza: Sundhara, Jawalakhel, Pokhara, Biratnagar, Narayangarh', 1),
 (3, 'OnePlus', 'oneplus', 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=120&auto=format&fit=crop&q=80', 'Never Settle flagship killer smartphones and audio devices with official authorized distributor warranty in Nepal.', 'Global', 'Smart Talk Authorized Service Center, CTC Mall 5th Floor, Sundhara, Kathmandu', 1),
 (4, 'Sony', 'sony', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=120&auto=format&fit=crop&q=80', 'Industry-standard active noise cancellation, mirrorless Alpha cameras, and home cinema systems distributed by Nepa Hima.', 'Japan', 'Nepa Hima Service Center, Kantipath, Kathmandu', 1),
@@ -105,4 +105,4 @@ VALUES
 -- 7. Seed Sample Digital Goods for Direct Sale
 INSERT OR IGNORE INTO products (id, name, description, price, image_url, affiliate_url, category_id, is_active)
 VALUES
-(25, 'Nepal Tech Buyer''s Definitive Field Guide 2026 (PDF & Checklist)', 'Complete 180-page comprehensive handbook detailing how to avoid gray-market phones, verify NTA MDMS tax compliance, calculate customs duties, negotiate with local New Road merchants, and compare bank 0% EMI schemes.', 499, 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=700&auto=format&fit=crop&q=80', '#', 1, 1);
+(25, 'Nepal Tech Buyer''s Definitive Field Guide 2026 (PDF & Checklist)', 'Complete 180-page comprehensive handbook detailing how to avoid overpriced gadgets, verify store warranties, negotiate with local New Road merchants, and compare bank 0% EMI schemes.', 499, 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=700&auto=format&fit=crop&q=80', '#', 1, 1);

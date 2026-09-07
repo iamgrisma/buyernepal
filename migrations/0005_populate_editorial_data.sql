@@ -7,13 +7,13 @@ VALUES
   1,
   'Best Mobile Phones Under Rs. 30,000 in Nepal (2026 Updated)',
   'best-mobile-phones-under-30000-nepal',
-  'A rigorous evaluation of budget smartphones available in Nepal offering AMOLED displays, 50MP OIS cameras, 5000mAh batteries, and official MDMS compliance.',
-  'Finding the ideal smartphone under Rs. 30,000 in Nepal is tricky with rampant gray-market imports and fluctuating retail prices. In 2026, budget buyers no longer need to compromise on core user experience: 120Hz refresh rates, bright AMOLED panels, 50MP Sony sensors with Optical Image Stabilization (OIS), and 45W+ fast charging have become standard in this competitive price tier.
+  'A rigorous evaluation of budget smartphones available in Nepal offering AMOLED displays, 50MP OIS cameras, 5000mAh batteries, and official brand warranty.',
+  'Finding the ideal smartphone under Rs. 30,000 in Nepal is tricky with fluctuating retail prices. In 2026, budget buyers no longer need to compromise on core user experience: 120Hz refresh rates, bright AMOLED panels, 50MP Sony sensors with Optical Image Stabilization (OIS), and 45W+ fast charging have become standard in this competitive price tier.
 
 ### What Should You Expect Under Rs. 30,000 in Nepal?
 1. **Display Quality:** Full HD+ AMOLED displays with at least 120Hz refresh rate and Gorilla Glass protection. Peak brightness should comfortably exceed 1,200 nits to handle direct sunlight during bright Kathmandu afternoons.
 2. **Processing Power:** MediaTek Dimensity 7050 / 7200 or Snapdragon 6 Gen 1 / 7s Gen 2 chipsets. These provide reliable 60fps daily multitasking, social media feeds, and moderate gaming in PUBG Mobile / Free Fire.
-3. **Official MDMS Status:** Crucial! Make sure you purchase from authorized Nepali distributors offering VAT invoices so your device''s IMEI is officially registered on NTA''s MDMS portal.
+3. **Official Brand Warranty:** Make sure you purchase from authorized Nepali distributors offering genuine VAT invoices for authentic manufacturer warranty coverage.
 
 ### Top Recommendation: Xiaomi Redmi Note 13 / 14 Series
 The Redmi Note lineup continues to offer unmatched value for money in Nepal. With a razor-thin bezel AMOLED panel and a dependable 5,000 mAh cell, it dominates the sub-30k bracket.
@@ -50,7 +50,7 @@ The dedicated Camera Control button on the lower right flank brings DSLR-like ta
 In our real-world Kathmandu network testing (alternating between NTC 5G, Ncell 4G, and fiber Wi-Fi), the 16 Pro Max delivered an astonishing 10.5 hours of screen-on time, easily lasting two full workdays.
 
 ### The Nepal Price Verdict: Should You Buy?
-Priced at Rs. 214,999 for the 256GB base variant, it is unquestionably a premium investment. However, with official GenNext 1-year warranty, 1-year breakage insurance, and official NTA MDMS clearance, it ensures total peace of mind against gray-market confiscation.',
+Priced at Rs. 214,999 for the 256GB base variant, it is unquestionably a premium investment. However, with official GenNext 1-year warranty, 1-year breakage insurance, and genuine VAT bill, it ensures complete peace of mind and authorized service center support.',
   'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=1200&auto=format&fit=crop&q=80',
   'Bikash Adhikari (Senior Tech Editor)',
   'Smartphone Reviews',
@@ -63,29 +63,26 @@ Priced at Rs. 214,999 for the 256GB base variant, it is unquestionably a premium
 ),
 (
   3,
-  'Nepal MDMS System & Customs Tax Explained: Avoid Getting Blacklisted',
-  'nepal-mdms-registration-customs-tax-guide',
-  'Everything Nepali travelers and overseas returnees must know about NTA MDMS registration, airport customs tax slabs, and IMEI verification rules.',
-  'The Nepal Telecommunications Authority (NTA) has strictly enforced the Mobile Device Management System (MDMS) to combat gray market imports, mobile theft, and tax evasion.
+  'Best Tech Deals in Nepal: How to Find Real Discounts & Avoid Fake Sales',
+  'best-tech-deals-nepal-shopping-guide',
+  'Proven tips for shopping smarter in Nepal: price history tracking, bank discount days, festival sale strategies, and verified dealer warranties.',
+  'Finding genuine discounts on gadgets and tech in Nepal can often be confusing. Between inflated original prices and temporary sales campaigns, knowing when a deal is truly worth it is an essential skill.
 
-### What is MDMS?
-MDMS is a centralized tracking system implemented across all telecom operators in Nepal (Nepal Telecom, Ncell, Smart Cell). Every smartphone connected to a Nepali SIM card must have its 15-digit IMEI whitelisted in the government database. Unregistered devices receive warning notices and are subsequently blocked from cellular connectivity.
+### 1. Track Price History Before Buying
+Never trust a "50% OFF" banner blindly. Retailers sometimes raise prices just days before a major sale to make discounts look larger. Always check historical prices and compare current rates against multiple stores like Daraz Mall, Oliz Store, and local New Road retailers.
 
-### Baggage Customs Rules for Travelers (Foreign Returnees)
-- **Nepali Citizens returning from abroad:** Allowed to bring ONE personal smartphone used abroad without paying customs duty.
-- **Second phone / Unpacked phone:** Subject to customs duty (approx. 18% to 24% depending on invoice value) and 13% VAT.
-- **Registration Process:** You can upload your immigration passport stamp, flight boarding pass, and purchase invoice directly at the official portal: mdms.nta.gov.np.
+### 2. Leverage Bank Card & Wallet Discount Days
+Most commercial banks in Nepal (Nabil, Global IME, NIC Asia, Himalayan Bank) and digital wallets (eSewa, Khalti) have dedicated partner discount days offering 10% to 15% instant discounts or cashback. 
 
-### Buying Locally: How to Verify Before Paying
-Always inspect the retail box before handing over payment:
-1. Dial *#06# on the phone keypad to get the genuine IMEI.
-2. Visit **mdms.nta.gov.np** and input the IMEI number.
-3. If it says "IMEI is registered in MDMS", your phone is official.
-4. Insist on a genuine VAT invoice stamped by the registered store.',
+### 3. Check for 0% EMI Schemes
+If you are purchasing a flagship laptop or smartphone, many authorized distributors offer 0% interest EMI options on commercial bank credit cards. This lets you break down the purchase into 6, 12, or 18 easy monthly installments without extra markup.
+
+### 4. Insist on Genuine VAT Invoices
+Always ask the retailer for an official VAT/PAN invoice. This is your primary proof of purchase required by official brand service centers for honoring warranty coverage in Nepal.',
   'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&auto=format&fit=crop&q=80',
-  'BuyerNepal Legal & Tech Desk',
-  'Nepal Tech',
-  'mdms, customs, nta, mobile-rules, nepal-law',
+  'BuyerNepal Shopping Desk',
+  'Buying Guides',
+  'deals, discounts, shopping-tips, nepal, vouchers',
   5,
   0,
   1,
@@ -149,7 +146,7 @@ VALUES
 (1, 'Oliz Store Nepal', 214999, 'https://www.olizstore.com', 'Authorized Apple Reseller', 1, '24-48 Hours Inside Valley', 'Official GenNext 1-Yr Warranty + Breakage Insurance'),
 (1, 'EvoStore Official', 214999, 'https://www.evostore.com.np', 'Apple Authorized Premium Reseller', 1, 'Same Day Kathmandu Valley', '1 Year Official Apple Warranty with VAT Bill'),
 (1, 'Daraz Mall (Apple Flagship)', 212499, 'https://www.daraz.com.np', 'Daraz Mall Verified', 1, '2-3 Days Nepalwide Delivery', '100% Authentic with 14 Days Return Guarantee'),
-(1, 'New Road Authorized Outlet', 209500, 'https://buyernepal.com', 'Physical Store Pickup', 1, 'Instant Handover in New Road', 'Official VAT Bill with Verified MDMS Clearance'),
+(1, 'New Road Authorized Outlet', 209500, 'https://buyernepal.com', 'Physical Store Pickup', 1, 'Instant Handover in New Road', 'Official VAT Bill with 1 Year Authorized Warranty'),
 (2, 'Samsung Plaza Nepal', 184999, 'https://www.samsung.com/np', 'Official Samsung Brand Shop', 1, '24 Hours Inside Kathmandu', 'Official IMS 1 Year Warranty + 1 Year Screen Protection'),
 (2, 'Daraz Mall (Samsung Official)', 182500, 'https://www.daraz.com.np', 'Daraz Mall Official', 1, '2-4 Days Nepalwide Delivery', '100% Genuine with Bank Voucher Discounts'),
 (2, 'Oliz Store Kathmandu', 184999, 'https://www.olizstore.com', 'Authorized Partner', 1, '24-48 Hours Delivery', '1 Year Full Nepal Official Warranty');

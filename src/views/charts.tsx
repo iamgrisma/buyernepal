@@ -26,6 +26,7 @@ export const TopChartsPage: FC<{
       title="Top 10 Gadget Leaderboard & Ranked Charts in Nepal (2026) | BuyerNepal"
       description="The definitive ranking of best smartphones, laptops, headphones and tech in Nepal. Rated by BuyerNepal Labs on performance, display, battery, and Nepal value."
       url="https://buyernepal.com/charts"
+      settings={settings}
     >
       <div className="store-page top-charts-page">
         <Header settings={settings} categories={categories} activeSlug="charts" />

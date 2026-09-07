@@ -67,6 +67,7 @@ export const ComparePage: FC<{
       title={pageTitle}
       description="Compare tech gadgets, smartphones, laptops, audio gear, and appliances in Nepal. Side-by-side technical specs, 0% EMI options, verified store prices, and BuyerNepal editorial verdicts."
       url="https://buyernepal.com/compare"
+      settings={settings}
     >
       <div className="store-page compare-page-shell">
         <Header settings={settings} categories={categories} activeSlug="compare" />

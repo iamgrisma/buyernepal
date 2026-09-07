@@ -55,145 +55,184 @@ export const HomePage: FC<{
     }))
   };
 
+  const defaultCatalogView = settings.catalog_default_view || 'grid';
+
   return (
     <Layout
       title={title}
       description={description}
       jsonLd={jsonLd}
+      settings={settings}
     >
       <div className="store-page">
         <Header settings={settings} categories={categories} />
-        <Hero settings={settings} />
-        <TrustStrip />
+        {settings.hero_enabled !== '0' && <Hero settings={settings} />}
+        {settings.trust_strip_enabled !== '0' && <TrustStrip settings={settings} />}
 
         {/* Live Flash Sale Showcase */}
-        {showFlashSale && <FlashSaleSection products={products} />}
+        {showFlashSale && <FlashSaleSection products={products} settings={settings} />}
 
         {/* Coupons Strip */}
-        {coupons.length > 0 && <CouponsStrip coupons={coupons} />}
+        {settings.coupons_section_enabled !== '0' && coupons.length > 0 && (
+          <CouponsStrip coupons={coupons} />
+        )}
 
         {/* Categories Section */}
-        <section className="store-shell category-section">
-          <div className="section-heading">
-            <div>
-              <span className="section-kicker">EXPLORE DEPARTMENTS</span>
-              <h2>Shop by Nepali Category</h2>
+        {settings.categories_section_enabled !== '0' && (
+          <section className="store-shell category-section">
+            <div className="section-heading">
+              <div>
+                <span className="section-kicker">{settings.categories_kicker || 'EXPLORE DEPARTMENTS'}</span>
+                <h2>{settings.categories_title || 'Shop by Nepali Category'}</h2>
+              </div>
+              <span className="section-count">{categories.length} Departments</span>
             </div>
-            <span className="section-count">{categories.length} Departments</span>
-          </div>
-          <div className="category-row">
-            <a href="/" className="category-chip active" data-cat="all">
-              <span>🛍️</span> All Categories
-            </a>
-            {categories.map((cat) => (
-              <a key={cat.id} href={`/category/${cat.slug}`} className="category-chip" data-cat={cat.id}>
-                <span>{cat.icon || '📁'}</span>
-                <span>{cat.name}</span>
+            <div className="category-row">
+              <a href="/" className="category-chip active" data-cat="all">
+                <span>🛍️</span> All Categories
               </a>
-            ))}
-          </div>
-        </section>
-
-        {/* Filter Bar & Products Shortlist */}
-        <section className="store-shell products-section">
-          <div className="filter-bar" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-              <div className="filter-chips-group">
-                <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--muted)', marginRight: '4px' }}>FILTER:</span>
-                <button type="button" className="filter-pill active" data-filter="all">All Items</button>
-                <button type="button" className="filter-pill" data-filter="hot">🔥 Hot Deals</button>
-                <button type="button" className="filter-pill" data-filter="editor">🏆 Editor\'s Pick</button>
-                <button type="button" className="filter-pill" data-filter="emi">💳 0% EMI Ready</button>
-                <button type="button" className="filter-pill" data-filter="under10k">💰 Under Rs. 10,000</button>
-                <button type="button" className="filter-pill" data-filter="flagship">📱 Flagships</button>
-                <button type="button" className="filter-pill" data-filter="local">🇳🇵 Nepal Classic</button>
-              </div>
-
-              <div className="sort-controls">
-                <label htmlFor="sortSelect">Sort By:</label>
-                <select id="sortSelect" className="sort-select">
-                  <option value="featured">Featured First</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="discount">Biggest Discount</option>
-                  <option value="rating">Highest Rated</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Quick Store and Price Range Bar */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid var(--line)' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted)' }}>VERIFIED STORES:</span>
-              <button type="button" className="filter-pill active store-filter-pill" data-store="all">All Stores</button>
-              <button type="button" className="filter-pill store-filter-pill" data-store="daraz">Daraz Mall</button>
-              <button type="button" className="filter-pill store-filter-pill" data-store="oliz">Oliz Store</button>
-              <button type="button" className="filter-pill store-filter-pill" data-store="samsung">Samsung Plaza</button>
-              <button type="button" className="filter-pill store-filter-pill" data-store="evo">EvoStore</button>
-              <button type="button" className="filter-pill store-filter-pill" data-store="goldstar">Goldstar</button>
-            </div>
-          </div>
-
-          <div className="section-heading" style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-            <div>
-              <span className="section-kicker">VERIFIED CATALOG</span>
-              <h2>Curated Products in Nepal</h2>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-              {/* REHub View Mode Switcher: Grid, List, Table */}
-              <div className="view-mode-toggle" aria-label="Catalog View Modes">
-                <button type="button" className="view-btn active" data-view="grid" title="Grid View">🔲 Grid</button>
-                <button type="button" className="view-btn" data-view="list" title="Detailed List View">📄 List</button>
-                <button type="button" className="view-btn" data-view="table" title="Compact Table Comparison">📑 Table</button>
-              </div>
-              <span id="productCountBadge" className="section-count">
-                Showing {products.length} products
-              </span>
-            </div>
-          </div>
-
-          {products.length > 0 ? (
-            <div id="productGrid" className="product-grid">
-              {products.map((p) => (
-                <ProductCard key={p.id} product={p} />
+              {categories.map((cat) => (
+                <a key={cat.id} href={`/category/${cat.slug}`} className="category-chip" data-cat={cat.id}>
+                  <span>{cat.icon || '📁'}</span>
+                  <span>{cat.name}</span>
+                </a>
               ))}
             </div>
-          ) : (
-            <div className="store-empty">
-              <div className="empty-icon">🔍</div>
-              <h3>No products available yet</h3>
-              <p>Check back soon or visit our admin panel to seed curated products.</p>
-              <a href="/admin" className="primary-action">
-                Go to Admin Portal
-              </a>
-            </div>
-          )}
+          </section>
+        )}
 
-          <div id="noSearchResults" className="store-empty" style={{ display: 'none' }}>
-            <div className="empty-icon">⌕</div>
-            <h3>No matching products found</h3>
-            <p>Try searching with another keyword or reset your filter chips.</p>
-            <button
-              id="resetFiltersBtn"
-              type="button"
-              className="primary-action"
-              style={{ marginTop: '12px' }}
-            >
-              Reset All Filters
-            </button>
-          </div>
-        </section>
+        {/* Filter Bar & Products Shortlist */}
+        {settings.catalog_section_enabled !== '0' && (
+          <section className="store-shell products-section">
+            {settings.filter_bar_enabled !== '0' && (
+              <div className="filter-bar" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <div className="filter-chips-group">
+                    <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--muted)', marginRight: '4px' }}>FILTER:</span>
+                    <button type="button" className="filter-pill active" data-filter="all">All Items</button>
+                    <button type="button" className="filter-pill" data-filter="hot">🔥 Hot Deals</button>
+                    <button type="button" className="filter-pill" data-filter="editor">🏆 Editor\'s Pick</button>
+                    <button type="button" className="filter-pill" data-filter="emi">💳 0% EMI Ready</button>
+                    <button type="button" className="filter-pill" data-filter="under10k">💰 Under Rs. 10,000</button>
+                    <button type="button" className="filter-pill" data-filter="flagship">📱 Flagships</button>
+                    <button type="button" className="filter-pill" data-filter="local">🇳🇵 Nepal Classic</button>
+                  </div>
+
+                  <div className="sort-controls">
+                    <label htmlFor="sortSelect">Sort By:</label>
+                    <select id="sortSelect" className="sort-select">
+                      <option value="featured">Featured First</option>
+                      <option value="price-asc">Price: Low to High</option>
+                      <option value="price-desc">Price: High to Low</option>
+                      <option value="discount">Biggest Discount</option>
+                      <option value="rating">Highest Rated</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Quick Store and Price Range Bar */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', paddingTop: '10px', borderTop: '1px solid var(--line)' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted)' }}>VERIFIED STORES:</span>
+                  <button type="button" className="filter-pill active store-filter-pill" data-store="all">All Stores</button>
+                  <button type="button" className="filter-pill store-filter-pill" data-store="daraz">Daraz Mall</button>
+                  <button type="button" className="filter-pill store-filter-pill" data-store="oliz">Oliz Store</button>
+                  <button type="button" className="filter-pill store-filter-pill" data-store="samsung">Samsung Plaza</button>
+                  <button type="button" className="filter-pill store-filter-pill" data-store="evo">EvoStore</button>
+                  <button type="button" className="filter-pill store-filter-pill" data-store="goldstar">Goldstar</button>
+                </div>
+              </div>
+            )}
+
+            <div className="section-heading" style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <span className="section-kicker">{settings.catalog_kicker || 'VERIFIED CATALOG'}</span>
+                <h2>{settings.catalog_title || 'Curated Products in Nepal'}</h2>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                {/* REHub View Mode Switcher: Grid, List, Table */}
+                <div className="view-mode-toggle" aria-label="Catalog View Modes">
+                  <button
+                    type="button"
+                    className={`view-btn ${defaultCatalogView === 'grid' ? 'active' : ''}`}
+                    data-view="grid"
+                    title="Grid View"
+                  >
+                    🔲 Grid
+                  </button>
+                  <button
+                    type="button"
+                    className={`view-btn ${defaultCatalogView === 'list' ? 'active' : ''}`}
+                    data-view="list"
+                    title="Detailed List View"
+                  >
+                    📄 List
+                  </button>
+                  <button
+                    type="button"
+                    className={`view-btn ${defaultCatalogView === 'table' ? 'active' : ''}`}
+                    data-view="table"
+                    title="Compact Table Comparison"
+                  >
+                    📑 Table
+                  </button>
+                </div>
+                <span id="productCountBadge" className="section-count">
+                  Showing {products.length} products
+                </span>
+              </div>
+            </div>
+
+            {products.length > 0 ? (
+              <div
+                id="productGrid"
+                className={`product-grid ${defaultCatalogView === 'list' ? 'view-list' : defaultCatalogView === 'table' ? 'view-table' : ''}`}
+              >
+                {products.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            ) : (
+              <div className="store-empty">
+                <div className="empty-icon">🔍</div>
+                <h3>No products available yet</h3>
+                <p>Check back soon or visit our admin panel to seed curated products.</p>
+                <a href="/admin" className="primary-action">
+                  Go to Admin Portal
+                </a>
+              </div>
+            )}
+
+            <div id="noSearchResults" className="store-empty" style={{ display: 'none' }}>
+              <div className="empty-icon">⌕</div>
+              <h3>No matching products found</h3>
+              <p>Try searching with another keyword or reset your filter chips.</p>
+              <button
+                id="resetFiltersBtn"
+                type="button"
+                className="primary-action"
+                style={{ marginTop: '12px' }}
+              >
+                Reset All Filters
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* Nepal Store Shipping & Delivery Estimator */}
-        {settings.delivery_estimator_enabled !== '0' && (
+        {settings.delivery_guide_section_enabled !== '0' && settings.delivery_estimator_enabled !== '0' && (
           <section className="store-shell" style={{ marginTop: '36px' }}>
             <NepalCityDeliveryEstimator />
           </section>
         )}
 
         {/* Nepal Shopping FAQ Accordion */}
-        <NepalShoppingFaq />
+        {settings.faq_section_enabled !== '0' && <NepalShoppingFaq settings={settings} />}
 
-        <EditorialBanner count={products.length} />
+        {/* Editorial Disclosure Banner */}
+        {settings.editorial_banner_enabled !== '0' && (
+          <EditorialBanner count={products.length} settings={settings} />
+        )}
+
         <Footer settings={settings} categories={categories} />
         <MobileBottomBar activeTab="home" />
       </div>
@@ -397,7 +436,7 @@ export const HomePage: FC<{
 
   // REHub View Mode Switcher
   const viewBtns = document.querySelectorAll('.view-btn');
-  const savedView = localStorage.getItem('bn_catalog_view') || 'grid';
+  const savedView = localStorage.getItem('bn_catalog_view') || '${defaultCatalogView}';
   if (productGrid && savedView !== 'grid') {
     productGrid.classList.remove('view-grid', 'view-list', 'view-table');
     productGrid.classList.add('view-' + savedView);

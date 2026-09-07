@@ -1209,7 +1209,7 @@ app.post('/admin/users/:id/delete', async (c) => {
   return c.redirect('/admin?tab=users&msg=User+access+revoked');
 });
 
-// Admin Action: Update Site Settings & Feature Flags
+// Admin Action: Update Site Settings & Feature Flags / Customizer
 app.post('/admin/settings', async (c) => {
   const s = await getSession(c);
   if (!s || s.role !== 'admin') return c.redirect('/admin/login');
@@ -1220,23 +1220,24 @@ app.post('/admin/settings', async (c) => {
 
     const updatePayload: Record<string, string> = {};
 
-    if (body['site_title'] !== undefined) updatePayload.site_title = String(body['site_title']).trim();
-    if (body['site_description'] !== undefined) updatePayload.site_description = String(body['site_description']).trim();
-    if (body['announcement_text'] !== undefined) updatePayload.announcement_text = String(body['announcement_text']).trim();
-    if (body['contact_phone'] !== undefined) updatePayload.contact_phone = String(body['contact_phone']).trim();
-    if (body['whatsapp_number'] !== undefined) updatePayload.whatsapp_number = String(body['whatsapp_number']).trim();
-    if (body['social_facebook'] !== undefined) updatePayload.social_facebook = String(body['social_facebook']).trim();
-    if (body['social_instagram'] !== undefined) updatePayload.social_instagram = String(body['social_instagram']).trim();
+    // 1. Process explicit checkbox list (unchecked checkboxes are omitted by browser)
+    if (body['_checkbox_fields']) {
+      const checkboxList = String(body['_checkbox_fields']).split(',');
+      for (const field of checkboxList) {
+        const trimmed = field.trim();
+        if (trimmed) {
+          updatePayload[trimmed] = body[trimmed] ? '1' : '0';
+        }
+      }
+    }
 
-    // Feature Flags Toggles
-    if (returnTab === 'customizer') {
-      updatePayload.flash_sale_enabled = body['flash_sale_enabled'] ? '1' : '0';
-      updatePayload.emi_enabled = body['emi_enabled'] ? '1' : '0';
-      updatePayload.currency_converter_enabled = body['currency_converter_enabled'] ? '1' : '0';
-      updatePayload.delivery_estimator_enabled = body['delivery_estimator_enabled'] ? '1' : '0';
-      updatePayload.comparison_enabled = body['comparison_enabled'] ? '1' : '0';
-      updatePayload.announcement_active = body['announcement_active'] ? '1' : '0';
-      if (body['flash_sale_title'] !== undefined) updatePayload.flash_sale_title = String(body['flash_sale_title']).trim();
+    // 2. Process all other form fields
+    for (const [key, val] of Object.entries(body)) {
+      if (key.startsWith('_')) continue;
+      if (updatePayload[key] !== undefined) continue;
+      if (typeof val === 'string') {
+        updatePayload[key] = val.trim();
+      }
     }
 
     await updateSettings(c.env?.DB, updatePayload);

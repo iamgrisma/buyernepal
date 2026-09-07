@@ -28,12 +28,6 @@ export const ProductPage: FC<{
   const brand = product.brand || 'Official';
   const emiAvailable = Number(product.emi_available) === 1;
   const baseMonthlyEmi = Math.round(price / 18);
-  // Only actual cellular smartphones require NTA MDMS / IMEI registration tips
-  const isPhoneOrCellular = Boolean(
-    product.name &&
-    /(iphone\s*(1[1-7]|se|pro|plus|mini)|galaxy\s*(s\d{2}|z\s*(fold|flip)|a\d{2}|m\d{2})|pixel\s*\d|redmi\s*note|oneplus\s*\d|poco\s*(f|x|m)\d)/i.test(product.name) &&
-    !/(case|cover|charger|adapter|cable|buds|airpods|watch|band|air fryer|cleaner|speaker|power\s*bank)/i.test(product.name)
-  );
 
   const priceHistory = product.price_history || [
     { month: 'Apr 2026', price: Math.round(price * 1.18) },
@@ -76,6 +70,7 @@ export const ProductPage: FC<{
       image={product.image_url}
       type="product"
       jsonLd={jsonLd}
+      settings={settings}
     >
       <div className="store-page product-detail-page">
         <Header settings={settings} categories={categories} activeSlug={product.category_name?.toLowerCase()} />
@@ -173,15 +168,7 @@ export const ProductPage: FC<{
                     <p>We research and aggregate verified rates across top Nepal retailers so you don't overpay.</p>
                   </div>
                 </div>
-                {isPhoneOrCellular && (
-                  <div className="trust-item">
-                    <span className="trust-icon">📱</span>
-                    <div>
-                      <strong>Consumer Tip: Check MDMS for Phones</strong>
-                      <p>Always verify IMEI registration on <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: 700 }}>mdms.nta.gov.np</a> before finalizing phone purchases.</p>
-                    </div>
-                  </div>
-                )}
+
                 <div className="trust-item">
                   <span className="trust-icon">🧾</span>
                   <div>
@@ -230,7 +217,7 @@ export const ProductPage: FC<{
                 <div className="product-variants-box">
                   <div className="variant-label-row">
                     <span className="variant-heading">Select Model / Storage Variant:</span>
-                    <span className="variant-mdms-tag">✓ Verified Nepal Stock</span>
+                    <span className="variant-stock-tag">✓ Official Stock</span>
                   </div>
                   <div className="variant-pills-row">
                     {product.variants.map((v, i) => (
@@ -722,12 +709,7 @@ export const ProductPage: FC<{
                       <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Official Nepal Warranty</td>
                       <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Manufacturer Warranty via Authorized Importer</td>
                     </tr>
-                    {isPhoneOrCellular && (
-                      <tr>
-                        <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>NTA MDMS Buyer Tip</td>
-                        <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Check IMEI status on <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: 700 }}>mdms.nta.gov.np</a> before purchase</td>
-                      </tr>
-                    )}
+
                     <tr>
                       <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Delivery Window</td>
                       <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Kathmandu Valley: 24h Express • Nationwide: 2-3 Days</td>

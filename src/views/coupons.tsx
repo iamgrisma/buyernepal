@@ -16,6 +16,7 @@ export const CouponsPage: FC<{
       title="Verified Promo Codes, Discount Coupons & Deals in Nepal | BuyerNepal"
       description="Exclusive Daraz vouchers, Nepal bank card discounts, festive promo codes, and verified store deals in Nepal. Verified daily by BuyerNepal editors."
       url="https://buyernepal.com/coupons"
+      settings={settings}
     >
       <div className="store-page coupons-page">
         <Header settings={settings} categories={categories} activeSlug="coupons" />

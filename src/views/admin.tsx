@@ -5,25 +5,26 @@ import { Layout } from './layout';
 export const AdminLoginView: FC<{ error?: string; success?: string }> = ({ error, success }) => {
   return (
     <Layout title="Admin Portal Login — BuyerNepal">
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a', padding: '20px' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', padding: '20px' }}>
         <div
           style={{
-            background: '#ffffff',
+            background: 'var(--card-bg)',
+            border: '1px solid var(--line)',
             borderRadius: '16px',
             padding: '40px 36px',
             maxWidth: '440px',
             width: '100%',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            boxShadow: 'var(--shadow-xl)'
           }}
         >
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <span className="store-logo-mark" style={{ margin: '0 auto 16px', width: '48px', height: '48px', fontSize: '24px' }}>
               B
             </span>
-            <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.8px' }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--ink)', letterSpacing: '-0.8px' }}>
               BuyerNepal Portal
             </h1>
-            <p style={{ fontSize: '13px', color: '#64748b', marginTop: '6px' }}>
+            <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '6px' }}>
               Management suite for verified Nepal products, deals and stores.
             </p>
           </div>
@@ -52,7 +53,7 @@ export const AdminLoginView: FC<{ error?: string; success?: string }> = ({ error
           </form>
 
           <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '13px' }}>
-            <a href="/" style={{ color: '#64748b', fontWeight: 600 }}>← Return to Public Storefront</a>
+            <a href="/" style={{ color: 'var(--muted)', fontWeight: 600 }}>← Return to Public Storefront</a>
           </div>
         </div>
       </div>
@@ -265,7 +266,7 @@ export const AdminDashboardView: FC<{
                   {activeTab === 'settings' && 'Global Settings'}
                 </span>
               </div>
-              <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.8px', margin: 0 }}>
+              <h1 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--ink)', letterSpacing: '-0.8px', margin: 0 }}>
                 {activeTab === 'overview' && 'Executive Overview & Analytics'}
                 {activeTab === 'products' && 'Curated Products Catalog'}
                 {activeTab === 'categories' && 'Departments & Menu Hierarchy'}
@@ -291,7 +292,7 @@ export const AdminDashboardView: FC<{
               >
                 + Add Curated Product
               </button>
-              <a href="/" target="_blank" className="primary-action" style={{ background: '#ffffff', color: '#0f172a', border: '1px solid var(--line)' }}>
+              <a href="/" target="_blank" className="btn-secondary">
                 View Storefront ↗
               </a>
               <form method="post" action="/admin/seed" style={{ display: 'inline' }}>
@@ -1248,26 +1249,271 @@ export const AdminDashboardView: FC<{
             </div>
           )}
 
-          {/* TAB: STORE CUSTOMIZER & FEATURE FLAGS */}
+          {/* TAB: STORE CUSTOMIZER & THEME MANAGER */}
           {activeTab === 'customizer' && (
             <div>
-              <div className="admin-card">
-                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '6px' }}>
-                  🎨 2026 Store Customizer &amp; Feature Flags
-                </h2>
-                <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '24px' }}>
-                  Toggle cutting-edge discovery features on the public storefront with real-time effect.
-                </p>
+              {/* Customizer Sticky Sub-Header */}
+              <div
+                className="admin-card"
+                style={{
+                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                  color: '#ffffff',
+                  marginBottom: '20px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '16px'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '20px' }}>🎨</span>
+                    <h2 style={{ fontSize: '20px', fontWeight: 900, margin: 0, color: '#ffffff', letterSpacing: '-0.5px' }}>
+                      WordPress &amp; REHub-Grade Visual Customizer
+                    </h2>
+                    <span className="badge" style={{ background: '#f43f5e', color: '#ffffff', fontWeight: 700 }}>
+                      Live Edge SSR
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0, maxWidth: '650px', lineHeight: 1.5 }}>
+                    Control your store's palette, typography, container scale, section visibility, navigation menus, and homepage microcopy in real-time. Every change updates the public storefront immediately.
+                  </p>
+                </div>
 
-                <form method="post" action="/admin/settings">
-                  <input type="hidden" name="_return_tab" value="customizer" />
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <a
+                    href="/"
+                    target="_blank"
+                    className="primary-action"
+                    style={{ background: 'rgba(255, 255, 255, 0.1)', color: '#ffffff', border: '1px solid rgba(255, 255, 255, 0.2)' }}
+                  >
+                    View Live Store ↗
+                  </a>
+                  <button
+                    type="submit"
+                    form="customizerForm"
+                    className="primary-action"
+                    style={{ background: 'var(--accent)', color: '#ffffff', fontWeight: 800 }}
+                  >
+                    Save All Changes 🚀
+                  </button>
+                </div>
+              </div>
+
+              <form id="customizerForm" method="post" action="/admin/settings">
+                <input type="hidden" name="_return_tab" value="customizer" />
+                <input
+                  type="hidden"
+                  name="_checkbox_fields"
+                  value="flash_sale_enabled,emi_enabled,currency_converter_enabled,delivery_estimator_enabled,comparison_enabled,announcement_active,hero_enabled,header_badges_enabled,trust_strip_enabled,coupons_section_enabled,categories_section_enabled,filter_bar_enabled,catalog_section_enabled,delivery_guide_section_enabled,blog_section_enabled,faq_section_enabled,editorial_banner_enabled,menu_show_deals,menu_show_compare,menu_show_charts,menu_show_blog,menu_show_coupons,menu_show_stores,menu_show_brands"
+                />
+
+                {/* 1. VISUAL THEME, COLOR & TYPOGRAPHY */}
+                <div className="admin-card" style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', borderBottom: '1px solid var(--line)', paddingBottom: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>🎨</span>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                        1. Visual Theme, Palette &amp; Typography
+                      </h3>
+                      <small style={{ color: 'var(--muted)' }}>Global CSS variables and font scaling injected dynamically</small>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+                    {/* Primary Accent Color */}
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span>Brand Primary Accent Color</span>
+                        <span style={{ fontWeight: 600, color: 'var(--accent)' }}>{settings.theme_accent_color || '#dc2626'}</span>
+                      </label>
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '6px' }}>
+                        <input
+                          id="customizerAccentColor"
+                          type="color"
+                          defaultValue={settings.theme_accent_color || '#dc2626'}
+                          style={{ width: '48px', height: '40px', padding: '2px', border: '1px solid var(--line)', borderRadius: '8px', cursor: 'pointer', background: 'transparent' }}
+                          onchange="document.getElementById('customizerAccentHex').value = this.value;"
+                        />
+                        <input
+                          id="customizerAccentHex"
+                          type="text"
+                          name="theme_accent_color"
+                          defaultValue={settings.theme_accent_color || '#dc2626'}
+                          style={{ flex: 1, fontFamily: 'monospace', fontWeight: 700 }}
+                          oninput="if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) document.getElementById('customizerAccentColor').value = this.value;"
+                        />
+                      </div>
+                      {/* Swatches */}
+                      <div style={{ display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <small style={{ fontSize: '11px', color: 'var(--muted)', marginRight: '4px' }}>Presets:</small>
+                        {[
+                          { name: 'Crimson', hex: '#dc2626' },
+                          { name: 'Rose', hex: '#e11d48' },
+                          { name: 'Sapphire', hex: '#2563eb' },
+                          { name: 'Emerald', hex: '#059669' },
+                          { name: 'Violet', hex: '#7c3aed' },
+                          { name: 'Amber', hex: '#d97706' },
+                          { name: 'Slate', hex: '#0f172a' }
+                        ].map((swatch) => (
+                          <button
+                            key={swatch.hex}
+                            type="button"
+                            title={swatch.name}
+                            style={{
+                              width: '22px',
+                              height: '22px',
+                              borderRadius: '50%',
+                              backgroundColor: swatch.hex,
+                              border: '2px solid #ffffff',
+                              boxShadow: '0 0 0 1px rgba(0,0,0,0.2)',
+                              cursor: 'pointer'
+                            }}
+                            onclick={`document.getElementById('customizerAccentColor').value = '${swatch.hex}'; document.getElementById('customizerAccentHex').value = '${swatch.hex}';`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Font Family */}
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Typography / Primary Font Family</label>
+                      <select name="theme_font" defaultValue={settings.theme_font || 'Outfit'}>
+                        <option value="Outfit">Outfit (Modern Geometric Brand Sans)</option>
+                        <option value="Inter">Inter (Ultra-Clean Digital Editorial)</option>
+                        <option value="Plus Jakarta Sans">Plus Jakarta Sans (High-End SaaS &amp; Tech)</option>
+                        <option value="Poppins">Poppins (Friendly Display &amp; E-commerce)</option>
+                        <option value="Roboto">Roboto (Universal Standard Web Sans)</option>
+                      </select>
+                      <small style={{ color: 'var(--muted)', fontSize: '11.5px', marginTop: '4px', display: 'block' }}>
+                        Loaded directly via Google Fonts CDN with zero layout shifts.
+                      </small>
+                    </div>
+
+                    {/* Container Max Width */}
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Store Container Geometry</label>
+                      <select name="theme_container_width" defaultValue={settings.theme_container_width || '1240px'}>
+                        <option value="1240px">1240px (Standard Balanced — Default)</option>
+                        <option value="1360px">1360px (Modern Widescreen)</option>
+                        <option value="1480px">1480px (Ultra-Wide High Density)</option>
+                      </select>
+                      <small style={{ color: 'var(--muted)', fontSize: '11.5px', marginTop: '4px', display: 'block' }}>
+                        Controls max-width of the storefront content wrapper.
+                      </small>
+                    </div>
+
+                    {/* Product Card Style */}
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Product Card Visual Design Style</label>
+                      <select name="card_style" defaultValue={settings.card_style || 'modern'}>
+                        <option value="modern">Modern Floating (Soft Shadow &amp; Pill Badges)</option>
+                        <option value="bordered">Bordered High-Contrast (REHub Clean 2px Border)</option>
+                        <option value="compact">Compact Directory (Dense Catalog Shopping)</option>
+                      </select>
+                      <small style={{ color: 'var(--muted)', fontSize: '11.5px', marginTop: '4px', display: 'block' }}>
+                        Switches borders, elevations, and card paddings across the catalog.
+                      </small>
+                    </div>
+
+                    {/* Default Catalog Layout View */}
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Default Catalog Layout View</label>
+                      <select name="catalog_default_view" defaultValue={settings.catalog_default_view || 'grid'}>
+                        <option value="grid">4-Column Modern Grid (Default)</option>
+                        <option value="list">Horizontal Deal Rows (REHub Feed List)</option>
+                        <option value="table">Compact Spec Comparison Table</option>
+                      </select>
+                      <small style={{ color: 'var(--muted)', fontSize: '11.5px', marginTop: '4px', display: 'block' }}>
+                        Visitors can still switch views manually using the view buttons.
+                      </small>
+                    </div>
+
+                    {/* Default Dark Mode Mode */}
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Storefront Color Mode Default</label>
+                      <select name="dark_mode_default" defaultValue={settings.dark_mode_default || 'auto'}>
+                        <option value="auto">Auto (Match User Device OS Preference)</option>
+                        <option value="light">Force Crisp Light Mode</option>
+                        <option value="dark">Force Sleek Dark Mode</option>
+                      </select>
+                      <small style={{ color: 'var(--muted)', fontSize: '11.5px', marginTop: '4px', display: 'block' }}>
+                        Users can always toggle their own preference using the moon icon.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. HOMEPAGE SECTION VISIBILITY (LAYOUT BUILDER) */}
+                <div className="admin-card" style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', borderBottom: '1px solid var(--line)', paddingBottom: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>🏠</span>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                        2. Homepage Section Visibility &amp; Layout Switcher
+                      </h3>
+                      <small style={{ color: 'var(--muted)' }}>Turn individual homepage blocks ON or OFF instantly</small>
+                    </div>
+                  </div>
 
                   <div className="admin-flags-grid">
-                    {/* Feature 1: Flash Sale */}
+                    {/* Section: Hero */}
                     <div className="admin-flag-item">
                       <div className="admin-flag-info">
-                        <strong>⚡ Live Flash Sale with Ticking Timer</strong>
-                        <small>Display countdown banner &amp; claimed progress meter</small>
+                        <strong>🌟 Hero Search &amp; Value Proposition</strong>
+                        <small>Search bar, popular tags, and trust checklist</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="hero_enabled"
+                          value="1"
+                          defaultChecked={settings.hero_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: Header Badges */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>🏷️ Header Authority Badges</strong>
+                        <small>Right-side 3 badges in top navigation strip</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="header_badges_enabled"
+                          value="1"
+                          defaultChecked={settings.header_badges_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: Trust Strip */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>🛡️ Homepage 4-Card Trust Strip</strong>
+                        <small>Guarantees bar below the hero section</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="trust_strip_enabled"
+                          value="1"
+                          defaultChecked={settings.trust_strip_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: Flash Sale */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>⚡ Live Flash Sale Showcase</strong>
+                        <small>Ticking countdown timer &amp; flash deal cards</small>
                       </div>
                       <label className="switch">
                         <input
@@ -1280,11 +1526,147 @@ export const AdminDashboardView: FC<{
                       </label>
                     </div>
 
-                    {/* Feature 2: Bank 0% EMI Calculator */}
+                    {/* Section: Coupons Strip */}
                     <div className="admin-flag-item">
                       <div className="admin-flag-info">
-                        <strong>💳 Nepal Bank 0% EMI Calculator</strong>
-                        <small>Interactive installment estimator on products &gt; Rs. 10,000</small>
+                        <strong>🎟️ Promo Vouchers &amp; Coupons Strip</strong>
+                        <small>Interactive 1-click copy coupon codes</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="coupons_section_enabled"
+                          value="1"
+                          defaultChecked={settings.coupons_section_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: Categories Grid */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>📁 Category Filter Chips Row</strong>
+                        <small>Browse by Nepali department pill buttons</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="categories_section_enabled"
+                          value="1"
+                          defaultChecked={settings.categories_section_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: Filter Bar */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>🔍 Filter &amp; Sorting Toolbar</strong>
+                        <small>Hot deals, 0% EMI chips, price sort dropdown</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="filter_bar_enabled"
+                          value="1"
+                          defaultChecked={settings.filter_bar_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: Catalog Grid */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>🛍️ Main Curated Products Catalog</strong>
+                        <small>Core product showcase grid and list</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="catalog_section_enabled"
+                          value="1"
+                          defaultChecked={settings.catalog_section_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: Delivery Estimator */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>🚚 Nepal Shipping Transit Guide</strong>
+                        <small>Calculator for 77 districts and KTM couriers</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="delivery_guide_section_enabled"
+                          value="1"
+                          defaultChecked={settings.delivery_guide_section_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: FAQ */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>❓ Shopping Advisory FAQ Accordion</strong>
+                        <small>Nepali customer buying guides &amp; warranty info</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="faq_section_enabled"
+                          value="1"
+                          defaultChecked={settings.faq_section_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: Editorial Banner */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>📰 Editorial Transparency Banner</strong>
+                        <small>"A Better Shopping Experience" statement box</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="editorial_banner_enabled"
+                          value="1"
+                          defaultChecked={settings.editorial_banner_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Section: Announcement Bar */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>📢 Top Notification Announcement</strong>
+                        <small>Urgent announcement bar above header</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="announcement_active"
+                          value="1"
+                          defaultChecked={settings.announcement_active !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Feature: EMI Calculator */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>💳 Bank 0% EMI Calculator</strong>
+                        <small>Monthly installment estimator on products</small>
                       </div>
                       <label className="switch">
                         <input
@@ -1297,11 +1679,11 @@ export const AdminDashboardView: FC<{
                       </label>
                     </div>
 
-                    {/* Feature 3: Multi-Currency Switcher */}
+                    {/* Feature: Multi-Currency Switcher */}
                     <div className="admin-flag-item">
                       <div className="admin-flag-info">
                         <strong>💱 Multi-Currency Converter</strong>
-                        <small>Allow shoppers to convert prices between NPR, USD, INR</small>
+                        <small>Convert NPR to USD and INR</small>
                       </div>
                       <label className="switch">
                         <input
@@ -1314,28 +1696,11 @@ export const AdminDashboardView: FC<{
                       </label>
                     </div>
 
-                    {/* Feature 4: Nepal City Delivery Fee Estimator */}
+                    {/* Feature: Comparison Dock */}
                     <div className="admin-flag-item">
                       <div className="admin-flag-info">
-                        <strong>🚚 Nepal City Delivery Estimator</strong>
-                        <small>Show shipping charges &amp; times across Kathmandu &amp; 77 districts</small>
-                      </div>
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          name="delivery_estimator_enabled"
-                          value="1"
-                          defaultChecked={settings.delivery_estimator_enabled !== '0'}
-                        />
-                        <span className="slider"></span>
-                      </label>
-                    </div>
-
-                    {/* Feature 5: Comparison Floating Dock */}
-                    <div className="admin-flag-item">
-                      <div className="admin-flag-info">
-                        <strong>⚖️ Product Comparison Dock</strong>
-                        <small>Enable side-by-side spec &amp; price comparisons (up to 3 items)</small>
+                        <strong>⚖️ Floating Comparison Dock</strong>
+                        <small>Side-by-side spec comparison tool</small>
                       </div>
                       <label className="switch">
                         <input
@@ -1347,28 +1712,318 @@ export const AdminDashboardView: FC<{
                         <span className="slider"></span>
                       </label>
                     </div>
+                  </div>
+                </div>
 
-                    {/* Feature 6: Top Announcement Banner */}
-                    <div className="admin-flag-item">
-                      <div className="admin-flag-info">
-                        <strong>📢 Top Notification Banner</strong>
-                        <small>Display top urgent deal strip across the site</small>
-                      </div>
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          name="announcement_active"
-                          value="1"
-                          defaultChecked={settings.announcement_active !== '0'}
-                        />
-                        <span className="slider"></span>
-                      </label>
+                {/* 3. NAVIGATION MENU MANAGER */}
+                <div className="admin-card" style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', borderBottom: '1px solid var(--line)', paddingBottom: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>🧭</span>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                        3. Header Navigation Menu &amp; Badges Manager
+                      </h3>
+                      <small style={{ color: 'var(--muted)' }}>Configure which links and badges appear in the top navbar and mobile drawer</small>
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+                  <strong style={{ display: 'block', fontSize: '13px', color: 'var(--ink)', marginBottom: '10px' }}>
+                    Default Navigation Menu Pills
+                  </strong>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginBottom: '20px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', background: 'var(--bg-alt)', padding: '10px 14px', borderRadius: '8px' }}>
+                      <input type="checkbox" name="menu_show_deals" value="1" defaultChecked={settings.menu_show_deals !== '0'} />
+                      <span>🏠 All Deals</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', background: 'var(--bg-alt)', padding: '10px 14px', borderRadius: '8px' }}>
+                      <input type="checkbox" name="menu_show_compare" value="1" defaultChecked={settings.menu_show_compare !== '0'} />
+                      <span>⚖️ Compare Tool</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', background: 'var(--bg-alt)', padding: '10px 14px', borderRadius: '8px' }}>
+                      <input type="checkbox" name="menu_show_charts" value="1" defaultChecked={settings.menu_show_charts !== '0'} />
+                      <span>🏆 Top Charts</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', background: 'var(--bg-alt)', padding: '10px 14px', borderRadius: '8px' }}>
+                      <input type="checkbox" name="menu_show_blog" value="1" defaultChecked={settings.menu_show_blog !== '0'} />
+                      <span>📰 Tech Guides</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', background: 'var(--bg-alt)', padding: '10px 14px', borderRadius: '8px' }}>
+                      <input type="checkbox" name="menu_show_coupons" value="1" defaultChecked={settings.menu_show_coupons !== '0'} />
+                      <span>🎟️ Coupons</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', background: 'var(--bg-alt)', padding: '10px 14px', borderRadius: '8px' }}>
+                      <input type="checkbox" name="menu_show_stores" value="1" defaultChecked={settings.menu_show_stores !== '0'} />
+                      <span>🏪 Stores</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', background: 'var(--bg-alt)', padding: '10px 14px', borderRadius: '8px' }}>
+                      <input type="checkbox" name="menu_show_brands" value="1" defaultChecked={settings.menu_show_brands !== '0'} />
+                      <span>🏷️ Brands</span>
+                    </label>
+                  </div>
+
+                  <strong style={{ display: 'block', fontSize: '13px', color: 'var(--ink)', marginBottom: '10px' }}>
+                    Custom Navigation Links (Optional)
+                  </strong>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                    <div style={{ background: 'var(--bg-alt)', padding: '14px', borderRadius: '10px' }}>
+                      <label style={{ fontWeight: 700, fontSize: '12px', display: 'block', marginBottom: '6px' }}>Custom Link 1</label>
+                      <input
+                        name="custom_nav_1_label"
+                        type="text"
+                        placeholder="Link Label (e.g. Festival Offers)"
+                        defaultValue={settings.custom_nav_1_label || ''}
+                        style={{ marginBottom: '8px' }}
+                      />
+                      <input
+                        name="custom_nav_1_url"
+                        type="text"
+                        placeholder="Target URL (e.g. /category/electronics or /go/deal)"
+                        defaultValue={settings.custom_nav_1_url || ''}
+                      />
+                    </div>
+                    <div style={{ background: 'var(--bg-alt)', padding: '14px', borderRadius: '10px' }}>
+                      <label style={{ fontWeight: 700, fontSize: '12px', display: 'block', marginBottom: '6px' }}>Custom Link 2</label>
+                      <input
+                        name="custom_nav_2_label"
+                        type="text"
+                        placeholder="Link Label (e.g. Dashain Deals)"
+                        defaultValue={settings.custom_nav_2_label || ''}
+                        style={{ marginBottom: '8px' }}
+                      />
+                      <input
+                        name="custom_nav_2_url"
+                        type="text"
+                        placeholder="Target URL (e.g. /coupons)"
+                        defaultValue={settings.custom_nav_2_url || ''}
+                      />
+                    </div>
+                  </div>
+
+                  <strong style={{ display: 'block', fontSize: '13px', color: 'var(--ink)', marginBottom: '10px' }}>
+                    Header Nav Highlights (3 Badges on the right)
+                  </strong>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Highlight Badge 1</label>
+                      <input
+                        name="nav_highlight_1"
+                        type="text"
+                        defaultValue={settings.nav_highlight_1 || '🔍 Independent Reviews'}
+                      />
+                    </div>
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Highlight Badge 2</label>
+                      <input
+                        name="nav_highlight_2"
+                        type="text"
+                        defaultValue={settings.nav_highlight_2 || '⚖️ Multi-Store Compare'}
+                      />
+                    </div>
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Highlight Badge 3</label>
+                      <input
+                        name="nav_highlight_3"
+                        type="text"
+                        defaultValue={settings.nav_highlight_3 || '🇳🇵 Verified Nepal Pricing'}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. HERO SECTION COPY, SEARCH TAGS & STATS */}
+                <div className="admin-card" style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', borderBottom: '1px solid var(--line)', paddingBottom: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>✍️</span>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                        4. Hero Section Headlines, Microcopy &amp; Metrics
+                      </h3>
+                      <small style={{ color: 'var(--muted)' }}>Customize every word on the main hero banner</small>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                      <label>Hero Eyebrow Pill Text</label>
+                      <input
+                        name="hero_eyebrow"
+                        type="text"
+                        defaultValue={settings.hero_eyebrow || "🇳🇵 NEPAL'S PREMIER SHOPPING INTELLIGENCE"}
+                      />
+                    </div>
                     <div className="form-group">
-                      <label>Flash Sale Banner Title</label>
+                      <label>Headline Line 1 (Standard Weight)</label>
+                      <input
+                        name="hero_headline_line1"
+                        type="text"
+                        defaultValue={settings.hero_headline_line1 || 'Shop smarter.'}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Headline Line 2 (Italicized Accent)</label>
+                      <input
+                        name="hero_headline_line2"
+                        type="text"
+                        defaultValue={settings.hero_headline_line2 || 'Never overpay in Nepal.'}
+                      />
+                    </div>
+                    <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                      <label>Hero Subtitle / Description</label>
+                      <textarea
+                        name="hero_subtitle"
+                        rows={2}
+                        defaultValue={settings.hero_subtitle || settings.site_description || 'Discover products worth buying in Nepal — verified NPR prices, authorized store links, and zero marketplace markups.'}
+                      ></textarea>
+                    </div>
+                    <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                      <label>Popular Search Quick Tags (Comma-Separated)</label>
+                      <input
+                        name="hero_tags"
+                        type="text"
+                        defaultValue={settings.hero_tags || 'iPhone 16, Galaxy S25, MacBook M3, Sony WH-1000XM5, Xiaomi Air Fryer, Goldstar Shoes, Chyangra Pashmina'}
+                      />
+                      <small style={{ color: 'var(--muted)', fontSize: '11px' }}>Clicking these tags on the homepage immediately filters the catalog.</small>
+                    </div>
+                  </div>
+
+                  <strong style={{ display: 'block', fontSize: '13px', color: 'var(--ink)', marginTop: '16px', marginBottom: '10px' }}>
+                    Hero Checkmark Trust Points (4 Items)
+                  </strong>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+                    <input name="hero_point_1" type="text" defaultValue={settings.hero_point_1 || '✓ Verified NPR Pricing'} />
+                    <input name="hero_point_2" type="text" defaultValue={settings.hero_point_2 || '✓ Official Nepal Warranties'} />
+                    <input name="hero_point_3" type="text" defaultValue={settings.hero_point_3 || '✓ 0% Bank Credit Card EMI'} />
+                    <input name="hero_point_4" type="text" defaultValue={settings.hero_point_4 || '✓ Direct Seller Links'} />
+                  </div>
+
+                  <strong style={{ display: 'block', fontSize: '13px', color: 'var(--ink)', marginTop: '16px', marginBottom: '10px' }}>
+                    Hero Right Card Curation Metrics (3 Stat Boxes)
+                  </strong>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                    <div style={{ background: 'var(--bg-alt)', padding: '12px', borderRadius: '8px' }}>
+                      <label style={{ fontSize: '11.5px', fontWeight: 700 }}>Stat Box 1</label>
+                      <input name="hero_stat1_num" type="text" placeholder="Number (e.g. 500+)" defaultValue={settings.hero_stat1_num || '500+'} style={{ marginBottom: '6px' }} />
+                      <input name="hero_stat1_lbl" type="text" placeholder="Label" defaultValue={settings.hero_stat1_lbl || 'Curated Products'} />
+                    </div>
+                    <div style={{ background: 'var(--bg-alt)', padding: '12px', borderRadius: '8px' }}>
+                      <label style={{ fontSize: '11.5px', fontWeight: 700 }}>Stat Box 2</label>
+                      <input name="hero_stat2_num" type="text" placeholder="Number (e.g. 15+)" defaultValue={settings.hero_stat2_num || '15+'} style={{ marginBottom: '6px' }} />
+                      <input name="hero_stat2_lbl" type="text" placeholder="Label" defaultValue={settings.hero_stat2_lbl || 'Nepal Stores'} />
+                    </div>
+                    <div style={{ background: 'var(--bg-alt)', padding: '12px', borderRadius: '8px' }}>
+                      <label style={{ fontSize: '11.5px', fontWeight: 700 }}>Stat Box 3</label>
+                      <input name="hero_stat3_num" type="text" placeholder="Number (e.g. 100%)" defaultValue={settings.hero_stat3_num || '100%'} style={{ marginBottom: '6px' }} />
+                      <input name="hero_stat3_lbl" type="text" placeholder="Label" defaultValue={settings.hero_stat3_lbl || 'Unbiased Testing'} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. HOMEPAGE TRUST STRIP (4 CARDS) */}
+                <div className="admin-card" style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', borderBottom: '1px solid var(--line)', paddingBottom: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>🛡️</span>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                        5. Homepage Trust Strip (4 Verification Guarantee Cards)
+                      </h3>
+                      <small style={{ color: 'var(--muted)' }}>Displayed directly beneath the hero section to establish consumer confidence</small>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                    {/* Card 1 */}
+                    <div style={{ background: 'var(--bg-alt)', padding: '14px', borderRadius: '10px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                        <input name="trust_item1_icon" type="text" defaultValue={settings.trust_item1_icon || '🇳🇵'} style={{ width: '44px', textAlign: 'center', fontSize: '18px' }} />
+                        <input name="trust_item1_title" type="text" defaultValue={settings.trust_item1_title || 'Curated for Nepal'} style={{ flex: 1, fontWeight: 700 }} />
+                      </div>
+                      <textarea name="trust_item1_desc" rows={2} defaultValue={settings.trust_item1_desc || 'Prices, models and distributor warranties verified for Nepali buyers.'}></textarea>
+                    </div>
+
+                    {/* Card 2 */}
+                    <div style={{ background: 'var(--bg-alt)', padding: '14px', borderRadius: '10px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                        <input name="trust_item2_icon" type="text" defaultValue={settings.trust_item2_icon || '🏷️'} style={{ width: '44px', textAlign: 'center', fontSize: '18px' }} />
+                        <input name="trust_item2_title" type="text" defaultValue={settings.trust_item2_title || 'Zero Price Markups'} style={{ flex: 1, fontWeight: 700 }} />
+                      </div>
+                      <textarea name="trust_item2_desc" rows={2} defaultValue={settings.trust_item2_desc || 'Compare authentic prices across Daraz, Oliz Store, EvoStore & more.'}></textarea>
+                    </div>
+
+                    {/* Card 3 */}
+                    <div style={{ background: 'var(--bg-alt)', padding: '14px', borderRadius: '10px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                        <input name="trust_item3_icon" type="text" defaultValue={settings.trust_item3_icon || '🔍'} style={{ width: '44px', textAlign: 'center', fontSize: '18px' }} />
+                        <input name="trust_item3_title" type="text" defaultValue={settings.trust_item3_title || 'Independent Testing'} style={{ flex: 1, fontWeight: 700 }} />
+                      </div>
+                      <textarea name="trust_item3_desc" rows={2} defaultValue={settings.trust_item3_desc || 'In-depth benchmarks, real-world testing, pros & cons from Nepal editors.'}></textarea>
+                    </div>
+
+                    {/* Card 4 */}
+                    <div style={{ background: 'var(--bg-alt)', padding: '14px', borderRadius: '10px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                        <input name="trust_item4_icon" type="text" defaultValue={settings.trust_item4_icon || '⚖️'} style={{ width: '44px', textAlign: 'center', fontSize: '18px' }} />
+                        <input name="trust_item4_title" type="text" defaultValue={settings.trust_item4_title || 'Multi-Store Comparison'} style={{ flex: 1, fontWeight: 700 }} />
+                      </div>
+                      <textarea name="trust_item4_desc" rows={2} defaultValue={settings.trust_item4_desc || 'Live price tracking & stock verification across verified Nepal retailers.'}></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 6. SECTION HEADINGS & BANNER COPY */}
+                <div className="admin-card" style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', borderBottom: '1px solid var(--line)', paddingBottom: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>📑</span>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                        6. Section Kickers, Headlines &amp; Announcement Bar
+                      </h3>
+                      <small style={{ color: 'var(--muted)' }}>Customize section titles, kickers, and notification text</small>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                      <label>Top Urgent Announcement Bar Text</label>
+                      <input
+                        name="announcement_text"
+                        type="text"
+                        defaultValue={settings.announcement_text || '🇳🇵 Nepal\'s Independent Shopping Intelligence • Real-Time Multi-Store Price Comparison & Tech Reviews'}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Departments Kicker (Small Uppercase)</label>
+                      <input
+                        name="categories_kicker"
+                        type="text"
+                        defaultValue={settings.categories_kicker || 'EXPLORE DEPARTMENTS'}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Departments Section Heading</label>
+                      <input
+                        name="categories_title"
+                        type="text"
+                        defaultValue={settings.categories_title || 'Shop by Nepali Category'}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Catalog Kicker (Small Uppercase)</label>
+                      <input
+                        name="catalog_kicker"
+                        type="text"
+                        defaultValue={settings.catalog_kicker || 'VERIFIED CATALOG'}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Catalog Section Heading</label>
+                      <input
+                        name="catalog_title"
+                        type="text"
+                        defaultValue={settings.catalog_title || 'Curated Products in Nepal'}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Flash Sale Title</label>
                       <input
                         name="flash_sale_title"
                         type="text"
@@ -1376,20 +2031,182 @@ export const AdminDashboardView: FC<{
                       />
                     </div>
                     <div className="form-group">
-                      <label>Top Announcement Banner Text</label>
+                      <label>Flash Sale Subtitle</label>
                       <input
-                        name="announcement_text"
+                        name="flash_sale_subtitle"
                         type="text"
-                        defaultValue={settings.announcement_text || '🇳🇵 Nepal\'s Independent Shopping Intelligence • Real-Time Multi-Store Price Comparison & Tech Reviews'}
+                        defaultValue={settings.flash_sale_subtitle || 'Exclusive discounts with verified authorized warranty. Prices end at countdown!'}
                       />
                     </div>
                   </div>
+                </div>
 
-                  <button type="submit" className="primary-action" style={{ marginTop: '8px' }}>
-                    Save Customizer Settings 🚀
-                  </button>
-                </form>
-              </div>
+                {/* 7. EDITORIAL BANNER & FAQ */}
+                <div className="admin-card" style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', borderBottom: '1px solid var(--line)', paddingBottom: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>💡</span>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                        7. Editorial Banner &amp; FAQ Advisory Headings
+                      </h3>
+                      <small style={{ color: 'var(--muted)' }}>Customize the editorial mission statement and advisory headers</small>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="form-group">
+                      <label>Editorial Banner Kicker</label>
+                      <input
+                        name="editorial_banner_kicker"
+                        type="text"
+                        defaultValue={settings.editorial_banner_kicker || 'A BETTER SHOPPING EXPERIENCE'}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Editorial Banner Title</label>
+                      <input
+                        name="editorial_banner_title"
+                        type="text"
+                        defaultValue={settings.editorial_banner_title || 'Verified Nepal prices.\nNo marketplace confusion.'}
+                      />
+                    </div>
+                    <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                      <label>Editorial Banner Description</label>
+                      <textarea
+                        name="editorial_banner_text"
+                        rows={2}
+                        defaultValue={settings.editorial_banner_text || 'BuyerNepal cuts through endless copycat listings, fake discounts, and unverified sellers. Every product listed here is inspected for authentic Nepal pricing, manufacturer warranty, and buyer satisfaction.'}
+                      ></textarea>
+                    </div>
+                    <div className="form-group">
+                      <label>FAQ Section Kicker</label>
+                      <input
+                        name="faq_kicker"
+                        type="text"
+                        defaultValue={settings.faq_kicker || 'BUYER GUIDE & HELP'}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>FAQ Section Title</label>
+                      <input
+                        name="faq_title"
+                        type="text"
+                        defaultValue={settings.faq_title || 'Frequently Asked Questions in Nepal'}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 8. FOOTER, AFFILIATE TRANSPARENCY & CONTACTS */}
+                <div className="admin-card" style={{ marginBottom: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', borderBottom: '1px solid var(--line)', paddingBottom: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>🦶</span>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>
+                        8. Footer, Legal Transparency &amp; Contact Information
+                      </h3>
+                      <small style={{ color: 'var(--muted)' }}>Footer about summary, affiliate disclosure statement, and official contacts</small>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Footer About Text</label>
+                    <textarea
+                      name="footer_about_text"
+                      rows={2}
+                      defaultValue={settings.footer_about_text || settings.site_description || 'Discover products worth buying in Nepal — curated recommendations, verified NPR prices, and direct store links.'}
+                    ></textarea>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Affiliate Transparency Statement (Consumer Disclosure)</label>
+                    <textarea
+                      name="footer_disclosure_text"
+                      rows={3}
+                      defaultValue={settings.footer_disclosure_text || 'BuyerNepal is an independent consumer guide and price comparison platform in Nepal. We research and verify products independently. When you click our partner links to retailers (such as Daraz, Hamrobazar, Oliz Store, Samsung Plaza) and make a purchase, we may receive a referral commission at no additional cost to you.'}
+                    ></textarea>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Copyright Line</label>
+                    <input
+                      name="copyright_text"
+                      type="text"
+                      defaultValue={settings.copyright_text || `© ${new Date().getFullYear()} ${settings.site_title || 'BuyerNepal'}. All verified prices in NPR (Nepali Rupees). Crafted with ❤️ for shoppers across Nepal 🇳🇵`}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Contact Phone (Kathmandu)</label>
+                      <input name="contact_phone" type="text" defaultValue={settings.contact_phone || '+977-1-4521098'} />
+                    </div>
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>WhatsApp Support Number</label>
+                      <input name="whatsapp_number" type="text" defaultValue={settings.whatsapp_number || '+977-9801234567'} />
+                    </div>
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Facebook Page URL</label>
+                      <input name="social_facebook" type="url" defaultValue={settings.social_facebook || ''} />
+                    </div>
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label>Instagram Page URL</label>
+                      <input name="social_instagram" type="url" defaultValue={settings.social_instagram || ''} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sticky Action Footer */}
+                <div
+                  style={{
+                    position: 'sticky',
+                    bottom: '20px',
+                    zIndex: 90,
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    color: '#ffffff',
+                    padding: '16px 24px',
+                    borderRadius: '16px',
+                    boxShadow: '0 20px 30px -10px rgba(0, 0, 0, 0.4)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '18px' }}>⚡</span>
+                    <div>
+                      <strong style={{ display: 'block', fontSize: '14px' }}>Ready to Publish Customizer Updates?</strong>
+                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>Saves directly to Cloudflare D1 key-value store with instant propagation.</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <a
+                      href="/"
+                      target="_blank"
+                      style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'underline' }}
+                    >
+                      Open Live Storefront ↗
+                    </a>
+                    <button
+                      type="submit"
+                      className="primary-action"
+                      style={{
+                        background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%)',
+                        color: '#ffffff',
+                        fontWeight: 800,
+                        padding: '12px 28px',
+                        fontSize: '14px',
+                        boxShadow: '0 4px 14px rgba(225, 29, 72, 0.4)'
+                      }}
+                    >
+                      Save Customizer Settings 🚀
+                    </button>
+                  </div>
+                </div>
+              </form>
 
               {/* Regional Traffic Analytics Visualizer */}
               <div className="admin-card">
@@ -1985,7 +2802,7 @@ export const AdminDashboardView: FC<{
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+              <button type="button" className="close-admin-modal btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="primary-action">
@@ -2085,7 +2902,7 @@ export const AdminDashboardView: FC<{
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+              <button type="button" className="close-admin-modal btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="primary-action">
@@ -2133,7 +2950,7 @@ export const AdminDashboardView: FC<{
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+              <button type="button" className="close-admin-modal btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="primary-action">
@@ -2190,7 +3007,7 @@ export const AdminDashboardView: FC<{
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+              <button type="button" className="close-admin-modal btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="primary-action">
@@ -2256,7 +3073,7 @@ export const AdminDashboardView: FC<{
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+              <button type="button" className="close-admin-modal btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="primary-action" style={{ background: '#d97706' }}>
@@ -2354,7 +3171,7 @@ export const AdminDashboardView: FC<{
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+              <button type="button" className="close-admin-modal btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="primary-action">
@@ -2408,7 +3225,7 @@ export const AdminDashboardView: FC<{
 
               <div className="form-group">
                 <label>Tags (Comma separated)</label>
-                <input name="tags" type="text" placeholder="e.g. smartphones, budget, mdms, nepal" />
+                <input name="tags" type="text" placeholder="e.g. smartphones, budget, deals, nepal" />
               </div>
 
               <div className="form-group">
@@ -2451,7 +3268,7 @@ export const AdminDashboardView: FC<{
             </div>
 
             <div className="admin-modal-footer">
-              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+              <button type="button" className="close-admin-modal btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="primary-action" style={{ background: 'var(--accent)', color: '#ffffff' }}>
@@ -2489,7 +3306,7 @@ export const AdminDashboardView: FC<{
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+              <button type="button" className="close-admin-modal btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="primary-action" style={{ background: 'var(--accent)', color: '#ffffff' }}>
@@ -2536,7 +3353,7 @@ export const AdminDashboardView: FC<{
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+              <button type="button" className="close-admin-modal btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="primary-action" style={{ background: 'var(--accent)', color: '#ffffff' }}>

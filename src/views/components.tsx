@@ -121,56 +121,82 @@ export const Header: FC<{
           <div className="store-shell store-nav-strip-inner">
             <div className="store-nav-scroll-wrapper">
               <nav className="store-nav-pills" aria-label="Department navigation">
-                <a href="/" className={`nav-pill ${!activeSlug ? 'nav-pill-active' : ''}`}>
-                  <span>🏠</span>
-                  <span>All Deals</span>
-                </a>
-                <a
-                  href="/compare"
-                  className={`nav-pill ${activeSlug === 'compare' ? 'nav-pill-active' : ''}`}
-                  style={{ borderColor: 'rgba(99, 102, 241, 0.35)', background: activeSlug === 'compare' ? 'var(--primary)' : 'rgba(99, 102, 241, 0.08)' }}
-                >
-                  <span>⚖️</span>
-                  <span>Compare</span>
-                </a>
-                <a
-                  href="/charts"
-                  className={`nav-pill ${activeSlug === 'charts' ? 'nav-pill-active' : ''}`}
-                  style={{ borderColor: 'rgba(234, 179, 8, 0.35)', background: activeSlug === 'charts' ? 'var(--primary)' : 'rgba(234, 179, 8, 0.08)' }}
-                >
-                  <span>🏆</span>
-                  <span>Top Charts</span>
-                </a>
-                <a
-                  href="/blog"
-                  className={`nav-pill ${activeSlug === 'blog' ? 'nav-pill-active' : ''}`}
-                  style={{ borderColor: 'rgba(217, 119, 6, 0.35)', background: activeSlug === 'blog' ? 'var(--primary)' : 'rgba(245, 158, 11, 0.08)' }}
-                >
-                  <span>📰</span>
-                  <span>Tech Guides &amp; Blog</span>
-                </a>
-                <a
-                  href="/coupons"
-                  className={`nav-pill ${activeSlug === 'coupons' ? 'nav-pill-active' : ''}`}
-                  style={{ borderColor: 'rgba(225, 29, 72, 0.35)', background: activeSlug === 'coupons' ? 'var(--primary)' : 'rgba(225, 29, 72, 0.08)' }}
-                >
-                  <span>🎟️</span>
-                  <span>Coupons &amp; Deals</span>
-                </a>
-                <a
-                  href="/stores"
-                  className={`nav-pill ${activeSlug === 'stores' ? 'nav-pill-active' : ''}`}
-                >
-                  <span>🏪</span>
-                  <span>Stores</span>
-                </a>
-                <a
-                  href="/brands"
-                  className={`nav-pill ${activeSlug === 'brands' ? 'nav-pill-active' : ''}`}
-                >
-                  <span>🏷️</span>
-                  <span>Brands</span>
-                </a>
+                {settings.menu_show_deals !== '0' && (
+                  <a href="/" className={`nav-pill ${!activeSlug ? 'nav-pill-active' : ''}`}>
+                    <span>🏠</span>
+                    <span>All Deals</span>
+                  </a>
+                )}
+                {settings.menu_show_compare !== '0' && (
+                  <a
+                    href="/compare"
+                    className={`nav-pill ${activeSlug === 'compare' ? 'nav-pill-active' : ''}`}
+                    style={{ borderColor: 'rgba(99, 102, 241, 0.35)', background: activeSlug === 'compare' ? 'var(--primary)' : 'rgba(99, 102, 241, 0.08)' }}
+                  >
+                    <span>⚖️</span>
+                    <span>Compare</span>
+                  </a>
+                )}
+                {settings.menu_show_charts !== '0' && (
+                  <a
+                    href="/charts"
+                    className={`nav-pill ${activeSlug === 'charts' ? 'nav-pill-active' : ''}`}
+                    style={{ borderColor: 'rgba(234, 179, 8, 0.35)', background: activeSlug === 'charts' ? 'var(--primary)' : 'rgba(234, 179, 8, 0.08)' }}
+                  >
+                    <span>🏆</span>
+                    <span>Top Charts</span>
+                  </a>
+                )}
+                {settings.menu_show_blog !== '0' && (
+                  <a
+                    href="/blog"
+                    className={`nav-pill ${activeSlug === 'blog' ? 'nav-pill-active' : ''}`}
+                    style={{ borderColor: 'rgba(217, 119, 6, 0.35)', background: activeSlug === 'blog' ? 'var(--primary)' : 'rgba(245, 158, 11, 0.08)' }}
+                  >
+                    <span>📰</span>
+                    <span>Tech Guides &amp; Blog</span>
+                  </a>
+                )}
+                {settings.menu_show_coupons !== '0' && (
+                  <a
+                    href="/coupons"
+                    className={`nav-pill ${activeSlug === 'coupons' ? 'nav-pill-active' : ''}`}
+                    style={{ borderColor: 'rgba(225, 29, 72, 0.35)', background: activeSlug === 'coupons' ? 'var(--primary)' : 'rgba(225, 29, 72, 0.08)' }}
+                  >
+                    <span>🎟️</span>
+                    <span>Coupons &amp; Deals</span>
+                  </a>
+                )}
+                {settings.menu_show_stores !== '0' && (
+                  <a
+                    href="/stores"
+                    className={`nav-pill ${activeSlug === 'stores' ? 'nav-pill-active' : ''}`}
+                  >
+                    <span>🏪</span>
+                    <span>Stores</span>
+                  </a>
+                )}
+                {settings.menu_show_brands !== '0' && (
+                  <a
+                    href="/brands"
+                    className={`nav-pill ${activeSlug === 'brands' ? 'nav-pill-active' : ''}`}
+                  >
+                    <span>🏷️</span>
+                    <span>Brands</span>
+                  </a>
+                )}
+                {settings.custom_nav_1_label && settings.custom_nav_1_url && (
+                  <a href={settings.custom_nav_1_url} className="nav-pill">
+                    <span>🔗</span>
+                    <span>{settings.custom_nav_1_label}</span>
+                  </a>
+                )}
+                {settings.custom_nav_2_label && settings.custom_nav_2_url && (
+                  <a href={settings.custom_nav_2_url} className="nav-pill">
+                    <span>🔗</span>
+                    <span>{settings.custom_nav_2_label}</span>
+                  </a>
+                )}
                 {categories.map((cat) => (
                   <a
                     key={cat.id}
@@ -185,11 +211,13 @@ export const Header: FC<{
             </div>
 
             {/* Right Review Authority & Trust Badges */}
-            <div className="store-nav-highlights">
-              <span className="nav-highlight-item">🔍 Independent Reviews</span>
-              <span className="nav-highlight-item">⚖️ Multi-Store Compare</span>
-              <span className="nav-highlight-item">🇳🇵 Verified Nepal Pricing</span>
-            </div>
+            {settings.header_badges_enabled !== '0' && (
+              <div className="store-nav-highlights">
+                <span className="nav-highlight-item">{settings.nav_highlight_1 || '🔍 Independent Reviews'}</span>
+                <span className="nav-highlight-item">{settings.nav_highlight_2 || '⚖️ Multi-Store Compare'}</span>
+                <span className="nav-highlight-item">{settings.nav_highlight_3 || '🇳🇵 Verified Nepal Pricing'}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -268,21 +296,44 @@ export const Header: FC<{
 };
 
 export const Hero: FC<{ settings: SiteSettings }> = ({ settings }) => {
-  const description =
+  const eyebrow = settings.hero_eyebrow || "🇳🇵 NEPAL'S PREMIER SHOPPING INTELLIGENCE";
+  const headlineLine1 = settings.hero_headline_line1 || 'Shop smarter.';
+  const headlineLine2 = settings.hero_headline_line2 || 'Never overpay in Nepal.';
+  const subtitle =
+    settings.hero_subtitle ||
     settings.site_description ||
     'Discover products worth buying in Nepal — verified NPR prices, authorized store links, and zero marketplace markups.';
+
+  const tags = (settings.hero_tags || 'iPhone 16, Galaxy S25, MacBook M3, Sony WH-1000XM5, Xiaomi Air Fryer, Goldstar Shoes, Chyangra Pashmina')
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean);
+
+  const trustPoints = [
+    settings.hero_point_1 || '✓ Verified NPR Pricing',
+    settings.hero_point_2 || '✓ Official Nepal Warranties',
+    settings.hero_point_3 || '✓ 0% Bank Credit Card EMI',
+    settings.hero_point_4 || '✓ Direct Seller Links'
+  ].filter(Boolean);
+
+  const stat1Num = settings.hero_stat1_num || '500+';
+  const stat1Lbl = settings.hero_stat1_lbl || 'Curated Products';
+  const stat2Num = settings.hero_stat2_num || '15+';
+  const stat2Lbl = settings.hero_stat2_lbl || 'Nepal Stores';
+  const stat3Num = settings.hero_stat3_num || '100%';
+  const stat3Lbl = settings.hero_stat3_lbl || 'Unbiased Testing';
 
   return (
     <section className="store-hero">
       <div className="store-shell hero-grid">
         <div className="hero-copy">
-          <span className="eyebrow">🇳🇵 NEPAL'S PREMIER SHOPPING INTELLIGENCE</span>
+          <span className="eyebrow">{eyebrow}</span>
           <h1>
-            Shop smarter.
+            {headlineLine1}
             <br />
-            <em>Never overpay in Nepal.</em>
+            <em>{headlineLine2}</em>
           </h1>
-          <p>{description}</p>
+          <p>{subtitle}</p>
 
           <div className="hero-search-wrapper">
             <div className="hero-search">
@@ -299,22 +350,21 @@ export const Hero: FC<{ settings: SiteSettings }> = ({ settings }) => {
             </div>
           </div>
 
-          <div className="hero-tags">
-            <span>Popular:</span>
-            <button type="button" className="quick-tag" data-search="iPhone">iPhone 16</button>
-            <button type="button" className="quick-tag" data-search="Galaxy">Galaxy S25</button>
-            <button type="button" className="quick-tag" data-search="MacBook">MacBook M3</button>
-            <button type="button" className="quick-tag" data-search="Sony">Sony WH-1000XM5</button>
-            <button type="button" className="quick-tag" data-search="Air Fryer">Xiaomi Air Fryer</button>
-            <button type="button" className="quick-tag" data-search="Goldstar">Goldstar Shoes</button>
-            <button type="button" className="quick-tag" data-search="Pashmina">Chyangra Pashmina</button>
-          </div>
+          {tags.length > 0 && (
+            <div className="hero-tags">
+              <span>Popular:</span>
+              {tags.map((tag) => (
+                <button key={tag} type="button" className="quick-tag" data-search={tag}>
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="hero-points">
-            <span>✓ Verified NPR Pricing</span>
-            <span>✓ Official Nepal Warranties</span>
-            <span>✓ 0% Bank Credit Card EMI</span>
-            <span>✓ Direct Seller Links</span>
+            {trustPoints.map((pt, i) => (
+              <span key={i}>{pt}</span>
+            ))}
           </div>
         </div>
 
@@ -333,16 +383,16 @@ export const Hero: FC<{ settings: SiteSettings }> = ({ settings }) => {
           </p>
           <div className="hero-stat-row">
             <div className="hero-stat-box">
-              <strong>500+</strong>
-              <span>Curated Products</span>
+              <strong>{stat1Num}</strong>
+              <span>{stat1Lbl}</span>
             </div>
             <div className="hero-stat-box">
-              <strong>15+</strong>
-              <span>Nepal Stores</span>
+              <strong>{stat2Num}</strong>
+              <span>{stat2Lbl}</span>
             </div>
             <div className="hero-stat-box">
-              <strong>100%</strong>
-              <span>Unbiased Testing</span>
+              <strong>{stat3Num}</strong>
+              <span>{stat3Lbl}</span>
             </div>
           </div>
         </div>
@@ -351,46 +401,67 @@ export const Hero: FC<{ settings: SiteSettings }> = ({ settings }) => {
   );
 };
 
-export const TrustStrip: FC = () => (
-  <section className="store-shell">
-    <div className="trust-strip">
-      <div className="trust-item">
-        <div className="trust-icon">🇳🇵</div>
-        <div className="trust-text">
-          <strong>Curated for Nepal</strong>
-          <span>Prices, models and distributor warranties verified for Nepali buyers.</span>
-        </div>
-      </div>
-      <div className="trust-item">
-        <div className="trust-icon">🏷️</div>
-        <div className="trust-text">
-          <strong>Zero Price Markups</strong>
-          <span>Compare authentic prices across Daraz, Oliz Store, EvoStore &amp; more.</span>
-        </div>
-      </div>
-      <div className="trust-item">
-        <div className="trust-icon">🔍</div>
-        <div className="trust-text">
-          <strong>Independent Testing</strong>
-          <span>In-depth benchmarks, real-world testing, pros &amp; cons from Nepal editors.</span>
-        </div>
-      </div>
-      <div className="trust-item">
-        <div className="trust-icon">⚖️</div>
-        <div className="trust-text">
-          <strong>Multi-Store Comparison</strong>
-          <span>Live price tracking &amp; stock verification across verified Nepal retailers.</span>
-        </div>
-      </div>
-    </div>
-  </section>
-);
+export const TrustStrip: FC<{ settings?: SiteSettings }> = ({ settings }) => {
+  const item1Icon = settings?.trust_item1_icon || '🇳🇵';
+  const item1Title = settings?.trust_item1_title || 'Curated for Nepal';
+  const item1Desc = settings?.trust_item1_desc || 'Prices, models and distributor warranties verified for Nepali buyers.';
 
-export const FlashSaleSection: FC<{ products: Product[] }> = ({ products }) => {
+  const item2Icon = settings?.trust_item2_icon || '🏷️';
+  const item2Title = settings?.trust_item2_title || 'Zero Price Markups';
+  const item2Desc = settings?.trust_item2_desc || 'Compare authentic prices across Daraz, Oliz Store, EvoStore & more.';
+
+  const item3Icon = settings?.trust_item3_icon || '🔍';
+  const item3Title = settings?.trust_item3_title || 'Independent Testing';
+  const item3Desc = settings?.trust_item3_desc || 'In-depth benchmarks, real-world testing, pros & cons from Nepal editors.';
+
+  const item4Icon = settings?.trust_item4_icon || '⚖️';
+  const item4Title = settings?.trust_item4_title || 'Multi-Store Comparison';
+  const item4Desc = settings?.trust_item4_desc || 'Live price tracking & stock verification across verified Nepal retailers.';
+
+  return (
+    <section className="store-shell">
+      <div className="trust-strip">
+        <div className="trust-item">
+          <div className="trust-icon">{item1Icon}</div>
+          <div className="trust-text">
+            <strong>{item1Title}</strong>
+            <span>{item1Desc}</span>
+          </div>
+        </div>
+        <div className="trust-item">
+          <div className="trust-icon">{item2Icon}</div>
+          <div className="trust-text">
+            <strong>{item2Title}</strong>
+            <span>{item2Desc}</span>
+          </div>
+        </div>
+        <div className="trust-item">
+          <div className="trust-icon">{item3Icon}</div>
+          <div className="trust-text">
+            <strong>{item3Title}</strong>
+            <span>{item3Desc}</span>
+          </div>
+        </div>
+        <div className="trust-item">
+          <div className="trust-icon">{item4Icon}</div>
+          <div className="trust-text">
+            <strong>{item4Title}</strong>
+            <span>{item4Desc}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const FlashSaleSection: FC<{ products: Product[]; settings?: SiteSettings }> = ({ products, settings }) => {
   const flashProducts = products.filter((p) => p.flash_deal === 1 || (p.price > 40000 && p.original_price));
   const displayItems = flashProducts.slice(0, 4);
 
   if (displayItems.length === 0) return null;
+
+  const title = settings?.flash_sale_title || '⚡ 2026 Mega Flash Sale • Limited Nepal Inventory';
+  const subtitle = settings?.flash_sale_subtitle || 'Exclusive discounts with verified authorized warranty. Prices end at countdown!';
 
   return (
     <section className="store-shell">
@@ -400,10 +471,10 @@ export const FlashSaleSection: FC<{ products: Product[] }> = ({ products }) => {
             <span className="flash-flame-icon">🔥</span>
             <div>
               <h2 style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '-0.5px' }}>
-                ⚡ 2026 Mega Flash Sale • Limited Nepal Inventory
+                {title}
               </h2>
               <p style={{ fontSize: '13px', color: '#fda4af', marginTop: '2px' }}>
-                Exclusive discounts with verified authorized warranty. Prices end at countdown!
+                {subtitle}
               </p>
             </div>
           </div>
@@ -705,29 +776,29 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
   );
 };
 
-export const EditorialBanner: FC<{ count: number }> = ({ count }) => (
-  <section className="store-shell">
-    <div className="editorial-banner">
-      <div>
-        <span className="section-kicker" style={{ color: '#fda4af' }}>A BETTER SHOPPING EXPERIENCE</span>
-        <h2>
-          Verified Nepal prices.
-          <br />
-          No marketplace confusion.
-        </h2>
-        <p>
-          BuyerNepal cuts through endless copycat listings, fake discounts, and unverified sellers.
-          Every product listed here is inspected for authentic Nepal pricing, manufacturer warranty,
-          and buyer satisfaction.
-        </p>
+export const EditorialBanner: FC<{ count: number; settings?: SiteSettings }> = ({ count, settings }) => {
+  const kicker = settings?.editorial_banner_kicker || 'A BETTER SHOPPING EXPERIENCE';
+  const title = settings?.editorial_banner_title || 'Verified Nepal prices.\nNo marketplace confusion.';
+  const text =
+    settings?.editorial_banner_text ||
+    'BuyerNepal cuts through endless copycat listings, fake discounts, and unverified sellers. Every product listed here is inspected for authentic Nepal pricing, manufacturer warranty, and buyer satisfaction.';
+
+  return (
+    <section className="store-shell">
+      <div className="editorial-banner">
+        <div>
+          <span className="section-kicker" style={{ color: '#fda4af' }}>{kicker}</span>
+          <h2 style={{ whiteSpace: 'pre-line' }}>{title}</h2>
+          <p>{text}</p>
+        </div>
+        <div className="editorial-stat">
+          <strong>{count || '22+'}</strong>
+          <span>Hand-Curated Items</span>
+        </div>
       </div>
-      <div className="editorial-stat">
-        <strong>{count || '22+'}</strong>
-        <span>Hand-Curated Items</span>
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export const WishlistDrawer: FC = () => (
   <>
@@ -844,56 +915,61 @@ export const NepalCityDeliveryEstimator: FC = () => (
   </div>
 );
 
-export const NepalShoppingFaq: FC = () => (
-  <section className="store-shell faq-container">
-    <div className="section-heading" style={{ marginBottom: '24px' }}>
-      <div>
-        <span className="section-kicker">BUYER GUIDE &amp; HELP</span>
-        <h2>Frequently Asked Questions in Nepal</h2>
-      </div>
-    </div>
+export const NepalShoppingFaq: FC<{ settings?: SiteSettings }> = ({ settings }) => {
+  const kicker = settings?.faq_kicker || 'BUYER GUIDE & HELP';
+  const title = settings?.faq_title || 'Frequently Asked Questions in Nepal';
 
-    <div className="faq-item">
-      <div className="faq-question">
-        <span>Are all smartphones and tablets NTA / MDMS approved in Nepal?</span>
-        <span className="faq-icon">▾</span>
+  return (
+    <section className="store-shell faq-container">
+      <div className="section-heading" style={{ marginBottom: '24px' }}>
+        <div>
+          <span className="section-kicker">{kicker}</span>
+          <h2>{title}</h2>
+        </div>
       </div>
-      <div className="faq-answer">
-        Yes, 100%. All mobile devices featured on BuyerNepal are sourced exclusively through authorized national distributors (such as GenNext for Apple, Samsung Plaza for Samsung) with official customs clearance, VAT invoice, and verified MDMS registration with Nepal Telecommunications Authority.
-      </div>
-    </div>
 
-    <div className="faq-item">
-      <div className="faq-question">
-        <span>How does 0% Bank Credit Card EMI work in Nepal?</span>
-        <span className="faq-icon">▾</span>
+      <div className="faq-item">
+        <div className="faq-question">
+          <span>Are all featured products 100% genuine with official Nepal warranty?</span>
+          <span className="faq-icon">▾</span>
+        </div>
+        <div className="faq-answer">
+          Yes, 100%. All products featured on BuyerNepal are sourced exclusively through authorized national distributors and verified retailers, complete with official brand warranty and genuine VAT invoices.
+        </div>
       </div>
-      <div className="faq-answer">
-        Cardholders of partner Nepali commercial banks (including Nabil Bank, NIC Asia, Global IME, Himalayan Bank, and Sanima Bank) can convert purchases of Rs. 10,000 or above into 6, 12, or 18 equal monthly installments at 0% markup without any hidden processing charges.
-      </div>
-    </div>
 
-    <div className="faq-item">
-      <div className="faq-question">
-        <span>Is Cash on Delivery (COD) available outside Kathmandu Valley?</span>
-        <span className="faq-icon">▾</span>
+      <div className="faq-item">
+        <div className="faq-question">
+          <span>How does 0% Bank Credit Card EMI work in Nepal?</span>
+          <span className="faq-icon">▾</span>
+        </div>
+        <div className="faq-answer">
+          Cardholders of partner Nepali commercial banks (including Nabil Bank, NIC Asia, Global IME, Himalayan Bank, and Sanima Bank) can convert purchases of Rs. 10,000 or above into 6, 12, or 18 equal monthly installments at 0% markup without any hidden processing charges.
+        </div>
       </div>
-      <div className="faq-answer">
-        Yes! Most verified sellers and courier partners (Nepal Can Move, Sundar Courier, Daraz Express) support Cash on Delivery across major cities including Pokhara, Chitwan, Biratnagar, Butwal, and Dharan. You can inspect the sealed package upon courier handover.
-      </div>
-    </div>
 
-    <div className="faq-item">
-      <div className="faq-question">
-        <span>How do I claim authorized warranty on products bought through BuyerNepal links?</span>
-        <span className="faq-icon">▾</span>
+      <div className="faq-item">
+        <div className="faq-question">
+          <span>Is Cash on Delivery (COD) available outside Kathmandu Valley?</span>
+          <span className="faq-icon">▾</span>
+        </div>
+        <div className="faq-answer">
+          Yes! Most verified sellers and courier partners (Nepal Can Move, Sundar Courier, Daraz Express) support Cash on Delivery across major cities including Pokhara, Chitwan, Biratnagar, Butwal, and Dharan. You can inspect the sealed package upon courier handover.
+        </div>
       </div>
-      <div className="faq-answer">
-        Every purchase made through our verified store links includes an official VAT bill and manufacturer warranty card. You can present these at any official brand service center in Kathmandu, Pokhara, or provincial branch hubs for complimentary warranty repairs.
+
+      <div className="faq-item">
+        <div className="faq-question">
+          <span>How do I claim authorized warranty on products bought through BuyerNepal links?</span>
+          <span className="faq-icon">▾</span>
+        </div>
+        <div className="faq-answer">
+          Every purchase made through our verified store links includes an official VAT bill and manufacturer warranty card. You can present these at any official brand service center in Kathmandu, Pokhara, or provincial branch hubs for complimentary warranty repairs.
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export const MobileBottomBar: FC<{ activeTab?: string }> = ({ activeTab = 'home' }) => (
   <div className="mobile-bottom-bar" aria-label="Mobile Navigation">
@@ -948,8 +1024,15 @@ export const Footer: FC<{ settings: SiteSettings; categories?: Category[] }> = (
 }) => {
   const title = settings.site_title || 'BuyerNepal';
   const description =
+    settings.footer_about_text ||
     settings.site_description ||
     'Discover products worth buying in Nepal — curated recommendations, verified NPR prices, and direct store links.';
+  const disclosure =
+    settings.footer_disclosure_text ||
+    'BuyerNepal is an independent consumer guide and price comparison platform in Nepal. We research and verify products independently. When you click our partner links to retailers (such as Daraz, Hamrobazar, Oliz Store, Samsung Plaza) and make a purchase, we may receive a referral commission at no additional cost to you.';
+  const copyright =
+    settings.copyright_text ||
+    `© ${new Date().getFullYear()} ${title}. All verified prices in NPR (Nepali Rupees). Crafted with ❤️ for shoppers across Nepal 🇳🇵`;
 
   return (
     <footer className="store-footer">
@@ -1006,7 +1089,7 @@ export const Footer: FC<{ settings: SiteSettings; categories?: Category[] }> = (
           <a href="/blog">📰 Tech Reviews &amp; Guides</a>
           <a href="/category/electronics">📱 Smartphone Buying Guide</a>
           <a href="/category/laptops-computing">💻 Laptop Price Guide Nepal</a>
-          <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer">🇳🇵 NTA MDMS (Mobile IMEI Check) ↗</a>
+          <a href="/stores">🏪 Verified Nepal Stores Directory</a>
         </div>
 
         <div>
@@ -1020,11 +1103,11 @@ export const Footer: FC<{ settings: SiteSettings; categories?: Category[] }> = (
       </div>
 
       <div className="store-shell" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '16px 0', fontSize: '11.5px', color: '#94a3b8', lineHeight: '1.6' }}>
-        <strong style={{ color: '#cbd5e1' }}>Affiliate Transparency Disclosure:</strong> BuyerNepal is an independent consumer guide and price comparison platform in Nepal. We research and verify products independently. When you click our partner links to retailers (such as Daraz, Hamrobazar, Oliz Store, Samsung Plaza) and make a purchase, we may receive a referral commission at no additional cost to you.
+        <strong style={{ color: '#cbd5e1' }}>Affiliate Transparency Disclosure:</strong> {disclosure}
       </div>
 
       <div className="store-shell footer-bottom">
-        <span>© {new Date().getFullYear()} {title}. All verified prices in NPR (Nepali Rupees).</span>
+        <span>{copyright}</span>
         <span>Crafted with ❤️ for shoppers across Nepal 🇳🇵</span>
       </div>
 

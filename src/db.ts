@@ -521,13 +521,13 @@ export const DEFAULT_ARTICLES: Article[] = [
     id: 1,
     title: 'Best Mobile Phones Under 30,000 in Nepal (2026 Edition)',
     slug: 'best-mobile-phones-under-30000-nepal',
-    excerpt: 'Comprehensive buyer guide analyzing Nepal\'s top budget champions featuring 120Hz AMOLED screens, 50MP OIS cameras, MDMS registration, and verified local pricing.',
+    excerpt: 'Comprehensive buyer guide analyzing Nepal\'s top budget champions featuring 120Hz AMOLED screens, 50MP OIS cameras, official brand warranty, and verified local pricing.',
     content: `Buying a smartphone under Rs. 30,000 in Nepal has transformed dramatically in 2026. Buyers no longer need to compromise on core user experience: 120Hz refresh rates, bright AMOLED panels, 50MP Sony sensors with Optical Image Stabilization (OIS), and 45W+ fast charging have become standard in this competitive price tier.
 
 ### What Should You Expect Under Rs. 30,000 in Nepal?
 1. **Display Quality:** Full HD+ AMOLED displays with at least 120Hz refresh rate and Gorilla Glass protection. Peak brightness should comfortably exceed 1,200 nits to handle direct sunlight during bright Kathmandu afternoons.
 2. **Processing Power:** MediaTek Dimensity 7050 / 7200 or Snapdragon 6 Gen 1 / 7s Gen 2 chipsets. These provide reliable 60fps daily multitasking, social media feeds, and moderate gaming in PUBG Mobile / Free Fire.
-3. **Official MDMS Status:** Crucial! Make sure you purchase from authorized Nepali distributors offering VAT invoices so your device's IMEI is officially registered on NTA's MDMS portal.
+3. **Official Brand Warranty:** Make sure you purchase from authorized Nepali distributors offering genuine VAT invoices for authentic manufacturer warranty coverage.
 
 ### Top Recommendation: Xiaomi Redmi Note 13 / 14 Series
 The Redmi Note lineup continues to offer unmatched value for money in Nepal. With a razor-thin bezel AMOLED panel and a dependable 5,000 mAh cell, it dominates the sub-30k bracket.
@@ -564,7 +564,7 @@ The dedicated Camera Control button on the lower right flank brings DSLR-like ta
 In our real-world Kathmandu network testing (alternating between NTC 5G, Ncell 4G, and fiber Wi-Fi), the 16 Pro Max delivered an astonishing 10.5 hours of screen-on time, easily lasting two full workdays.
 
 ### The Nepal Price Verdict: Should You Buy?
-Priced at Rs. 214,999 for the 256GB base variant, it is unquestionably a premium investment. However, with official GenNext 1-year warranty, 1-year breakage insurance, and official NTA MDMS clearance, it ensures total peace of mind against gray-market confiscation.`,
+Priced at Rs. 214,999 for the 256GB base variant, it is unquestionably a premium investment. However, with official GenNext 1-year warranty, 1-year breakage insurance, and genuine VAT bill, it ensures complete peace of mind and authorized service center support.`,
     cover_image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=1200&auto=format&fit=crop&q=80',
     author_name: 'Bikash Adhikari (Senior Tech Editor)',
     category: 'Smartphone Reviews',
@@ -577,29 +577,26 @@ Priced at Rs. 214,999 for the 256GB base variant, it is unquestionably a premium
   },
   {
     id: 3,
-    title: 'Nepal MDMS System & Customs Tax Explained: Avoid Getting Blacklisted',
-    slug: 'nepal-mdms-registration-customs-tax-guide',
-    excerpt: 'Everything Nepali travelers and overseas returnees must know about NTA MDMS registration, airport customs tax slabs, and IMEI verification rules.',
-    content: `The Nepal Telecommunications Authority (NTA) has strictly enforced the Mobile Device Management System (MDMS) to combat gray market imports, mobile theft, and tax evasion.
+    title: 'Best Tech Deals in Nepal: How to Find Real Discounts & Avoid Fake Sales',
+    slug: 'best-tech-deals-nepal-shopping-guide',
+    excerpt: 'Proven tips for shopping smarter in Nepal: price history tracking, bank discount days, festival sale strategies, and verified dealer warranties.',
+    content: `Finding genuine discounts on gadgets and tech in Nepal can often be confusing. Between inflated original prices and temporary sales campaigns, knowing when a deal is truly worth it is an essential skill.
 
-### What is MDMS?
-MDMS is a centralized tracking system implemented across all telecom operators in Nepal (Nepal Telecom, Ncell, Smart Cell). Every smartphone connected to a Nepali SIM card must have its 15-digit IMEI whitelisted in the government database. Unregistered devices receive warning notices and are subsequently blocked from cellular connectivity.
+### 1. Track Price History Before Buying
+Never trust a "50% OFF" banner blindly. Retailers sometimes raise prices just days before a major sale to make discounts look larger. Always check historical prices and compare current rates against multiple stores like Daraz Mall, Oliz Store, and local New Road retailers.
 
-### Baggage Customs Rules for Travelers (Foreign Returnees)
-- **Nepali Citizens returning from abroad:** Allowed to bring ONE personal smartphone used abroad without paying customs duty.
-- **Second phone / Unpacked phone:** Subject to customs duty (approx. 18% to 24% depending on invoice value) and 13% VAT.
-- **Registration Process:** You can upload your immigration passport stamp, flight boarding pass, and purchase invoice directly at the official portal: mdms.nta.gov.np.
+### 2. Leverage Bank Card & Wallet Discount Days
+Most commercial banks in Nepal (Nabil, Global IME, NIC Asia, Himalayan Bank) and digital wallets (eSewa, Khalti) have dedicated partner discount days offering 10% to 15% instant discounts or cashback. 
 
-### Buying Locally: How to Verify Before Paying
-Always inspect the retail box before handing over payment:
-1. Dial *#06# on the phone keypad to get the genuine IMEI.
-2. Visit **mdms.nta.gov.np** and input the IMEI number.
-3. If it says "IMEI is registered in MDMS", your phone is official.
-4. Insist on a genuine VAT invoice stamped by the registered store.`,
+### 3. Check for 0% EMI Schemes
+If you are purchasing a flagship laptop or smartphone, many authorized distributors offer 0% interest EMI options on commercial bank credit cards. This lets you break down the purchase into 6, 12, or 18 easy monthly installments without extra markup.
+
+### 4. Insist on Genuine VAT Invoices
+Always ask the retailer for an official VAT/PAN invoice. This is your primary proof of purchase required by official brand service centers for honoring warranty coverage in Nepal.`,
     cover_image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&auto=format&fit=crop&q=80',
-    author_name: 'BuyerNepal Legal & Tech Desk',
-    category: 'Nepal Tech',
-    tags: 'mdms, customs, nta, mobile-rules, nepal-law',
+    author_name: 'BuyerNepal Shopping Desk',
+    category: 'Buying Guides',
+    tags: 'deals, discounts, shopping-tips, nepal, vouchers',
     read_time_minutes: 5,
     is_featured: 0,
     is_published: 1,
@@ -723,13 +720,101 @@ export async function getSettings(db?: D1Database): Promise<SiteSettings> {
     social_facebook: 'https://facebook.com/buyernepal',
     social_instagram: 'https://instagram.com/buyernepal',
     flash_sale_enabled: '1',
-    flash_sale_title: '⚡ 2026 Mega Flash Sale • Limited Nepal Stock',
+    flash_sale_title: '⚡ 2026 Mega Flash Sale • Limited Nepal Inventory',
+    flash_sale_subtitle: 'Exclusive discounts with verified authorized warranty. Prices end at countdown!',
     flash_sale_ends: '2026-09-30T23:59:59',
     emi_enabled: '1',
     currency_converter_enabled: '1',
     delivery_estimator_enabled: '1',
     comparison_enabled: '1',
-    dark_mode_default: 'auto'
+    dark_mode_default: 'auto',
+
+    // 1. Visual Theme & Layout
+    theme_accent_color: '#dc2626',
+    theme_font: 'Outfit',
+    theme_container_width: '1240px',
+    card_style: 'modern',
+    catalog_default_view: 'grid',
+
+    // 2. Section Visibility Toggles (1 = show, 0 = hide)
+    hero_enabled: '1',
+    header_badges_enabled: '1',
+    trust_strip_enabled: '1',
+    coupons_section_enabled: '1',
+    categories_section_enabled: '1',
+    filter_bar_enabled: '1',
+    catalog_section_enabled: '1',
+    delivery_guide_section_enabled: '1',
+    blog_section_enabled: '1',
+    faq_section_enabled: '1',
+    editorial_banner_enabled: '1',
+
+    // 3. Navigation Menu Manager
+    menu_show_deals: '1',
+    menu_show_compare: '1',
+    menu_show_charts: '1',
+    menu_show_blog: '1',
+    menu_show_coupons: '1',
+    menu_show_stores: '1',
+    menu_show_brands: '1',
+    custom_nav_1_label: '',
+    custom_nav_1_url: '',
+    custom_nav_2_label: '',
+    custom_nav_2_url: '',
+
+    // 4. Header Badges Microcopy
+    nav_highlight_1: '🔍 Independent Reviews',
+    nav_highlight_2: '⚖️ Multi-Store Compare',
+    nav_highlight_3: '🇳🇵 Verified Nepal Pricing',
+
+    // 5. Hero Microcopy & Stats
+    hero_eyebrow: '🇳🇵 NEPAL\'S PREMIER SHOPPING INTELLIGENCE',
+    hero_headline_line1: 'Shop smarter.',
+    hero_headline_line2: 'Never overpay in Nepal.',
+    hero_subtitle: 'Discover products worth buying in Nepal — verified NPR prices, authorized store links, and zero marketplace markups.',
+    hero_tags: 'iPhone 16, Galaxy S25, MacBook M3, Sony WH-1000XM5, Xiaomi Air Fryer, Goldstar Shoes, Chyangra Pashmina',
+    hero_point_1: '✓ Verified NPR Pricing',
+    hero_point_2: '✓ Official Nepal Warranties',
+    hero_point_3: '✓ 0% Bank Credit Card EMI',
+    hero_point_4: '✓ Direct Seller Links',
+    hero_stat1_num: '500+',
+    hero_stat1_lbl: 'Curated Products',
+    hero_stat2_num: '15+',
+    hero_stat2_lbl: 'Nepal Stores',
+    hero_stat3_num: '100%',
+    hero_stat3_lbl: 'Unbiased Testing',
+
+    // 6. Trust Strip Microcopy
+    trust_item1_icon: '🇳🇵',
+    trust_item1_title: 'Curated for Nepal',
+    trust_item1_desc: 'Prices, models and distributor warranties verified for Nepali buyers.',
+    trust_item2_icon: '🏷️',
+    trust_item2_title: 'Zero Price Markups',
+    trust_item2_desc: 'Compare authentic prices across Daraz, Oliz Store, EvoStore & more.',
+    trust_item3_icon: '🔍',
+    trust_item3_title: 'Independent Testing',
+    trust_item3_desc: 'In-depth benchmarks, real-world testing, pros & cons from Nepal editors.',
+    trust_item4_icon: '⚖️',
+    trust_item4_title: 'Multi-Store Comparison',
+    trust_item4_desc: 'Live price tracking & stock verification across verified Nepal retailers.',
+
+    // 7. Categories & Catalog Headings
+    categories_kicker: 'EXPLORE DEPARTMENTS',
+    categories_title: 'Shop by Nepali Category',
+    catalog_kicker: 'VERIFIED CATALOG',
+    catalog_title: 'Curated Products in Nepal',
+
+    // 8. Editorial Banner & FAQ Microcopy
+    editorial_banner_kicker: 'A BETTER SHOPPING EXPERIENCE',
+    editorial_banner_title: 'Verified Nepal prices. No marketplace confusion.',
+    editorial_banner_text: 'BuyerNepal cuts through endless copycat listings, fake discounts, and unverified sellers. Every product listed here is inspected for authentic Nepal pricing, manufacturer warranty, and buyer satisfaction.',
+    faq_kicker: 'BUYER GUIDE & HELP',
+    faq_title: 'Frequently Asked Questions in Nepal',
+
+    // 9. Footer & Disclosures
+    footer_about_text: 'Discover products worth buying in Nepal — curated recommendations, verified NPR prices, and direct store links.',
+    footer_disclosure_text: 'BuyerNepal is an independent consumer guide and price comparison platform in Nepal. We research and verify products independently. When you click our partner links to retailers (such as Daraz, Hamrobazar, Oliz Store, Samsung Plaza) and make a purchase, we may receive a referral commission at no additional cost to you.',
+    copyright_text: 'All verified prices in NPR (Nepali Rupees). Crafted with ❤️ for shoppers across Nepal 🇳🇵'
   };
 
   if (!db) return defaults;
@@ -904,7 +989,7 @@ export function enrichProduct(p: Product): Product {
       'Storage': '256GB NVMe High-Speed',
       'Cameras': '48MP Fusion + 48MP Ultra-Wide + 12MP 5x Telephoto',
       'Battery': '4,685 mAh (Up to 33 hrs video)',
-      'NTA / MDMS': 'Officially Registered & Tax Paid in Nepal',
+      'Warranty': '1 Year Authorized GenNext Nepal Warranty',
       'Distributor': 'GenNext Nepal Official',
       ...defaultSpecs
     };
@@ -2278,7 +2363,7 @@ export const DEFAULT_BRANDS: Brand[] = [
     name: 'Apple',
     slug: 'apple',
     logo_url: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=120&auto=format&fit=crop&q=80',
-    description: 'World leader in personal computing, iPhones, iPads, and wearables with official NTA MDMS registration in Nepal.',
+    description: 'World leader in personal computing, iPhones, iPads, MacBooks, and wearables with official Nepal warranty.',
     origin_country: 'USA',
     warranty_service_center: 'GenNext Authorized Service Centers: Sherpa Mall Kathmandu, Pokhara, Butwal',
     is_featured: 1

@@ -38,7 +38,7 @@ export const CategoryPage: FC<{
   };
 
   return (
-    <Layout title={title} description={description} jsonLd={jsonLd}>
+    <Layout title={title} description={description} jsonLd={jsonLd} settings={settings}>
       <div className="store-page">
         <Header settings={settings} categories={categories} activeSlug={category.slug} />
 

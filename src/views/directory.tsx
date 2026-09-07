@@ -16,6 +16,7 @@ export const StoresListPage: FC<{
       title="Verified Stores & Authorized Retailers in Nepal | BuyerNepal"
       description="Directory of verified electronics retailers and official distributor showrooms across Nepal. Daraz Mall, Oliz Store, EvoStore, Samsung Plaza, and more."
       url="https://buyernepal.com/stores"
+      settings={settings}
     >
       <div className="store-page directory-page">
         <Header settings={settings} categories={categories} activeSlug="stores" />
@@ -24,54 +25,46 @@ export const StoresListPage: FC<{
           {/* Header */}
           <div className="directory-header-hero">
             <div className="coupons-hero-badge">🏪 VERIFIED NEPAL RETAILERS</div>
-            <h1 className="directory-hero-title">Authorized Electronics, Tech &amp; Lifestyle Retailers</h1>
+            <h1 className="directory-hero-title">Verified Stores &amp; Authorized Retailers</h1>
             <p className="directory-hero-subtitle">
-              Discover trusted retailers, authorized distributor showrooms, and top marketplace sellers across Nepal.
+              Shop with 100% peace of mind from vetted retailers offering genuine VAT bills, official warranties, and reliable delivery across Nepal.
             </p>
           </div>
 
           {/* Stores Grid */}
           <div className="stores-directory-grid" style={{ marginTop: '36px' }}>
-            {stores.map((store) => (
-              <div key={store.id} className="store-profile-card">
-                <div className="store-card-banner">
-                  <div className="store-card-logo">
-                    <img src={store.logo_url || 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=120&auto=format&fit=crop&q=80'} alt={store.name} />
+            {stores.map((s) => (
+              <a key={s.id} href={`/store/${s.slug}`} className="store-card-link">
+                <div className="store-card-header">
+                  <div className="store-card-logo-wrap">
+                    {s.logo_url ? <img src={s.logo_url} alt={s.name} /> : <div className="store-logo-fallback">{s.name[0]}</div>}
                   </div>
-                  <div className="store-card-badges">
-                    <span className="store-verified-pill">✓ Verified Store</span>
-                    <span className="store-rating-pill">★ {store.rating.toFixed(1)}</span>
+                  <div className="store-card-header-meta">
+                    <h3 className="store-card-name">{s.name}</h3>
+                    <div className="store-card-rating">
+                      <span>★ {s.rating.toFixed(1)}</span>
+                      <small>({s.review_count} ratings)</small>
+                    </div>
                   </div>
+                  {s.is_verified === 1 && (
+                    <span className="store-verified-pill" title="Verified Genuine Retailer">
+                      ✓ Verified
+                    </span>
+                  )}
                 </div>
 
-                <div className="store-card-body">
-                  <h2 className="store-card-name">
-                    <a href={`/store/${store.slug}`}>{store.name}</a>
-                  </h2>
-                  <p className="store-card-desc">{store.description}</p>
+                <p className="store-card-desc">{s.description}</p>
 
-                  <div className="store-meta-list">
-                    <div className="store-meta-row">
-                      <span className="meta-icon">📍</span>
-                      <span><strong>Location:</strong> {store.location}</span>
-                    </div>
-                    <div className="store-meta-row">
-                      <span className="meta-icon">🚚</span>
-                      <span><strong>Delivery:</strong> {store.delivery_coverage}</span>
-                    </div>
-                    <div className="store-meta-row">
-                      <span className="meta-icon">🛡️</span>
-                      <span><strong>Warranty:</strong> {store.warranty_support}</span>
-                    </div>
-                  </div>
-
-                  <div className="store-card-cta-row">
-                    <a href={`/store/${store.slug}`} className="store-browse-btn">
-                      Browse Deals in {store.name.split(' ')[0]} ↗
-                    </a>
-                  </div>
+                <div className="store-card-badges">
+                  <span className="store-badge-chip">📍 {s.location}</span>
+                  <span className="store-badge-chip">🚚 {s.delivery_coverage}</span>
+                  <span className="store-badge-chip">🛡️ {s.warranty_support}</span>
                 </div>
-              </div>
+
+                <div className="store-card-footer">
+                  <span className="store-card-cta">Browse Curated Products ➔</span>
+                </div>
+              </a>
             ))}
           </div>
         </main>
@@ -84,7 +77,7 @@ export const StoresListPage: FC<{
 };
 
 // ============================================================================
-// SINGLE STORE PROFILE & DEALS PAGE: /store/:slug
+// SINGLE STORE PROFILE & PRODUCTS PAGE: /store/:slug
 // ============================================================================
 export const StoreDetailPage: FC<{
   store: Store;
@@ -97,6 +90,7 @@ export const StoreDetailPage: FC<{
       title={`${store.name} — Verified Prices, Official Warranty & Deals in Nepal | BuyerNepal`}
       description={`Browse verified deals from ${store.name} in Nepal. ${store.description} Delivery: ${store.delivery_coverage}.`}
       url={`https://buyernepal.com/store/${store.slug}`}
+      settings={settings}
     >
       <div className="store-page store-profile-page">
         <Header settings={settings} categories={categories} activeSlug="stores" />
@@ -188,6 +182,7 @@ export const BrandsListPage: FC<{
       title="Top Electronics & Lifestyle Brands in Nepal | BuyerNepal Brand Directory"
       description="Official distributor warranty, authorized service center locations, and price guides for Apple, Samsung, Sony, OnePlus, DJI, Roborock in Nepal."
       url="https://buyernepal.com/brands"
+      settings={settings}
     >
       <div className="store-page directory-page">
         <Header settings={settings} categories={categories} activeSlug="brands" />
@@ -239,6 +234,7 @@ export const BrandDetailPage: FC<{
       title={`${brand.name} Price in Nepal 2026, Authorized Warranty & Products | BuyerNepal`}
       description={`Explore official ${brand.name} NPR prices, genuine stock, authorized warranty and official service centers in Nepal.`}
       url={`https://buyernepal.com/brand/${brand.slug}`}
+      settings={settings}
     >
       <div className="store-page brand-profile-page">
         <Header settings={settings} categories={categories} activeSlug="brands" />

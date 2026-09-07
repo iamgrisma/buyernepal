@@ -198,12 +198,100 @@ export interface SiteSettings {
   google_analytics_id?: string;
   flash_sale_enabled?: string;
   flash_sale_title?: string;
+  flash_sale_subtitle?: string;
   flash_sale_ends?: string;
   emi_enabled?: string;
   currency_converter_enabled?: string;
   delivery_estimator_enabled?: string;
   comparison_enabled?: string;
   dark_mode_default?: string;
+
+  // 1. Visual Theme & Layout
+  theme_accent_color?: string;
+  theme_font?: string;
+  theme_container_width?: string;
+  card_style?: 'modern' | 'bordered' | 'compact';
+  catalog_default_view?: 'grid' | 'list' | 'table';
+
+  // 2. Section Visibility Toggles (1 = show, 0 = hide)
+  hero_enabled?: string;
+  header_badges_enabled?: string;
+  trust_strip_enabled?: string;
+  coupons_section_enabled?: string;
+  categories_section_enabled?: string;
+  filter_bar_enabled?: string;
+  catalog_section_enabled?: string;
+  delivery_guide_section_enabled?: string;
+  blog_section_enabled?: string;
+  faq_section_enabled?: string;
+  editorial_banner_enabled?: string;
+
+  // 3. Navigation Menu Manager
+  menu_show_deals?: string;
+  menu_show_compare?: string;
+  menu_show_charts?: string;
+  menu_show_blog?: string;
+  menu_show_coupons?: string;
+  menu_show_stores?: string;
+  menu_show_brands?: string;
+  custom_nav_1_label?: string;
+  custom_nav_1_url?: string;
+  custom_nav_2_label?: string;
+  custom_nav_2_url?: string;
+
+  // 4. Header Badges Microcopy (3 pills on right of nav strip)
+  nav_highlight_1?: string;
+  nav_highlight_2?: string;
+  nav_highlight_3?: string;
+
+  // 5. Hero Microcopy & Stats
+  hero_eyebrow?: string;
+  hero_headline_line1?: string;
+  hero_headline_line2?: string;
+  hero_subtitle?: string;
+  hero_tags?: string;
+  hero_point_1?: string;
+  hero_point_2?: string;
+  hero_point_3?: string;
+  hero_point_4?: string;
+  hero_stat1_num?: string;
+  hero_stat1_lbl?: string;
+  hero_stat2_num?: string;
+  hero_stat2_lbl?: string;
+  hero_stat3_num?: string;
+  hero_stat3_lbl?: string;
+
+  // 6. Trust Strip Microcopy (4 cards)
+  trust_item1_icon?: string;
+  trust_item1_title?: string;
+  trust_item1_desc?: string;
+  trust_item2_icon?: string;
+  trust_item2_title?: string;
+  trust_item2_desc?: string;
+  trust_item3_icon?: string;
+  trust_item3_title?: string;
+  trust_item3_desc?: string;
+  trust_item4_icon?: string;
+  trust_item4_title?: string;
+  trust_item4_desc?: string;
+
+  // 7. Categories & Catalog Headings
+  categories_kicker?: string;
+  categories_title?: string;
+  catalog_kicker?: string;
+  catalog_title?: string;
+
+  // 8. Editorial Banner & FAQ Microcopy
+  editorial_banner_kicker?: string;
+  editorial_banner_title?: string;
+  editorial_banner_text?: string;
+  faq_kicker?: string;
+  faq_title?: string;
+
+  // 9. Footer & Disclosures
+  footer_about_text?: string;
+  footer_disclosure_text?: string;
+  copyright_text?: string;
 }
 
 export interface Order {

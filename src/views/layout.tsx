@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren } from 'hono/jsx';
 import { storefrontCss } from './styles';
+import { SiteSettings } from '../types';
 
 interface LayoutProps {
   title?: string;
@@ -9,6 +10,7 @@ interface LayoutProps {
   type?: string;
   jsonLd?: Record<string, any>;
   customHead?: string;
+  settings?: SiteSettings;
 }
 
 export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
@@ -19,8 +21,11 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
   type = 'website',
   jsonLd,
   customHead,
+  settings,
   children
 }) => {
+  const defaultMode = settings?.dark_mode_default || 'auto';
+
   return (
     <html lang="en">
       <head>
@@ -51,11 +56,11 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
           />
         )}
 
-        {/* Font Preconnect */}
+        {/* Font Preconnect & Customizer Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
 
@@ -66,8 +71,9 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
               (function() {
                 try {
                   const saved = localStorage.getItem('bn_theme');
+                  const defaultMode = '${defaultMode}';
                   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (saved === 'dark' || (!saved && prefersDark)) {
+                  if (saved === 'dark' || (!saved && defaultMode === 'dark') || (!saved && defaultMode === 'auto' && prefersDark)) {
                     document.documentElement.setAttribute('data-theme', 'dark');
                   } else {
                     document.documentElement.setAttribute('data-theme', 'light');
@@ -80,6 +86,38 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
 
         {/* Fast Inlined Critical CSS */}
         <style dangerouslySetInnerHTML={{ __html: storefrontCss }} />
+
+        {/* Dynamic Customizer CSS Theme Injection */}
+        {settings && (
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+                :root {
+                  ${settings.theme_accent_color ? `
+                    --accent: ${settings.theme_accent_color};
+                    --accent-hover: ${settings.theme_accent_color}ee;
+                    --accent-soft: ${settings.theme_accent_color}18;
+                  ` : ''}
+                  ${settings.theme_font ? `
+                    --font-main: '${settings.theme_font}', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                  ` : ''}
+                }
+                ${settings.theme_container_width ? `
+                  .store-shell, .page-shell { max-width: ${settings.theme_container_width} !important; }
+                ` : ''}
+                ${settings.card_style === 'bordered' ? `
+                  .product-card { border: 2px solid var(--line) !important; box-shadow: none !important; border-radius: 12px !important; }
+                  .product-card:hover { border-color: var(--accent) !important; }
+                ` : ''}
+                ${settings.card_style === 'compact' ? `
+                  .product-card { padding: 10px !important; }
+                  .product-card-body { padding: 10px 6px 6px !important; }
+                  .product-card-title { font-size: 13.5px !important; line-height: 1.3 !important; }
+                ` : ''}
+              `
+            }}
+          />
+        )}
 
         {customHead && <div dangerouslySetInnerHTML={{ __html: customHead }} />}
       </head>
