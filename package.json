@@ -16,11 +16,8 @@
     "preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/aa6158f1-7711-4485-f134-a8c802c0a800/preview",
     "publish": true
   },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20251228.0"
-  },
   "scripts": {
-    "build": "mkdir -p dist && echo '{\"version\":1,\"include\":[\"/*\"],\"exclude\":[]}' > dist/_routes.json",
+    "build": "tsc --noEmit",
     "check": "tsc --noEmit",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
@@ -28,19 +25,11 @@
     "seedLocalD1": "wrangler d1 migrations apply DB --local"
   },
   "dependencies": {
-    "@rollup/wasm-node": "^4.63.1",
-    "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.2",
-    "autoprefixer": "^10.4.22",
-    "dompurify": "^3.3.1",
-    "hono": "^4.13.7",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
-    "react-router-dom": "^7.10.1",
-    "tailwindcss": "^4.1.17",
-    "typescript": "5.8.3",
-    "vite": "^7.3.0",
-    "wrangler": "4.21.x"
+    "hono": "^4.13.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260907.1",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.129.0"
   }
 }

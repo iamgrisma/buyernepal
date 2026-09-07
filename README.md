@@ -1,6 +1,6 @@
 # BuyerNepal
 
-BuyerNepal is a Nepal-focused shopping discovery platform built with React, Vite, Cloudflare Workers and D1. It helps shoppers discover curated products, browse categories, inspect product details and continue to the seller through affiliate/store links.
+BuyerNepal is a Nepal-focused shopping discovery platform built with TypeScript, Hono Edge SSR, Cloudflare Workers and D1. It helps shoppers discover curated products, browse categories, inspect product details and continue to the seller through affiliate/store links.
 
 ## Product surface
 
@@ -14,16 +14,14 @@ BuyerNepal is a Nepal-focused shopping discovery platform built with React, Vite
 - D1-backed API on the same Worker origin
 - Sanitized custom homepage content
 - Loading, empty, error and not-found states
-- Cloudflare Workers Static Assets + D1 deployment
+- Cloudflare Workers + D1 deployment
 
 ## Stack
 
-- React 19 + TypeScript
-- Vite
-- React Router
+- Hono Fullstack Edge SSR
+- TypeScript
 - Cloudflare Workers
 - Cloudflare D1
-- DOMPurify
 
 ## Local development
 
@@ -44,7 +42,7 @@ Connect the repository to the `buyernepal` Worker and use:
 - **Deploy command:** `npm run deploy`
 - **Root directory:** `/`
 
-`npm run deploy` triggers the `predeploy` migration step and then runs `wrangler deploy`. Wrangler's custom build configuration runs the Vite build before deployment. Workers Builds does not use the `build` section in `wrangler.json`, so the dashboard Build/Deploy settings are authoritative.
+`npm run deploy` triggers the `predeploy` migration step and then runs `wrangler deploy`.
 
 If you prefer separate dashboard stages, use **Build command** `npm run build` and **Deploy command** `npx wrangler deploy`; apply D1 migrations separately before the first production deployment.
 
@@ -65,6 +63,6 @@ Never put database credentials or Cloudflare API tokens in source control.
 2. Confirm the `DB` binding points to the production D1 database.
 3. Confirm Workers Builds has a valid API token and the token has not hit the account token quota.
 4. Deploy from `main`.
-5. Confirm the deployment contains Vite-generated `/assets/*.js` files rather than serving `/src/main.tsx` directly.
+5. Verify TypeScript check (`npm run check`) passes cleanly.
 6. Open `/`, a category page, a product page and `/admin/login` after deployment.
 7. Apply/verify D1 migrations before expecting catalog or admin data.

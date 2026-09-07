@@ -140,13 +140,10 @@ web_modules/
 out
 
 # Nuxt.js build / generate output
-.nuxt
-dist/*
-!dist/.gitkeep
-!dist/_routes.json
-!dist/index.html
-!dist/_worker.js
-assets/
+# Build output
+dist/
+_worker.js
+
 
 # Gatsby files
 .cache/
