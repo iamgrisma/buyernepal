@@ -243,7 +243,7 @@ export const AdminDashboardView: FC<{
         </aside>
 
         {/* Main Content Area */}
-        </main>
+        <main className="admin-main">
           {/* Top Info Bar */}
           <div className="admin-topbar-card">
             <div>
