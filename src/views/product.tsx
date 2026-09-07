@@ -258,33 +258,37 @@ export const ProductPage: FC<{
                 {product.description}
               </p>
 
-              {/* Primary Affiliate Outbound Deal Box */}
-              {product.affiliate_url ? (
-                <div className="affiliate-deal-box">
-                  <a
-                    href={product.affiliate_url}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow"
+              {/* Primary Outbound Deal & Direct Order Dual CTA */}
+              <div className="affiliate-deal-box">
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  {product.affiliate_url ? (
+                    <a
+                      href={`/go/product/${product.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="detail-buy-btn"
+                      style={{ flex: 1.2, minWidth: '180px', marginBottom: 0 }}
+                    >
+                      <span>View Deal on {storeName}</span> <span className="buy-arrow">↗</span>
+                    </a>
+                  ) : null}
+
+                  {/* Direct Buy / Cash on Delivery Button */}
+                  <button
+                    id="openDirectOrderBtn"
+                    type="button"
                     className="detail-buy-btn"
+                    style={{ flex: 1, minWidth: '160px', background: '#0f172a', marginBottom: 0 }}
                   >
-                    <span>View Deal on {storeName}</span> <span className="buy-arrow">↗</span>
-                  </a>
-                  <div className="affiliate-redirect-notice">
-                    <span>🔒</span>
-                    <span>Direct partner link to {storeName}. 100% Tax-Paid Official Nepal Stock.</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="affiliate-deal-box">
-                  <button type="button" className="detail-buy-btn" disabled style={{ background: '#94a3b8', cursor: 'not-allowed' }}>
-                    Currently Out of Stock
+                    <span>⚡ Buy Direct / COD</span>
                   </button>
-                  <div className="affiliate-redirect-notice">
-                    <span>⏳</span>
-                    <span>Check back soon — we track restocks across Kathmandu authorized dealers daily.</span>
-                  </div>
                 </div>
-              )}
+
+                <div className="affiliate-redirect-notice" style={{ marginTop: '10px' }}>
+                  <span>🔒</span>
+                  <span>100% Tax-Paid Official Nepal Stock with full warranty support &amp; genuine VAT bill.</span>
+                </div>
+              </div>
 
               {/* 6-Month Historical Price Fluctuation Trend Card */}
               <div className="price-history-card" style={{ marginTop: '20px' }}>

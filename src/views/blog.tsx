@@ -20,19 +20,98 @@ function renderArticleHtml(markdown: string): string {
   const lines = markdown.split('\n');
   const htmlParts: string[] = [];
   let inList = false;
+  let inTable = false;
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+    let line = lines[i].trim();
 
     if (!line) {
-      if (inList) {
-        htmlParts.push('</ul>');
-        inList = false;
-      }
+      if (inList) { htmlParts.push('</ul>'); inList = false; }
+      if (inTable) { htmlParts.push('</tbody></table></div>'); inTable = false; }
       continue;
     }
 
-    // H3
+    // Embed: Pros Box [pros]...[/pros]
+    if (line.startsWith('[pros]') && line.endsWith('[/pros]')) {
+      const items = line.replace('[pros]', '').replace('[/pros]', '').split(';');
+      htmlParts.push(`
+        <div class="article-pros-box">
+          <div class="pros-header"><span>👍</span> <strong>Key Strengths &amp; Advantages</strong></div>
+          <ul class="pros-list">
+            ${items.map(it => `<li>✓ ${it.trim()}</li>`).join('')}
+          </ul>
+        </div>
+      `);
+      continue;
+    }
+
+    // Embed: Cons Box [cons]...[/cons]
+    if (line.startsWith('[cons]') && line.endsWith('[/cons]')) {
+      const items = line.replace('[cons]', '').replace('[/cons]', '').split(';');
+      htmlParts.push(`
+        <div class="article-cons-box">
+          <div class="cons-header"><span>⚠️</span> <strong>Downsides &amp; Trade-offs</strong></div>
+          <ul class="cons-list">
+            ${items.map(it => `<li>✕ ${it.trim()}</li>`).join('')}
+          </ul>
+        </div>
+      `);
+      continue;
+    }
+
+    // Embed: Deal Card [deal title="X" price="Y" store="Z" url="W"]
+    if (line.startsWith('[deal') && line.endsWith(']')) {
+      const titleMatch = line.match(/title="([^"]+)"/);
+      const priceMatch = line.match(/price="([^"]+)"/);
+      const storeMatch = line.match(/store="([^"]+)"/);
+      const urlMatch = line.match(/url="([^"]+)"/);
+
+      const title = titleMatch ? titleMatch[1] : 'Featured Recommendation';
+      const price = priceMatch ? priceMatch[1] : '';
+      const store = storeMatch ? storeMatch[1] : 'Daraz Mall';
+      const url = urlMatch ? urlMatch[1] : '#';
+
+      htmlParts.push(`
+        <div class="article-deal-embed">
+          <div class="deal-embed-content">
+            <span class="deal-embed-badge">🔥 Verified Nepal Deal</span>
+            <strong class="deal-embed-title">${title}</strong>
+            <div class="deal-embed-store">Available at: <strong>${store}</strong></div>
+          </div>
+          <div class="deal-embed-cta">
+            ${price ? `<span class="deal-embed-price">${price}</span>` : ''}
+            <a href="${url}" target="_blank" rel="noopener noreferrer nofollow" class="primary-action" style="padding: 9px 18px; font-size: 13px;">
+              Check Deal ↗
+            </a>
+          </div>
+        </div>
+      `);
+      continue;
+    }
+
+    // Markdown Table Row
+    if (line.startsWith('|') && line.endsWith('|')) {
+      if (inList) { htmlParts.push('</ul>'); inList = false; }
+      if (!inTable) {
+        htmlParts.push('<div class="article-table-responsive"><table class="article-markdown-table">');
+        const cells = line.split('|').map(c => c.trim()).filter((c, idx, arr) => idx > 0 && idx < arr.length - 1);
+        htmlParts.push('<thead><tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>');
+        inTable = true;
+        continue;
+      } else if (line.includes('---')) {
+        // Table divider row, skip
+        continue;
+      } else {
+        const cells = line.split('|').map(c => c.trim()).filter((c, idx, arr) => idx > 0 && idx < arr.length - 1);
+        htmlParts.push('<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>');
+        continue;
+      }
+    } else if (inTable) {
+      htmlParts.push('</tbody></table></div>');
+      inTable = false;
+    }
+
+    // H3 Subheading
     if (line.startsWith('### ')) {
       if (inList) { htmlParts.push('</ul>'); inList = false; }
       const text = line.replace('### ', '');
@@ -41,7 +120,7 @@ function renderArticleHtml(markdown: string): string {
       continue;
     }
 
-    // H2
+    // H2 Section Title
     if (line.startsWith('## ')) {
       if (inList) { htmlParts.push('</ul>'); inList = false; }
       const text = line.replace('## ', '');
@@ -58,7 +137,8 @@ function renderArticleHtml(markdown: string): string {
       }
       const content = line.substring(2)
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
       htmlParts.push(`<li>${content}</li>`);
       continue;
     }
@@ -68,7 +148,8 @@ function renderArticleHtml(markdown: string): string {
       if (inList) { htmlParts.push('</ul>'); inList = false; }
       const content = line.replace(/^\d+\.\s/, '')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
       htmlParts.push(`<div class="article-num-item"><span class="num-bullet">•</span><div>${content}</div></div>`);
       continue;
     }
@@ -76,20 +157,24 @@ function renderArticleHtml(markdown: string): string {
     // Callout quote
     if (line.startsWith('> ')) {
       if (inList) { htmlParts.push('</ul>'); inList = false; }
-      const content = line.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      htmlParts.push(`<blockquote class="article-callout"><span class="callout-icon">💡</span><p>${content}</p></blockquote>`);
+      const content = line.substring(2)
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+      htmlParts.push(`<blockquote class="article-callout"><span class="callout-icon">💡</span><div>${content}</div></blockquote>`);
       continue;
     }
 
-    // Standard paragraph
+    // Standard paragraph with links and inline styles
     if (inList) { htmlParts.push('</ul>'); inList = false; }
     const pContent = line
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>');
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     htmlParts.push(`<p class="article-paragraph">${pContent}</p>`);
   }
 
   if (inList) htmlParts.push('</ul>');
+  if (inTable) htmlParts.push('</tbody></table></div>');
   return htmlParts.join('\n');
 }
 

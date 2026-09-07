@@ -1,4 +1,4 @@
-import { Category, Product, Review, SiteSettings, User, Coupon, Article, ProductVariant, ProductScore, StoreOffer } from './types';
+import { Category, Product, Review, SiteSettings, User, Coupon, Article, ProductVariant, ProductScore, StoreOffer, Store, Brand, Order, OutboundClick } from './types';
 
 // Rich, production-grade curated categories for Nepal
 export const DEFAULT_CATEGORIES: Category[] = [
@@ -2127,4 +2127,411 @@ export async function getPriceAlertsAdmin(db?: D1Database): Promise<any[]> {
     return [];
   }
 }
+
+// ============================================================================
+// STORES & BRAND DIRECTORY (REHub Brand Engine)
+// ============================================================================
+export const DEFAULT_STORES: Store[] = [
+  {
+    id: 1,
+    name: 'Daraz Mall Nepal',
+    slug: 'daraz-mall',
+    logo_url: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=120&auto=format&fit=crop&q=80',
+    website_url: 'https://www.daraz.com.np',
+    affiliate_url: 'https://www.daraz.com.np',
+    description: "Nepal's largest e-commerce platform offering 100% genuine products directly from official brand flagships with 14-day easy returns.",
+    rating: 4.8,
+    review_count: 1420,
+    is_verified: 1,
+    location: 'Kathmandu (Central Hub)',
+    delivery_coverage: 'All 77 Districts across Nepal',
+    return_policy: '14-Day Free Returns on Mall items',
+    warranty_support: 'Authorized Brand Service Centers',
+    is_active: 1
+  },
+  {
+    id: 2,
+    name: 'Oliz Store Kathmandu',
+    slug: 'oliz-store',
+    logo_url: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=120&auto=format&fit=crop&q=80',
+    website_url: 'https://www.olizstore.com',
+    affiliate_url: 'https://www.olizstore.com',
+    description: 'Premier authorized tech haven in Babarmahal, Kathmandu specializing in genuine Apple devices, audiophile gear, and premium accessories.',
+    rating: 4.9,
+    review_count: 890,
+    is_verified: 1,
+    location: 'Babarmahal, Kathmandu',
+    delivery_coverage: 'Kathmandu Valley Express + Courier Nationwide',
+    return_policy: '7-Day Defect Replacement',
+    warranty_support: 'Official GenNext Apple Nepal Warranty',
+    is_active: 1
+  },
+  {
+    id: 3,
+    name: 'EvoStore Official',
+    slug: 'evostore',
+    logo_url: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=120&auto=format&fit=crop&q=80',
+    website_url: 'https://www.evostore.com.np',
+    affiliate_url: 'https://www.evostore.com.np',
+    description: 'Authorized Apple Premium Reseller in Nepal with flagship showrooms in Durbar Marg, Labim Mall, and Sherpa Mall.',
+    rating: 4.9,
+    review_count: 640,
+    is_verified: 1,
+    location: 'Durbar Marg & Labim Mall',
+    delivery_coverage: 'Kathmandu Valley + Major Cities',
+    return_policy: '7-Day Return on Unopened Units',
+    warranty_support: '1 Year Apple Authorized Warranty',
+    is_active: 1
+  },
+  {
+    id: 4,
+    name: 'Samsung Plaza Nepal',
+    slug: 'samsung-plaza',
+    logo_url: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=120&auto=format&fit=crop&q=80',
+    website_url: 'https://www.samsung.com/np',
+    affiliate_url: 'https://www.samsung.com/np',
+    description: 'Him Electronics authorized nationwide showroom network for genuine Samsung smartphones, OLED displays, and home appliances.',
+    rating: 4.8,
+    review_count: 520,
+    is_verified: 1,
+    location: 'Nationwide (50+ Showrooms)',
+    delivery_coverage: 'All 77 Districts',
+    return_policy: 'Official Importer Exchange Program',
+    warranty_support: '1 Year Official Samsung Nepal Warranty + Breakage Protection',
+    is_active: 1
+  },
+  {
+    id: 5,
+    name: 'Smart Living Nepal',
+    slug: 'smart-living',
+    logo_url: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=120&auto=format&fit=crop&q=80',
+    website_url: 'https://www.smartlivingnepal.com',
+    affiliate_url: 'https://www.smartlivingnepal.com',
+    description: "Nepal's leading smart home and robotic vacuum automation retailer offering authorized Roborock, Dyson, and IoT devices.",
+    rating: 4.8,
+    review_count: 210,
+    is_verified: 1,
+    location: 'New Baneshwor, Kathmandu',
+    delivery_coverage: 'Kathmandu Valley 24h & Major Hubs',
+    return_policy: '7-Day Free Replacement',
+    warranty_support: '1 Year Authorized Service Guarantee',
+    is_active: 1
+  },
+  {
+    id: 6,
+    name: 'Gurkha Blades Nepal',
+    slug: 'gurkha-blades',
+    logo_url: 'https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=120&auto=format&fit=crop&q=80',
+    website_url: 'https://www.gurkhablades.com',
+    affiliate_url: 'https://www.gurkhablades.com',
+    description: 'Authentic traditional blacksmith forge in Bhojpur and Dharan producing genuine high-carbon service Khukuris and heritage crafts.',
+    rating: 4.9,
+    review_count: 380,
+    is_verified: 1,
+    location: 'Bhojpur & Dharan (Shipped from KTM)',
+    delivery_coverage: 'Worldwide & All Nepal Districts',
+    return_policy: '100% Authentic Hand-Forged Guarantee',
+    warranty_support: 'Lifetime Steel Craftsmanship Assurance',
+    is_active: 1
+  },
+  {
+    id: 7,
+    name: 'Goldstar Official Store',
+    slug: 'goldstar-shoes',
+    logo_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120&auto=format&fit=crop&q=80',
+    website_url: 'https://www.goldstarshoes.com',
+    affiliate_url: 'https://www.goldstarshoes.com',
+    description: 'The pride of Nepal. Iconic rugged, stylish, and extraordinarily durable footwear designed and manufactured right here in Nepal.',
+    rating: 4.9,
+    review_count: 1850,
+    is_verified: 1,
+    location: 'Balaju, Kathmandu',
+    delivery_coverage: 'Nationwide Delivery',
+    return_policy: '15-Day Size & Defect Exchange',
+    warranty_support: 'Official Factory Warranty',
+    is_active: 1
+  }
+];
+
+export const DEFAULT_BRANDS: Brand[] = [
+  {
+    id: 1,
+    name: 'Apple',
+    slug: 'apple',
+    logo_url: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=120&auto=format&fit=crop&q=80',
+    description: 'World leader in personal computing, iPhones, iPads, and wearables with official NTA MDMS registration in Nepal.',
+    origin_country: 'USA',
+    warranty_service_center: 'GenNext Authorized Service Centers: Sherpa Mall Kathmandu, Pokhara, Butwal',
+    is_featured: 1
+  },
+  {
+    id: 2,
+    name: 'Samsung',
+    slug: 'samsung',
+    logo_url: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=120&auto=format&fit=crop&q=80',
+    description: 'Global electronics titan with highest market presence in Nepal, backed by official distributor Him Electronics & IMS.',
+    origin_country: 'South Korea',
+    warranty_service_center: 'Samsung Authorized Service Plaza: Sundhara, Jawalakhel, Pokhara, Biratnagar, Narayangarh',
+    is_featured: 1
+  },
+  {
+    id: 3,
+    name: 'OnePlus',
+    slug: 'oneplus',
+    logo_url: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=120&auto=format&fit=crop&q=80',
+    description: 'Never Settle flagship killer smartphones and audio devices with official authorized distributor warranty in Nepal.',
+    origin_country: 'Global',
+    warranty_service_center: 'Smart Talk Authorized Service Center, CTC Mall 5th Floor, Sundhara, Kathmandu',
+    is_featured: 1
+  },
+  {
+    id: 4,
+    name: 'Sony',
+    slug: 'sony',
+    logo_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=120&auto=format&fit=crop&q=80',
+    description: 'Industry-standard active noise cancellation, mirrorless Alpha cameras, and home cinema systems distributed by Nepa Hima.',
+    origin_country: 'Japan',
+    warranty_service_center: 'Nepa Hima Service Center, Kantipath, Kathmandu',
+    is_featured: 1
+  },
+  {
+    id: 5,
+    name: 'DJI',
+    slug: 'dji',
+    logo_url: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=120&auto=format&fit=crop&q=80',
+    description: 'Industry benchmark for camera drones, handheld gimbals, and action cameras compliant with CAAN Nepal drone regulations.',
+    origin_country: 'Global',
+    warranty_service_center: 'Oliz Store DJI Authorized Service, Babarmahal, Kathmandu',
+    is_featured: 1
+  },
+  {
+    id: 6,
+    name: 'Roborock',
+    slug: 'roborock',
+    logo_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=120&auto=format&fit=crop&q=80',
+    description: 'Intelligent robotic vacuum cleaners and automated mopping solutions engineered for high-altitude dust management.',
+    origin_country: 'Global',
+    warranty_service_center: 'Smart Living Service Hub, Kathmandu',
+    is_featured: 1
+  },
+  {
+    id: 7,
+    name: 'Bhojpur Gurkha',
+    slug: 'bhojpur-gurkha',
+    logo_url: 'https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=120&auto=format&fit=crop&q=80',
+    description: 'Centuries-old blacksmith heritage of Bhojpur, crafting world-renowned Khukuris for the Gurkha Regiments.',
+    origin_country: 'Nepal',
+    warranty_service_center: 'Bhojpur Master Kami Workshops & Kathmandu Distribution Guild',
+    is_featured: 1
+  },
+  {
+    id: 8,
+    name: 'Goldstar',
+    slug: 'goldstar',
+    logo_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120&auto=format&fit=crop&q=80',
+    description: 'The undisputed footwear champion of Nepal, worn by millions for daily commute, trekking, and style.',
+    origin_country: 'Nepal',
+    warranty_service_center: 'Kiran Shoes Manufacturers, Balaju Industrial Area, Kathmandu',
+    is_featured: 1
+  }
+];
+
+export async function getStores(db?: D1Database): Promise<Store[]> {
+  if (!db) return DEFAULT_STORES;
+  try {
+    const res = await db.prepare('SELECT * FROM stores WHERE is_active = 1 ORDER BY rating DESC, review_count DESC').all<Store>();
+    return res.results && res.results.length > 0 ? res.results : DEFAULT_STORES;
+  } catch {
+    return DEFAULT_STORES;
+  }
+}
+
+export async function getStoreBySlug(db: D1Database | undefined, slug: string): Promise<Store | null> {
+  const stores = await getStores(db);
+  return stores.find(s => s.slug.toLowerCase() === slug.toLowerCase()) || null;
+}
+
+export async function getBrands(db?: D1Database): Promise<Brand[]> {
+  if (!db) return DEFAULT_BRANDS;
+  try {
+    const res = await db.prepare('SELECT * FROM brands ORDER BY is_featured DESC, name ASC').all<Brand>();
+    return res.results && res.results.length > 0 ? res.results : DEFAULT_BRANDS;
+  } catch {
+    return DEFAULT_BRANDS;
+  }
+}
+
+export async function getBrandBySlug(db: D1Database | undefined, slug: string): Promise<Brand | null> {
+  const brands = await getBrands(db);
+  return brands.find(b => b.slug.toLowerCase() === slug.toLowerCase()) || null;
+}
+
+// ============================================================================
+// DIRECT ORDERS & DIGITAL GOODS (E-Commerce Module)
+// ============================================================================
+export async function createOrder(
+  db: D1Database | undefined,
+  order: {
+    customer_name: string;
+    customer_email: string;
+    customer_phone: string;
+    shipping_address?: string;
+    city?: string;
+    district?: string;
+    product_id: number;
+    product_name: string;
+    quantity: number;
+    unit_price: number;
+    total_amount: number;
+    payment_method: 'cod' | 'esewa' | 'khalti' | 'fonepay' | 'bank_transfer';
+    delivery_type?: 'physical' | 'digital';
+    notes?: string;
+  }
+): Promise<{ success: boolean; order_number: string; digital_code?: string; error?: string }> {
+  const orderNumber = 'BN-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
+  const isDigital = order.delivery_type === 'digital';
+  const digitalCode = isDigital ? 'BN-KEY-' + Math.random().toString(36).substring(2, 10).toUpperCase() : '';
+
+  if (!db) {
+    return { success: true, order_number: orderNumber, digital_code: digitalCode };
+  }
+
+  try {
+    await db
+      .prepare(
+        `INSERT INTO orders(
+          order_number, customer_name, customer_email, customer_phone,
+          shipping_address, city, district, product_id, product_name,
+          quantity, unit_price, total_amount, payment_method,
+          payment_status, order_status, delivery_type, digital_download_code, notes
+        ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .bind(
+        orderNumber,
+        order.customer_name,
+        order.customer_email.trim().toLowerCase(),
+        order.customer_phone.trim(),
+        order.shipping_address || '',
+        order.city || 'Kathmandu',
+        order.district || 'Kathmandu',
+        order.product_id,
+        order.product_name,
+        order.quantity || 1,
+        order.unit_price,
+        order.total_amount,
+        order.payment_method || 'cod',
+        order.payment_method === 'cod' ? 'pending' : 'pending',
+        'placed',
+        isDigital ? 'digital' : 'physical',
+        digitalCode,
+        order.notes || ''
+      )
+      .run();
+
+    return { success: true, order_number: orderNumber, digital_code: digitalCode };
+  } catch (err: any) {
+    return { success: false, order_number: '', error: err?.message || 'Failed to place order' };
+  }
+}
+
+export async function getOrdersAdmin(db?: D1Database, status?: string): Promise<Order[]> {
+  if (!db) return [];
+  try {
+    let q = 'SELECT * FROM orders';
+    if (status && status !== 'all') {
+      q += ` WHERE order_status = '${status}'`;
+    }
+    q += ' ORDER BY created_at DESC LIMIT 100';
+    const res = await db.prepare(q).all<Order>();
+    return res.results || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getOrderByIdOrNumber(db: D1Database | undefined, idOrNumber: string): Promise<Order | null> {
+  if (!db) return null;
+  try {
+    const res = await db
+      .prepare('SELECT * FROM orders WHERE order_number = ? OR id = ? LIMIT 1')
+      .bind(idOrNumber.trim(), Number(idOrNumber) || 0)
+      .first<Order>();
+    return res || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function updateOrderStatus(
+  db: D1Database | undefined,
+  orderId: number,
+  status: string,
+  paymentStatus?: string
+): Promise<boolean> {
+  if (!db) return true;
+  try {
+    if (paymentStatus) {
+      await db
+        .prepare('UPDATE orders SET order_status = ?, payment_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .bind(status, paymentStatus, orderId)
+        .run();
+    } else {
+      await db
+        .prepare('UPDATE orders SET order_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .bind(status, orderId)
+        .run();
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ============================================================================
+// OUTBOUND AFFILIATE CLICK TRACKING
+// ============================================================================
+export async function recordOutboundClick(
+  db: D1Database | undefined,
+  click: {
+    product_id?: number;
+    target_type: 'product' | 'store_offer' | 'coupon' | 'custom';
+    store_name: string;
+    target_url: string;
+    referrer?: string;
+    user_agent?: string;
+    ip_country?: string;
+  }
+): Promise<boolean> {
+  if (!db) return true;
+  try {
+    await db
+      .prepare(
+        'INSERT INTO outbound_clicks(product_id, target_type, store_name, target_url, referrer, user_agent, ip_country) VALUES(?, ?, ?, ?, ?, ?, ?)'
+      )
+      .bind(
+        click.product_id || null,
+        click.target_type,
+        click.store_name,
+        click.target_url,
+        click.referrer || '',
+        click.user_agent || '',
+        click.ip_country || 'NP'
+      )
+      .run();
+    return true;
+  } catch {
+    return true;
+  }
+}
+
+export async function getOutboundClicksAdmin(db?: D1Database): Promise<any[]> {
+  if (!db) return [];
+  try {
+    const res = await db.prepare('SELECT * FROM outbound_clicks ORDER BY created_at DESC LIMIT 100').all<any>();
+    return res.results || [];
+  } catch {
+    return [];
+  }
+}
+
 

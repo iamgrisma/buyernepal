@@ -3,9 +3,9 @@ import { Category, Product, SiteSettings, Coupon } from '../types';
 
 export const Header: FC<{
   settings: SiteSettings;
-  categories: Category[];
+  categories?: Category[];
   activeSlug?: string;
-}> = ({ settings, categories, activeSlug }) => {
+}> = ({ settings, categories = [], activeSlug }) => {
   const title = settings.site_title || 'BuyerNepal';
   const announcement =
     settings.announcement_text ||
@@ -39,24 +39,28 @@ export const Header: FC<{
             </span>
           </a>
 
-          {/* Central Header Quick Search */}
+          {/* Central Header Quick Search with Live Dropdown */}
           <div className="store-header-search">
-            <form
-              action="/"
-              method="get"
-              className="header-search-form"
-              onsubmit="event.preventDefault(); const inp = this.querySelector('input'); const val = inp ? inp.value.trim() : ''; const mainInput = document.getElementById('searchInput'); if (mainInput) { mainInput.value = val; mainInput.dispatchEvent(new Event('input')); mainInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); } else { window.location.href = '/?q=' + encodeURIComponent(val); }"
-            >
-              <span className="search-icon">🔍</span>
-              <input
-                type="search"
-                placeholder="Search iPhone, MacBook, Goldstar, Pashmina..."
-                className="header-search-input"
-                aria-label="Search verified deals in Nepal"
-                oninput="const mainInput = document.getElementById('searchInput'); if (mainInput) { mainInput.value = this.value; mainInput.dispatchEvent(new Event('input')); }"
-              />
-              <button type="submit" className="header-search-submit">Search</button>
-            </form>
+            <div className="search-form-wrap">
+              <form
+                action="/"
+                method="get"
+                className="header-search-form"
+                onsubmit="event.preventDefault(); const inp = this.querySelector('input'); const val = inp ? inp.value.trim() : ''; window.location.href = '/?q=' + encodeURIComponent(val);"
+              >
+                <span className="search-icon">🔍</span>
+                <input
+                  id="headerSearchInput"
+                  type="search"
+                  placeholder="Search iPhone, MacBook, Goldstar, Pashmina..."
+                  className="header-search-input"
+                  aria-label="Search verified deals in Nepal"
+                  autoComplete="off"
+                />
+                <button type="submit" className="header-search-submit">Search</button>
+              </form>
+              <div id="headerSearchDropdown" className="search-autocomplete-dropdown" />
+            </div>
           </div>
 
           {/* Header Action Utilities: Currency, Theme, Wishlist, Admin */}
@@ -125,7 +129,36 @@ export const Header: FC<{
                   style={{ borderColor: 'rgba(217, 119, 6, 0.35)', background: activeSlug === 'blog' ? 'var(--primary)' : 'rgba(245, 158, 11, 0.08)' }}
                 >
                   <span>📰</span>
-                  <span>Tech Guides & Blog</span>
+                  <span>Tech Guides &amp; Blog</span>
+                </a>
+                <a
+                  href="/coupons"
+                  className={`nav-pill ${activeSlug === 'coupons' ? 'nav-pill-active' : ''}`}
+                  style={{ borderColor: 'rgba(225, 29, 72, 0.35)', background: activeSlug === 'coupons' ? 'var(--primary)' : 'rgba(225, 29, 72, 0.08)' }}
+                >
+                  <span>🎟️</span>
+                  <span>Coupons &amp; Deals</span>
+                </a>
+                <a
+                  href="/stores"
+                  className={`nav-pill ${activeSlug === 'stores' ? 'nav-pill-active' : ''}`}
+                >
+                  <span>🏪</span>
+                  <span>Stores</span>
+                </a>
+                <a
+                  href="/brands"
+                  className={`nav-pill ${activeSlug === 'brands' ? 'nav-pill-active' : ''}`}
+                >
+                  <span>🏷️</span>
+                  <span>Brands</span>
+                </a>
+                <a
+                  href="/track-order"
+                  className={`nav-pill ${activeSlug === 'orders' ? 'nav-pill-active' : ''}`}
+                >
+                  <span>📦</span>
+                  <span>Track Order</span>
                 </a>
                 {categories.map((cat) => (
                   <a
@@ -874,9 +907,9 @@ export const MobileBottomBar: FC<{ activeTab?: string }> = ({ activeTab = 'home'
   </div>
 );
 
-export const Footer: FC<{ settings: SiteSettings; categories: Category[] }> = ({
+export const Footer: FC<{ settings: SiteSettings; categories?: Category[] }> = ({
   settings,
-  categories
+  categories = []
 }) => {
   const title = settings.site_title || 'BuyerNepal';
   const description =
@@ -924,12 +957,19 @@ export const Footer: FC<{ settings: SiteSettings; categories: Category[] }> = ({
         </div>
 
         <div>
-          <h3>Verified Stores</h3>
-          <a href="https://www.daraz.com.np" target="_blank" rel="noopener noreferrer nofollow">Daraz Mall Nepal ↗</a>
-          <a href="/" onClick={(e: any) => e.preventDefault()}>Oliz Store Kathmandu</a>
-          <a href="/" onClick={(e: any) => e.preventDefault()}>EvoStore Official</a>
-          <a href="/" onClick={(e: any) => e.preventDefault()}>Samsung Plaza Nepal</a>
-          <a href="/" onClick={(e: any) => e.preventDefault()}>Goldstar Official Store</a>
+          <h3>Nepal Directory</h3>
+          <a href="/stores">🏪 Verified Stores Directory</a>
+          <a href="/brands">🏷️ Official Brands in Nepal</a>
+          <a href="/coupons">🎟️ Verified Promo Codes &amp; Deals</a>
+          <a href="/track-order">📦 Track My Order Live</a>
+        </div>
+
+        <div>
+          <h3>Shopping Guides</h3>
+          <a href="/blog">📰 Tech Reviews &amp; Guides</a>
+          <a href="/category/electronics">📱 Smartphone Buying Guide</a>
+          <a href="/category/laptops-computing">💻 Laptop Price Guide Nepal</a>
+          <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer">🇳🇵 NTA MDMS Portal ↗</a>
         </div>
 
         <div>

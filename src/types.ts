@@ -61,6 +61,11 @@ export interface Product {
   cons?: string[];
   delivery_info?: string;
   verdict?: string;
+  product_type?: 'affiliate' | 'physical' | 'digital';
+  digital_file_url?: string;
+  digital_license_info?: string;
+  seo_title?: string;
+  seo_description?: string;
   variants?: ProductVariant[];
   scores?: ProductScore;
   store_offers?: StoreOffer[];
@@ -81,6 +86,8 @@ export interface Article {
   is_published?: number;
   views_count?: number;
   featured_product_ids?: string;
+  seo_title?: string;
+  seo_description?: string;
   published_at?: string;
   created_at?: string;
   updated_at?: string;
@@ -180,4 +187,71 @@ export interface SiteSettings {
   delivery_estimator_enabled?: string;
   comparison_enabled?: string;
   dark_mode_default?: string;
+}
+
+export interface Order {
+  id: number;
+  order_number: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  shipping_address?: string;
+  city?: string;
+  district?: string;
+  product_id: number;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  total_amount: number;
+  payment_method: 'cod' | 'esewa' | 'khalti' | 'fonepay' | 'bank_transfer';
+  payment_status: 'pending' | 'paid' | 'failed';
+  order_status: 'placed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  delivery_type: 'physical' | 'digital';
+  digital_download_code?: string;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Store {
+  id: number;
+  name: string;
+  slug: string;
+  logo_url?: string;
+  website_url?: string;
+  affiliate_url?: string;
+  description?: string;
+  rating: number;
+  review_count: number;
+  is_verified: number;
+  location: string;
+  delivery_coverage: string;
+  return_policy: string;
+  warranty_support: string;
+  is_active: number;
+  created_at?: string;
+}
+
+export interface Brand {
+  id: number;
+  name: string;
+  slug: string;
+  logo_url?: string;
+  description?: string;
+  origin_country: string;
+  warranty_service_center: string;
+  is_featured: number;
+  created_at?: string;
+}
+
+export interface OutboundClick {
+  id?: number;
+  product_id?: number;
+  target_type: 'product' | 'store_offer' | 'coupon' | 'custom';
+  store_name: string;
+  target_url: string;
+  referrer?: string;
+  user_agent?: string;
+  ip_country?: string;
+  created_at?: string;
 }

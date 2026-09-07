@@ -133,14 +133,22 @@ export const HomePage: FC<{
             </div>
           </div>
 
-          <div className="section-heading" style={{ marginTop: '20px' }}>
+          <div className="section-heading" style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
             <div>
               <span className="section-kicker">VERIFIED CATALOG</span>
               <h2>Curated Products in Nepal</h2>
             </div>
-            <span id="productCountBadge" className="section-count">
-              Showing {products.length} products
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              {/* REHub View Mode Switcher: Grid, List, Table */}
+              <div className="view-mode-toggle" aria-label="Catalog View Modes">
+                <button type="button" className="view-btn active" data-view="grid" title="Grid View">🔲 Grid</button>
+                <button type="button" className="view-btn" data-view="list" title="Detailed List View">📄 List</button>
+                <button type="button" className="view-btn" data-view="table" title="Compact Table Comparison">📑 Table</button>
+              </div>
+              <span id="productCountBadge" className="section-count">
+                Showing {products.length} products
+              </span>
+            </div>
           </div>
 
           {products.length > 0 ? (
@@ -384,6 +392,27 @@ export const HomePage: FC<{
       applySorting();
     });
   }
+
+  // REHub View Mode Switcher
+  const viewBtns = document.querySelectorAll('.view-btn');
+  const savedView = localStorage.getItem('bn_catalog_view') || 'grid';
+  if (productGrid && savedView !== 'grid') {
+    productGrid.classList.remove('view-grid', 'view-list', 'view-table');
+    productGrid.classList.add('view-' + savedView);
+    viewBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-view') === savedView));
+  }
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const view = btn.getAttribute('data-view');
+      viewBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (productGrid) {
+        productGrid.classList.remove('view-grid', 'view-list', 'view-table');
+        productGrid.classList.add('view-' + view);
+      }
+      localStorage.setItem('bn_catalog_view', view || 'grid');
+    });
+  });
 })();
           `
         }}

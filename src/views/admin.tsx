@@ -725,79 +725,83 @@ export const AdminDashboardView: FC<{
             </div>
           )}
 
-          {/* TAB 3: CATEGORIES */}
+          {/* TAB 3: CATEGORIES (Full-Width Suite) */}
           {activeTab === 'categories' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
-              <div className="admin-card">
-                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '16px' }}>Add Department</h2>
-                <form method="post" action="/admin/categories/new">
-                  <div className="form-group">
-                    <label>Department Name *</label>
-                    <input name="name" type="text" placeholder="e.g. Fitness &amp; Outdoors" required />
-                  </div>
-                  <div className="form-group">
-                    <label>URL Slug *</label>
-                    <input name="slug" type="text" placeholder="e.g. fitness-outdoors" required />
-                  </div>
-                  <div className="form-group">
-                    <label>Icon Emoji</label>
-                    <input name="icon" type="text" placeholder="e.g. 🏃" defaultValue="📁" />
-                  </div>
-                  <div className="form-group">
-                    <label>Description</label>
-                    <textarea name="description" rows={3} placeholder="Department highlights…"></textarea>
-                  </div>
-                  <button type="submit" className="primary-action" style={{ width: '100%', justifyContent: 'center' }}>
-                    Create Department
+            <div>
+              {/* Toolbar */}
+              <div className="admin-toolbar">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>Store Departments &amp; Categories</h2>
+                  <span className="badge badge-active" style={{ background: 'var(--line-subtle)', color: 'var(--ink)' }}>
+                    {categories.length} Departments
+                  </span>
+                </div>
+
+                <div className="admin-toolbar-actions">
+                  <button
+                    type="button"
+                    className="primary-action btn-trigger-add-category"
+                    style={{ background: 'var(--accent)', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    + Add Department
                   </button>
-                </form>
+                </div>
               </div>
 
-              <div className="admin-card">
-                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '16px' }}>Existing Departments ({categories.length})</h2>
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Icon &amp; Name</th>
-                      <th>Slug</th>
-                      <th>Description</th>
-                      <th style={{ textAlign: 'right' }}>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {categories.map((c) => (
-                      <tr key={c.id}>
-                        <td style={{ fontWeight: 700 }}>
-                          <span style={{ marginRight: '8px' }}>{c.icon || '📁'}</span> {c.name}
-                        </td>
-                        <td style={{ color: '#64748b' }}>{c.slug}</td>
-                        <td style={{ fontSize: '12px', color: '#64748b', maxWidth: '280px' }}>{c.description}</td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-                            <button
-                              type="button"
-                              className="btn-edit-category primary-action"
-                              style={{ padding: '4px 8px', fontSize: '11px', background: '#2563eb', border: 0, cursor: 'pointer' }}
-                              data-id={c.id}
-                              data-name={c.name}
-                              data-slug={c.slug}
-                              data-icon={c.icon || '📁'}
-                              data-desc={c.description || ''}
-                              data-active={c.is_active ? '1' : '0'}
-                            >
-                              ✏️ Edit
-                            </button>
-                            <form method="post" action={`/admin/categories/${c.id}/delete`} onsubmit="return confirm('Delete this category?');" style={{ display: 'inline' }}>
-                              <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>
-                                Delete
-                              </button>
-                            </form>
-                          </div>
-                        </td>
+              {/* Full-Width Table Card */}
+              <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ overflowX: 'auto', maxHeight: '800px' }}>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th style={{ width: '28%' }}>Department &amp; Icon</th>
+                        <th style={{ width: '22%' }}>URL Slug</th>
+                        <th>Description &amp; Highlights</th>
+                        <th style={{ textAlign: 'right', width: '18%' }}>Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {categories.map((c) => (
+                        <tr key={c.id}>
+                          <td style={{ fontWeight: 800, color: 'var(--ink)' }}>
+                            <span style={{ marginRight: '10px', fontSize: '18px' }}>{c.icon || '📁'}</span>
+                            {c.name}
+                          </td>
+                          <td>
+                            <span style={{ color: 'var(--muted)', background: 'var(--line-subtle)', padding: '2px 8px', borderRadius: '6px', fontSize: '11.5px', fontFamily: 'monospace' }}>
+                              /category/{c.slug}
+                            </span>
+                          </td>
+                          <td style={{ fontSize: '12.5px', color: 'var(--ink-secondary)' }}>
+                            {c.description || 'Curated departmental showcase'}
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                              <button
+                                type="button"
+                                className="btn-edit-category primary-action"
+                                style={{ padding: '5px 10px', fontSize: '11.5px', background: '#2563eb', border: 0, cursor: 'pointer' }}
+                                data-id={c.id}
+                                data-name={c.name}
+                                data-slug={c.slug}
+                                data-icon={c.icon || '📁'}
+                                data-desc={c.description || ''}
+                                data-active={c.is_active ? '1' : '0'}
+                              >
+                                ✏️ Edit
+                              </button>
+                              <form method="post" action={`/admin/categories/${c.id}/delete`} onsubmit="return confirm('Delete this category?');" style={{ display: 'inline' }}>
+                                <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '5px 9px', borderRadius: '6px', cursor: 'pointer', fontSize: '11.5px', fontWeight: 700 }}>
+                                  Delete
+                                </button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -890,89 +894,87 @@ export const AdminDashboardView: FC<{
             </div>
           )}
 
-          {/* TAB 5: COUPONS */}
+          {/* TAB 5: COUPONS (Full-Width Suite) */}
           {activeTab === 'coupons' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
-              <div className="admin-card">
-                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '16px' }}>Create Promo Voucher</h2>
-                <form method="post" action="/admin/coupons/new">
-                  <div className="form-group">
-                    <label>Coupon Code *</label>
-                    <input name="code" type="text" placeholder="e.g. DASHAIN2026" required style={{ textTransform: 'uppercase' }} />
-                  </div>
-                  <div className="form-group">
-                    <label>Discount Type</label>
-                    <select name="discount_type">
-                      <option value="fixed">Fixed NPR Discount</option>
-                      <option value="percentage">Percentage Discount (%)</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label>Discount Value *</label>
-                    <input name="discount_value" type="number" placeholder="1000 or 15" required />
-                  </div>
-                  <div className="form-group">
-                    <label>Minimum Purchase (NPR)</label>
-                    <input name="min_purchase" type="number" placeholder="5000" defaultValue="0" />
-                  </div>
-                  <div className="form-group">
-                    <label>Description</label>
-                    <input name="description" type="text" placeholder="Flat Rs. 1,000 OFF on electronics" />
-                  </div>
-                  <button type="submit" className="primary-action" style={{ width: '100%', justifyContent: 'center' }}>
-                    Publish Promo Voucher
+            <div>
+              {/* Toolbar */}
+              <div className="admin-toolbar">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>Verified Promo Codes &amp; Vouchers</h2>
+                  <span className="badge badge-active" style={{ background: 'var(--line-subtle)', color: 'var(--ink)' }}>
+                    {coupons.length} Vouchers
+                  </span>
+                </div>
+
+                <div className="admin-toolbar-actions">
+                  <button
+                    type="button"
+                    className="primary-action btn-trigger-add-coupon"
+                    style={{ background: 'var(--accent)', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    + Create Promo Voucher
                   </button>
-                </form>
+                </div>
               </div>
 
-              <div className="admin-card">
-                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '16px' }}>Active Promo Vouchers ({coupons.length})</h2>
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Code</th>
-                      <th>Discount</th>
-                      <th>Min Purchase</th>
-                      <th>Description</th>
-                      <th style={{ textAlign: 'right' }}>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {coupons.map((c) => (
-                      <tr key={c.id}>
-                        <td style={{ fontWeight: 800, color: '#e11d48' }}>{c.code}</td>
-                        <td style={{ fontWeight: 700 }}>
-                          {c.discount_type === 'percentage' ? `${c.discount_value}%` : `Rs. ${c.discount_value}`}
-                        </td>
-                        <td>Rs. {c.min_purchase.toLocaleString('en-NP')}</td>
-                        <td style={{ fontSize: '12px', color: '#64748b' }}>{c.description}</td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-                            <button
-                              type="button"
-                              className="btn-edit-coupon primary-action"
-                              style={{ padding: '4px 8px', fontSize: '11px', background: '#2563eb', border: 0, cursor: 'pointer' }}
-                              data-id={c.id}
-                              data-code={c.code}
-                              data-type={c.discount_type}
-                              data-value={c.discount_value}
-                              data-min={c.min_purchase}
-                              data-desc={c.description || ''}
-                              data-active={c.is_active ? '1' : '0'}
-                            >
-                              ✏️ Edit
-                            </button>
-                            <form method="post" action={`/admin/coupons/${c.id}/delete`} onsubmit="return confirm('Delete coupon?');" style={{ display: 'inline' }}>
-                              <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>
-                                Delete
-                              </button>
-                            </form>
-                          </div>
-                        </td>
+              {/* Full-Width Table Card */}
+              <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ overflowX: 'auto', maxHeight: '800px' }}>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th style={{ width: '22%' }}>Voucher Code</th>
+                        <th style={{ width: '18%' }}>Discount Value</th>
+                        <th style={{ width: '20%' }}>Min Order Value</th>
+                        <th>Terms / Description</th>
+                        <th style={{ textAlign: 'right', width: '15%' }}>Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {coupons.map((c) => (
+                        <tr key={c.id}>
+                          <td>
+                            <strong style={{ color: 'var(--accent)', letterSpacing: '1px', background: 'var(--accent-soft)', padding: '3px 8px', borderRadius: '6px', fontSize: '12.5px' }}>
+                              {c.code}
+                            </strong>
+                          </td>
+                          <td style={{ fontWeight: 800, color: 'var(--emerald)' }}>
+                            {c.discount_type === 'percentage' ? `${c.discount_value}% OFF` : `Rs. ${c.discount_value.toLocaleString()} OFF`}
+                          </td>
+                          <td style={{ fontSize: '12.5px', color: 'var(--ink-secondary)', fontWeight: 600 }}>
+                            {c.min_purchase > 0 ? `Rs. ${c.min_purchase.toLocaleString('en-NP')}` : 'No Minimum'}
+                          </td>
+                          <td style={{ fontSize: '12.5px', color: 'var(--muted)' }}>
+                            {c.description || 'Verified promo discount'}
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                              <button
+                                type="button"
+                                className="btn-edit-coupon primary-action"
+                                style={{ padding: '5px 10px', fontSize: '11.5px', background: '#2563eb', border: 0, cursor: 'pointer' }}
+                                data-id={c.id}
+                                data-code={c.code}
+                                data-type={c.discount_type}
+                                data-value={c.discount_value}
+                                data-min={c.min_purchase}
+                                data-desc={c.description || ''}
+                                data-active={c.is_active ? '1' : '0'}
+                              >
+                                ✏️ Edit
+                              </button>
+                              <form method="post" action={`/admin/coupons/${c.id}/delete`} onsubmit="return confirm('Delete coupon?');" style={{ display: 'inline' }}>
+                                <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '5px 9px', borderRadius: '6px', cursor: 'pointer', fontSize: '11.5px', fontWeight: 700 }}>
+                                  Delete
+                                </button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -1020,145 +1022,124 @@ export const AdminDashboardView: FC<{
             </div>
           )}
 
-          {/* TAB: TECH GUIDES & BLOG CMS */}
+          {/* TAB: TECH GUIDES & BLOG CMS (Full-Width Suite) */}
           {activeTab === 'blog' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '24px' }}>
-              {/* Add Article Form */}
-              <div className="admin-card">
-                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '16px' }}>
-                  ✍️ Write New Tech Guide / Review
-                </h2>
-                <form method="post" action="/admin/articles/new">
-                  <div className="form-group">
-                    <label>Article Title *</label>
-                    <input name="title" type="text" placeholder="e.g. Best Mobile Phones Under 30,000 in Nepal (2026)" required />
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div className="form-group">
-                      <label>Category *</label>
-                      <select name="category" required>
-                        <option value="Buying Guides">Buying Guides</option>
-                        <option value="Smartphone Reviews">Smartphone Reviews</option>
-                        <option value="Laptop Guides">Laptop Guides</option>
-                        <option value="Nepal Tech">Nepal Tech</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label>Reading Time (Minutes)</label>
-                      <input name="read_time_minutes" type="number" defaultValue={5} />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Author Byline *</label>
-                    <input name="author_name" type="text" defaultValue="BuyerNepal Editorial Team" required />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Cover Image URL *</label>
-                    <input name="cover_image" type="url" placeholder="https://images.unsplash.com/..." required />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Tags (Comma separated)</label>
-                    <input name="tags" type="text" placeholder="e.g. smartphones, budget, mdms, nepal" />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Executive Excerpt / Deck *</label>
-                    <textarea name="excerpt" rows={2} placeholder="Brief summary of the article..." required></textarea>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Article Body (Markdown supported) *</label>
-                    <textarea
-                      name="content"
-                      rows={8}
-                      placeholder="Write your in-depth guide here... Use ## for section titles, ### for subheadings, - for bullets, and > for callouts."
-                      required
-                    ></textarea>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '20px', marginBottom: '16px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: 700 }}>
-                      <input type="checkbox" name="is_featured" value="1" />
-                      ⭐ Feature as Hero Story
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: 700 }}>
-                      <input type="checkbox" name="is_published" value="1" defaultChecked />
-                      🚀 Publish Immediately
-                    </label>
-                  </div>
-
-                  <button type="submit" className="primary-action" style={{ width: '100%', justifyContent: 'center' }}>
-                    Publish Article to Storefront
-                  </button>
-                </form>
-              </div>
-
-              {/* Articles Management Table */}
-              <div className="admin-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <div>
-                    <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>
-                      Editorial Magazine Articles ({articles.length})
-                    </h2>
-                    <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0' }}>
-                      Publish, moderate, or edit tech journalism and consumer buying guides.
-                    </p>
-                  </div>
-                  <a href="/blog" target="_blank" className="primary-action" style={{ padding: '6px 12px', fontSize: '12px', background: '#0f172a' }}>
-                    View Magazine ↗
-                  </a>
+            <div>
+              {/* Toolbar */}
+              <div className="admin-toolbar">
+                <div className="admin-search-box">
+                  <span className="admin-search-icon">🔍</span>
+                  <input
+                    type="text"
+                    id="adminArticleSearch"
+                    placeholder="Live search guides by title, category, or author..."
+                  />
                 </div>
 
-                <div style={{ overflowX: 'auto', maxHeight: '700px' }}>
-                  <table className="admin-table">
+                <div className="admin-toolbar-actions">
+                  <select id="adminArticleCategoryFilter" className="admin-filter-select">
+                    <option value="">All Editorial Categories</option>
+                    <option value="buying guides">Buying Guides</option>
+                    <option value="smartphone reviews">Smartphone Reviews</option>
+                    <option value="laptop guides">Laptop Guides</option>
+                    <option value="nepal tech">Nepal Tech</option>
+                  </select>
+
+                  <a
+                    href="/blog"
+                    target="_blank"
+                    className="primary-action"
+                    style={{ background: 'var(--ink)', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    View Magazine ↗
+                  </a>
+
+                  <button
+                    type="button"
+                    className="primary-action btn-trigger-add-article"
+                    style={{ background: 'var(--accent)', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    + Write New Guide
+                  </button>
+                </div>
+              </div>
+
+              {/* Full-Width Table Card */}
+              <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--card-bg)' }}>
+                  <div>
+                    <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>Editorial Articles &amp; Buying Guides</h2>
+                    <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Publish, moderate, or edit tech journalism and consumer recommendations</span>
+                  </div>
+                  <span id="filteredArticleCount" className="badge badge-active" style={{ background: 'var(--line-subtle)', color: 'var(--ink)' }}>
+                    {articles.length} Articles
+                  </span>
+                </div>
+
+                <div style={{ overflowX: 'auto', maxHeight: '800px' }}>
+                  <table className="admin-table" id="adminArticlesTable">
                     <thead>
                       <tr>
-                        <th>Guide Title</th>
+                        <th style={{ width: '42%' }}>Guide Title &amp; Slug</th>
                         <th>Category</th>
-                        <th>Author</th>
-                        <th>Views</th>
+                        <th>Author Byline</th>
+                        <th>Readership</th>
                         <th>Status</th>
                         <th style={{ textAlign: 'right' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {articles.map((art) => (
-                        <tr key={art.id}>
+                        <tr
+                          key={art.id}
+                          className="admin-article-row"
+                          data-title={art.title.toLowerCase()}
+                          data-category={art.category.toLowerCase()}
+                          data-author={art.author_name.toLowerCase()}
+                        >
                           <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                               <img
                                 src={art.cover_image}
                                 alt=""
-                                style={{ width: '42px', height: '32px', borderRadius: '4px', objectFit: 'cover' }}
+                                style={{ width: '56px', height: '42px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--line)' }}
                               />
                               <div>
-                                <span style={{ fontWeight: 700, display: 'block' }}>{art.title}</span>
-                                <span style={{ fontSize: '11px', color: '#64748b' }}>
-                                  /{art.slug} {art.is_featured === 1 && '• ⭐ Hero'}
+                                <span style={{ fontWeight: 800, display: 'block', fontSize: '13.5px', color: 'var(--ink)', lineHeight: '1.3' }}>
+                                  {art.title}
                                 </span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px', fontSize: '11px', color: 'var(--muted)' }}>
+                                  <span>/{art.slug}</span>
+                                  {art.is_featured === 1 && (
+                                    <span style={{ color: '#d97706', fontWeight: 800, background: '#fef3c7', padding: '1px 6px', borderRadius: '4px' }}>
+                                      ⭐ Hero Story
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </td>
                           <td>
-                            <span style={{ fontSize: '11px', fontWeight: 700, background: '#f1f5f9', padding: '2px 8px', borderRadius: '12px' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 700, background: 'var(--line-subtle)', color: 'var(--ink)', padding: '3px 9px', borderRadius: '12px', border: '1px solid var(--line)' }}>
                               {art.category}
                             </span>
                           </td>
-                          <td style={{ fontSize: '12px', color: '#475569' }}>{art.author_name}</td>
-                          <td style={{ fontSize: '12px', fontWeight: 700 }}>👁️ {art.views_count || 0}</td>
+                          <td style={{ fontSize: '12.5px', color: 'var(--ink-secondary)', fontWeight: 600 }}>
+                            {art.author_name}
+                          </td>
+                          <td style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>
+                            👁️ {(art.views_count || 0).toLocaleString()}
+                          </td>
                           <td>
                             <form method="post" action={`/admin/articles/${art.id}/toggle`} style={{ display: 'inline' }}>
                               <input type="hidden" name="is_published" value={art.is_published ? '0' : '1'} />
                               <button
                                 type="submit"
                                 className={`badge ${art.is_published ? 'badge-active' : 'badge-inactive'}`}
-                                style={{ border: 0, cursor: 'pointer' }}
+                                style={{ border: 0, cursor: 'pointer', padding: '4px 10px', fontSize: '11px' }}
+                                title="Click to toggle status"
                               >
-                                {art.is_published ? 'Published' : 'Draft'}
+                                {art.is_published ? '✓ Published' : 'Draft'}
                               </button>
                             </form>
                           </td>
@@ -1168,14 +1149,14 @@ export const AdminDashboardView: FC<{
                                 href={`/blog/${art.slug}`}
                                 target="_blank"
                                 className="primary-action"
-                                style={{ padding: '4px 8px', fontSize: '11px', background: '#0f172a' }}
+                                style={{ padding: '5px 10px', fontSize: '11.5px', background: 'var(--ink)' }}
                               >
                                 View ↗
                               </a>
                               <button
                                 type="button"
                                 className="btn-edit-article primary-action"
-                                style={{ padding: '4px 8px', fontSize: '11px', background: '#2563eb', border: 0, cursor: 'pointer' }}
+                                style={{ padding: '5px 10px', fontSize: '11.5px', background: '#2563eb', border: 0, cursor: 'pointer' }}
                                 data-id={art.id}
                                 data-title={art.title}
                                 data-slug={art.slug}
@@ -1194,12 +1175,12 @@ export const AdminDashboardView: FC<{
                               <form
                                 method="post"
                                 action={`/admin/articles/${art.id}/delete`}
-                                onsubmit="return confirm('Delete this article?');"
+                                onsubmit="return confirm('Delete this article permanently?');"
                                 style={{ display: 'inline' }}
                               >
                                 <button
                                   type="submit"
-                                  style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}
+                                  style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '5px 9px', borderRadius: '6px', cursor: 'pointer', fontSize: '11.5px', fontWeight: 700 }}
                                 >
                                   Delete
                                 </button>
@@ -1930,6 +1911,176 @@ export const AdminDashboardView: FC<{
         </div>
       </div>
 
+      {/* Modal: Write New Tech Guide / Review */}
+      <div id="addArticleModal" className="admin-modal-backdrop">
+        <div className="admin-modal-content" style={{ maxWidth: '780px' }}>
+          <div className="admin-modal-header">
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)' }}>✍️ Write New Tech Guide / Review</h3>
+            <button type="button" className="close-admin-modal" style={{ background: 'transparent', border: 0, fontSize: '24px', cursor: 'pointer', color: 'var(--muted)', lineHeight: 1 }}>×</button>
+          </div>
+          <form method="post" action="/admin/articles/new">
+            <div className="admin-modal-body">
+              <div className="form-group">
+                <label>Article Title *</label>
+                <input name="title" type="text" placeholder="e.g. Best Mobile Phones Under 30,000 in Nepal (2026)" required />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="form-group">
+                  <label>Category *</label>
+                  <select name="category" required>
+                    <option value="Buying Guides">Buying Guides</option>
+                    <option value="Smartphone Reviews">Smartphone Reviews</option>
+                    <option value="Laptop Guides">Laptop Guides</option>
+                    <option value="Nepal Tech">Nepal Tech</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Reading Time (Minutes)</label>
+                  <input name="read_time_minutes" type="number" defaultValue={5} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="form-group">
+                  <label>Author Byline *</label>
+                  <input name="author_name" type="text" defaultValue="BuyerNepal Editorial Team" required />
+                </div>
+                <div className="form-group">
+                  <label>Cover Image URL *</label>
+                  <input name="cover_image" type="url" placeholder="https://images.unsplash.com/..." required />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Tags (Comma separated)</label>
+                <input name="tags" type="text" placeholder="e.g. smartphones, budget, mdms, nepal" />
+              </div>
+
+              <div className="form-group">
+                <label>Executive Excerpt / Deck *</label>
+                <textarea name="excerpt" rows={2} placeholder="Brief summary of the article..." required></textarea>
+              </div>
+
+              <div className="form-group">
+                <label>Article Body (Markdown supported) *</label>
+                <textarea
+                  name="content"
+                  rows={9}
+                  placeholder="Write your in-depth guide here... Use ## for section titles, ### for subheadings, - for bullets, and > for callouts."
+                  required
+                ></textarea>
+              </div>
+
+              <div style={{ display: 'flex', gap: '20px', padding: '10px 0' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: 700, color: 'var(--ink)' }}>
+                  <input type="checkbox" name="is_featured" value="1" style={{ width: '16px', height: '16px' }} />
+                  ⭐ Feature as Hero Story
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: 700, color: 'var(--ink)' }}>
+                  <input type="checkbox" name="is_published" value="1" defaultChecked style={{ width: '16px', height: '16px' }} />
+                  🚀 Publish Immediately
+                </label>
+              </div>
+            </div>
+
+            <div className="admin-modal-footer">
+              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+                Cancel
+              </button>
+              <button type="submit" className="primary-action" style={{ background: 'var(--accent)', color: '#ffffff' }}>
+                Publish Article to Storefront 🚀
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Modal: Add Department / Category */}
+      <div id="addCategoryModal" className="admin-modal-backdrop">
+        <div className="admin-modal-content" style={{ maxWidth: '580px' }}>
+          <div className="admin-modal-header">
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)' }}>📁 Add Store Department</h3>
+            <button type="button" className="close-admin-modal" style={{ background: 'transparent', border: 0, fontSize: '24px', cursor: 'pointer', color: 'var(--muted)', lineHeight: 1 }}>×</button>
+          </div>
+          <form method="post" action="/admin/categories/new">
+            <div className="admin-modal-body">
+              <div className="form-group">
+                <label>Department Name *</label>
+                <input name="name" type="text" placeholder="e.g. Fitness &amp; Outdoors" required />
+              </div>
+              <div className="form-group">
+                <label>URL Slug *</label>
+                <input name="slug" type="text" placeholder="e.g. fitness-outdoors" required />
+              </div>
+              <div className="form-group">
+                <label>Icon Emoji</label>
+                <input name="icon" type="text" placeholder="e.g. 🏃" defaultValue="📁" />
+              </div>
+              <div className="form-group">
+                <label>Editorial Description</label>
+                <textarea name="description" rows={3} placeholder="Department highlights and summary…"></textarea>
+              </div>
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+                Cancel
+              </button>
+              <button type="submit" className="primary-action" style={{ background: 'var(--accent)', color: '#ffffff' }}>
+                Create Department
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Modal: Create Promo Voucher */}
+      <div id="addCouponModal" className="admin-modal-backdrop">
+        <div className="admin-modal-content" style={{ maxWidth: '580px' }}>
+          <div className="admin-modal-header">
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)' }}>🏷️ Create Promo Voucher</h3>
+            <button type="button" className="close-admin-modal" style={{ background: 'transparent', border: 0, fontSize: '24px', cursor: 'pointer', color: 'var(--muted)', lineHeight: 1 }}>×</button>
+          </div>
+          <form method="post" action="/admin/coupons/new">
+            <div className="admin-modal-body">
+              <div className="form-group">
+                <label>Coupon Code *</label>
+                <input name="code" type="text" placeholder="e.g. DASHAIN2026" required style={{ textTransform: 'uppercase' }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="form-group">
+                  <label>Discount Type</label>
+                  <select name="discount_type">
+                    <option value="fixed">Fixed NPR Discount</option>
+                    <option value="percentage">Percentage Discount (%)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Discount Value *</label>
+                  <input name="discount_value" type="number" placeholder="1000 or 15" required />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Minimum Purchase (NPR)</label>
+                <input name="min_purchase" type="number" placeholder="5000" defaultValue="0" />
+              </div>
+              <div className="form-group">
+                <label>Description / Terms</label>
+                <input name="description" type="text" placeholder="Flat Rs. 1,000 OFF on electronics" />
+              </div>
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+                Cancel
+              </button>
+              <button type="submit" className="primary-action" style={{ background: 'var(--accent)', color: '#ffffff' }}>
+                Publish Promo Voucher
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       {/* Admin Interactive Script for Modals */}
       <script
         dangerouslySetInnerHTML={{
@@ -1942,6 +2093,61 @@ export const AdminDashboardView: FC<{
                   if (addProdModal) addProdModal.classList.add('open');
                 });
               });
+
+              // 0.01 Add Article, Category, Coupon Modal Triggers
+              const addArtModal = document.getElementById('addArticleModal');
+              document.querySelectorAll('.btn-trigger-add-article').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  if (addArtModal) addArtModal.classList.add('open');
+                });
+              });
+
+              const addCatModal = document.getElementById('addCategoryModal');
+              document.querySelectorAll('.btn-trigger-add-category').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  if (addCatModal) addCatModal.classList.add('open');
+                });
+              });
+
+              const addCpnModal = document.getElementById('addCouponModal');
+              document.querySelectorAll('.btn-trigger-add-coupon').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  if (addCpnModal) addCpnModal.classList.add('open');
+                });
+              });
+
+              // 0.02 Real-time Articles Live Search & Filter
+              const artSearch = document.getElementById('adminArticleSearch');
+              const artCatFilter = document.getElementById('adminArticleCategoryFilter');
+              const artCountBadge = document.getElementById('filteredArticleCount');
+              const artRows = document.querySelectorAll('.admin-article-row');
+
+              function applyArticleFilters() {
+                const q = (artSearch?.value || '').toLowerCase().trim();
+                const cat = (artCatFilter?.value || '').toLowerCase().trim();
+                let count = 0;
+
+                artRows.forEach(row => {
+                  const title = row.getAttribute('data-title') || '';
+                  const author = row.getAttribute('data-author') || '';
+                  const rowCat = row.getAttribute('data-category') || '';
+
+                  const matchQ = !q || title.includes(q) || author.includes(q);
+                  const matchC = !cat || rowCat.includes(cat);
+
+                  if (matchQ && matchC) {
+                    row.style.display = '';
+                    count++;
+                  } else {
+                    row.style.display = 'none';
+                  }
+                });
+
+                if (artCountBadge) artCountBadge.textContent = count + ' Articles';
+              }
+
+              if (artSearch) artSearch.addEventListener('input', applyArticleFilters);
+              if (artCatFilter) artCatFilter.addEventListener('change', applyArticleFilters);
 
               // 0.1 Real-time Catalog Live Search & Filters
               const searchInput = document.getElementById('adminProductSearch');
