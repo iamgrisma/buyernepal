@@ -1113,9 +1113,9 @@ export async function getUsers(db?: D1Database): Promise<User[]> {
   try {
     const r = await db
       .prepare(
-        `SELECT u.id, u.username, u.email, u.is_active, u.created_at, COALESCE(r.role, 'user') role
+        `SELECT u.id, u.username, u.email, u.is_active, u.created_at, COALESCE(u.role, r.role, 'user') role
          FROM users u
-         LEFT JOIN user_roles r ON r.user_id = u.id
+         LEFT JOIN user_roles r ON CAST(r.user_id AS TEXT) = CAST(u.id AS TEXT)
          ORDER BY u.created_at DESC`
       )
       .all<User>();
@@ -1329,11 +1329,10 @@ export async function seedCatalog(db: D1Database | undefined): Promise<{ success
     }
 
     // 4. Seed Default Admin
+    const now = Math.floor(Date.now() / 1000);
     await db
-      .prepare("INSERT OR IGNORE INTO users(id, username, email, password_hash, password_salt, is_active) VALUES(1, 'admin', 'admin@buyernepal.com', 'admin123', '', 1)")
-      .run();
-    await db
-      .prepare("INSERT OR IGNORE INTO user_roles(user_id, role) VALUES(1, 'admin')")
+      .prepare("INSERT OR REPLACE INTO users(id, username, email, first_name, last_name, role, password_hash, password_salt, is_active, created_at, updated_at) VALUES('1', 'admin', 'admin@buyernepal.com', 'System', 'Admin', 'admin', '55b91f704ed3b16f227c1ece596820f5a2477e44f0f19d37f7f44368b465e485', 'c8dfee5333d4b80f8f0f73924d889652', 1, ?, ?)")
+      .bind(now, now)
       .run();
 
     return { success: true, message: `Successfully seeded ${DEFAULT_PRODUCTS.length} curated products, ${DEFAULT_CATEGORIES.length} categories, and coupons into D1.` };
