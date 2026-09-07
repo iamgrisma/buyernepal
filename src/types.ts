@@ -66,9 +66,22 @@ export interface Product {
   digital_license_info?: string;
   seo_title?: string;
   seo_description?: string;
+  votes_up?: number;
+  votes_down?: number;
+  temperature?: number;
   variants?: ProductVariant[];
   scores?: ProductScore;
   store_offers?: StoreOffer[];
+}
+
+export interface PriceAlert {
+  id?: number;
+  product_id: number;
+  email: string;
+  target_price: number;
+  current_price: number;
+  is_active?: number;
+  created_at?: string;
 }
 
 export interface Article {

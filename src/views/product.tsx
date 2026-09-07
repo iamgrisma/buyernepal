@@ -28,7 +28,12 @@ export const ProductPage: FC<{
   const brand = product.brand || 'Official';
   const emiAvailable = Number(product.emi_available) === 1;
   const baseMonthlyEmi = Math.round(price / 18);
-  const isPhoneOrCellular = product.category_id === 1 || (product.name && /iphone|galaxy|phone|pixel|redmi|realme|oneplus|poco|xiaomi/i.test(product.name));
+  // Only actual cellular smartphones require NTA MDMS / IMEI registration tips
+  const isPhoneOrCellular = Boolean(
+    product.name &&
+    /(iphone\s*(1[1-7]|se|pro|plus|mini)|galaxy\s*(s\d{2}|z\s*(fold|flip)|a\d{2}|m\d{2})|pixel\s*\d|redmi\s*note|oneplus\s*\d|poco\s*(f|x|m)\d)/i.test(product.name) &&
+    !/(case|cover|charger|adapter|cable|buds|airpods|watch|band|air fryer|cleaner|speaker|power\s*bank)/i.test(product.name)
+  );
 
   const priceHistory = product.price_history || [
     { month: 'Apr 2026', price: Math.round(price * 1.18) },
@@ -92,7 +97,7 @@ export const ProductPage: FC<{
           <div className="affiliate-disclosure-banner">
             <span className="affiliate-disclosure-icon">ℹ️</span>
             <div>
-              <strong>BuyerNepal Independent Guide:</strong> When you purchase through verified store links on our site (such as {storeName}, Hamrobazar, or official showrooms), we may earn an affiliate commission at no additional cost to you. We only recommend products tested for authentic Nepal pricing, MDMS/VAT compliance, and warranty support.
+              <strong>BuyerNepal Independent Guide:</strong> When you purchase through verified store links on our site (such as {storeName}, Hamrobazar, or official showrooms), we may earn an affiliate commission at no additional cost to you. We only recommend products verified for authentic Nepal pricing, genuine tax bills, and official warranty support.
             </div>
           </div>
 

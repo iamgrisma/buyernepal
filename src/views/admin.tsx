@@ -1823,7 +1823,7 @@ export const AdminDashboardView: FC<{
                   <div>
                     <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>Official Brand Directory</h2>
                     <span style={{ fontSize: '12px', color: '#64748b' }}>
-                      Authorized distributors, authorized warranty service hubs, and MDMS compliance in Nepal
+                      Authorized national distributors and official warranty service networks across Nepal
                     </span>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>

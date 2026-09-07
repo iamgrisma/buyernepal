@@ -1002,7 +1002,7 @@ export const Footer: FC<{ settings: SiteSettings; categories?: Category[] }> = (
           <a href="/blog">📰 Tech Reviews &amp; Guides</a>
           <a href="/category/electronics">📱 Smartphone Buying Guide</a>
           <a href="/category/laptops-computing">💻 Laptop Price Guide Nepal</a>
-          <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer">🇳🇵 NTA MDMS Portal ↗</a>
+          <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer">🇳🇵 NTA MDMS (Mobile IMEI Check) ↗</a>
         </div>
 
         <div>
