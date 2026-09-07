@@ -841,9 +841,34 @@ export const ProductPage: FC<{
                     <p style={{ fontSize: '13px', color: 'var(--ink-secondary)', lineHeight: '1.6', marginTop: '4px' }}>
                       {r.comment}
                     </p>
-                    <time style={{ fontSize: '11px', color: 'var(--muted)', display: 'block', marginTop: '6px' }}>
-                      {r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Verified Review'}
-                    </time>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed var(--line)', fontSize: '11.5px', color: 'var(--muted)' }}>
+                      <time>
+                        {r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Verified Review'}
+                      </time>
+                      <div className="review-vote-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Helpful?</span>
+                        <button
+                          type="button"
+                          className="review-vote-btn"
+                          data-review-id={r.id}
+                          data-vote-type="helpful"
+                          title="Mark as helpful"
+                          style={{ border: '1px solid var(--line)', background: 'var(--card-bg)', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--ink)' }}
+                        >
+                          👍 <span className="vote-count">{r.helpful_count ?? 0}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="review-vote-btn"
+                          data-review-id={r.id}
+                          data-vote-type="unhelpful"
+                          title="Mark as unhelpful"
+                          style={{ border: '1px solid var(--line)', background: 'var(--card-bg)', borderRadius: '4px', padding: '3px 8px', fontSize: '11px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--ink)' }}
+                        >
+                          👎 <span className="vote-count">{r.unhelpful_count ?? 0}</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1226,6 +1251,45 @@ export const ProductPage: FC<{
       }
     });
   }
+
+  // 5. Helpful Review Voting
+  document.querySelectorAll('.review-vote-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const reviewId = btn.getAttribute('data-review-id');
+      const voteType = btn.getAttribute('data-vote-type');
+      if (!reviewId) return;
+
+      const storageKey = 'bn_voted_rev_' + reviewId;
+      if (localStorage.getItem(storageKey)) {
+        if (window.bnShowToast) window.bnShowToast('You already voted on this review.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/reviews/' + reviewId + '/vote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: voteType })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem(storageKey, '1');
+          const parent = btn.closest('.review-vote-actions');
+          if (parent) {
+            const helpfulBtn = parent.querySelector('[data-vote-type="helpful"] .vote-count');
+            const unhelpfulBtn = parent.querySelector('[data-vote-type="unhelpful"] .vote-count');
+            if (helpfulBtn) helpfulBtn.textContent = data.helpful_count;
+            if (unhelpfulBtn) unhelpfulBtn.textContent = data.unhelpful_count;
+          }
+          btn.style.borderColor = 'var(--primary)';
+          btn.style.fontWeight = 'bold';
+          if (window.bnShowToast) window.bnShowToast('Thank you for your feedback! 👍');
+        }
+      } catch {
+        if (window.bnShowToast) window.bnShowToast('Thank you for voting!');
+      }
+    });
+  });
 })();
           `
         }}

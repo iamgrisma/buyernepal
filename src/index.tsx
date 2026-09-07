@@ -55,7 +55,9 @@ import {
   getOrderByIdOrNumber,
   updateOrderStatus,
   recordOutboundClick,
-  getOutboundClicksAdmin
+  getOutboundClicksAdmin,
+  getProductsForCompare,
+  voteReviewHelpful
 } from './db';
 import { getSession, createSession, clearSession, passwordHash, safeEqual, digest } from './auth';
 import { HomePage } from './views/home';
@@ -65,6 +67,8 @@ import { BlogIndexPage, ArticleDetailPage } from './views/blog';
 import { CouponsPage } from './views/coupons';
 import { StoresListPage, StoreDetailPage, BrandsListPage, BrandDetailPage } from './views/directory';
 import { TrackOrderPage, OrderSuccessPage } from './views/orders';
+import { ComparePage } from './views/compare';
+import { TopChartsPage } from './views/charts';
 import { AdminLoginView, AdminDashboardView } from './views/admin';
 import { api } from './api';
 
@@ -101,6 +105,8 @@ app.get('/sitemap.xml', async (c) => {
   const baseUrl = 'https://buyernepal.com';
   const urls = [
     baseUrl + '/',
+    baseUrl + '/compare',
+    baseUrl + '/charts',
     baseUrl + '/blog',
     baseUrl + '/coupons',
     baseUrl + '/stores',
@@ -226,6 +232,70 @@ app.get('/product/:id', async (c) => {
       categories={categories}
       product={product}
       reviews={reviews}
+    />
+  );
+});
+
+// SSR: REHub Head-to-Head Comparison Matrix
+app.get('/compare', async (c) => {
+  const idsParam = c.req.query('ids') || '';
+  const removeIdStr = c.req.query('remove');
+
+  let idArray: number[] = idsParam
+    ? idsParam
+        .split(',')
+        .map((s) => Number(s.trim()))
+        .filter((n) => !isNaN(n) && n > 0)
+    : [1, 2];
+
+  if (removeIdStr) {
+    const remId = Number(removeIdStr);
+    idArray = idArray.filter((id) => id !== remId);
+  }
+
+  const [settings, categories, comparedProducts, allProducts] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB),
+    getProductsForCompare(c.env?.DB, idArray),
+    getProducts(c.env?.DB, undefined, 50)
+  ]);
+
+  return c.html(
+    <ComparePage
+      products={comparedProducts}
+      allProducts={allProducts}
+      settings={settings}
+      categories={categories}
+    />
+  );
+});
+
+// SSR: REHub Top 10 Charts & Leaderboard Table
+app.get('/charts', async (c) => {
+  const catSlug = c.req.query('category') || 'all';
+  const sortBy = c.req.query('sort') || 'score';
+
+  const [settings, categories, allProducts] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB),
+    getProducts(c.env?.DB, undefined, 100)
+  ]);
+
+  let filtered = allProducts;
+  if (catSlug !== 'all') {
+    const matchedCategory = categories.find((c) => c.slug === catSlug);
+    if (matchedCategory) {
+      filtered = allProducts.filter((p) => p.category_id === matchedCategory.id);
+    }
+  }
+
+  return c.html(
+    <TopChartsPage
+      products={filtered}
+      categories={categories}
+      settings={settings}
+      activeCategorySlug={catSlug}
+      sortBy={sortBy}
     />
   );
 });
@@ -557,6 +627,30 @@ app.post('/api/reviews', async (c) => {
   } catch (err: any) {
     return c.json({ success: false, error: err?.message || 'Failed to submit review' }, 500);
   }
+});
+
+// API: Helpful / Unhelpful Review Vote
+app.post('/api/reviews/:id/vote', async (c) => {
+  const id = Number(c.req.param('id'));
+  if (!id) return c.json({ success: false, error: 'Invalid review ID' }, 400);
+
+  let type: 'helpful' | 'unhelpful' = 'helpful';
+  try {
+    const jsonBody = await c.req.json().catch(() => null);
+    if (jsonBody && jsonBody.type === 'unhelpful') {
+      type = 'unhelpful';
+    } else {
+      const formBody: Record<string, any> = await c.req.parseBody().catch(() => ({}));
+      if (formBody['type'] === 'unhelpful') {
+        type = 'unhelpful';
+      }
+    }
+  } catch {
+    type = 'helpful';
+  }
+
+  const result = await voteReviewHelpful(c.env?.DB, id, type);
+  return c.json(result);
 });
 
 // API: Register Price Drop Alert

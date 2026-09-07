@@ -59,6 +59,85 @@ function renderArticleHtml(markdown: string): string {
       continue;
     }
 
+    // Embed: REHub Review Score Box [score: 9.4 | Display: 9.6 | Performance: 9.8 | Cameras: 9.2 | Battery: 9.0 | Nepal Value: 9.4 | verdict: Nepal's ultimate flagship powerhouse]
+    if (line.startsWith('[score:') && line.endsWith(']')) {
+      const raw = line.slice(7, -1).trim();
+      const parts = raw.split('|').map(p => p.trim());
+      const overall = parts[0] || '9.0';
+      const metrics: { name: string; val: number }[] = [];
+      let verdict = '';
+
+      for (let j = 1; j < parts.length; j++) {
+        const seg = parts[j];
+        if (seg.toLowerCase().startsWith('verdict:')) {
+          verdict = seg.substring(8).trim();
+        } else if (seg.includes(':')) {
+          const [mName, mVal] = seg.split(':');
+          metrics.push({ name: mName.trim(), val: parseFloat(mVal.trim()) || 9.0 });
+        }
+      }
+
+      htmlParts.push(`
+        <div class="rehub-article-scorebox" style="background: var(--card-bg); border: 2px solid var(--accent); border-radius: var(--radius-lg); padding: 24px; margin: 28px 0; box-shadow: var(--shadow-md);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 16px;">
+            <div>
+              <span style="font-size: 11px; font-weight: 800; color: var(--accent); letter-spacing: 0.8px; text-transform: uppercase;">🏆 BUYERNEPAL LABS SCORECARD</span>
+              <h4 style="font-size: 18px; font-weight: 900; margin: 4px 0 0; color: var(--ink);">Comprehensive Review Verdict</h4>
+            </div>
+            <div style="background: linear-gradient(135deg, var(--accent), #e11d48); color: #fff; padding: 10px 18px; border-radius: 12px; text-align: center; min-width: 90px;">
+              <span style="font-size: 26px; font-weight: 900; display: block; line-height: 1;">${overall}</span>
+              <small style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">OVERALL / 10</small>
+            </div>
+          </div>
+          ${metrics.length > 0 ? `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 16px;">
+              ${metrics.map(m => `
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; margin-bottom: 4px;">
+                    <span style="color: var(--ink-secondary);">${m.name}</span>
+                    <strong style="color: var(--ink);">${m.val}/10</strong>
+                  </div>
+                  <div style="background: var(--line); height: 7px; border-radius: 4px; overflow: hidden;">
+                    <div style="background: var(--accent); width: ${Math.min(100, Math.max(0, m.val * 10))}%; height: 100%; border-radius: 4px;"></div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          ${verdict ? `
+            <div style="background: rgba(225, 29, 72, 0.06); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 13.5px; color: var(--ink); font-style: italic; margin-top: 12px;">
+              <strong>Editorial Verdict:</strong> "${verdict}"
+            </div>
+          ` : ''}
+        </div>
+      `);
+      continue;
+    }
+
+    // Embed: REHub Coupon Voucher Box [coupon: CODE | Store | Discount | URL]
+    if (line.startsWith('[coupon:') && line.endsWith(']')) {
+      const raw = line.slice(8, -1).trim();
+      const [code, store, discount, url] = raw.split('|').map(s => s.trim());
+      htmlParts.push(`
+        <div class="rehub-article-coupon-box" style="background: #fffbeb; border: 2px dashed #f59e0b; border-radius: var(--radius-lg); padding: 20px; margin: 24px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <span style="font-size: 10.5px; font-weight: 800; background: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">🎟️ Exclusive Voucher</span>
+            <h4 style="font-size: 16px; font-weight: 800; color: #92400e; margin: 6px 0 2px;">${discount || 'Special Discount'} at ${store || 'Store'}</h4>
+            <span style="font-size: 12px; color: #78350f;">Apply promo code at checkout on official portal.</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="coupon-code-pill" style="font-family: monospace; font-size: 15px; font-weight: 900; background: #fff; border: 1px solid #fde68a; color: #b45309; padding: 8px 14px; border-radius: 8px; letter-spacing: 1px;">
+              ${code || 'BUYERNEPAL'}
+            </span>
+            <a href="${url || '#'}" target="_blank" rel="noopener noreferrer nofollow" class="primary-action" style="padding: 9px 16px; font-size: 12.5px; background: #d97706; text-decoration: none;">
+              Redeem Deal ↗
+            </a>
+          </div>
+        </div>
+      `);
+      continue;
+    }
+
     // Embed: Deal Card [deal title="X" price="Y" store="Z" url="W"]
     if (line.startsWith('[deal') && line.endsWith(']')) {
       const titleMatch = line.match(/title="([^"]+)"/);

@@ -2127,6 +2127,8 @@ export const AdminDashboardView: FC<{
                     <button type="button" className="btn-insert-tag" data-tag="cons">⚠️ Cons</button>
                     <button type="button" className="btn-insert-tag" data-tag="deal">⚡ Deal</button>
                     <button type="button" className="btn-insert-tag" data-tag="table">📊 Table</button>
+                    <button type="button" className="btn-insert-tag" data-tag="score">🏆 Scorecard</button>
+                    <button type="button" className="btn-insert-tag" data-tag="coupon">🎟️ Coupon</button>
                   </div>
                 </div>
                 <textarea id="editArticleContent" name="content" rows={8} required></textarea>
@@ -2216,6 +2218,8 @@ export const AdminDashboardView: FC<{
                     <button type="button" className="btn-insert-tag" data-tag="cons">⚠️ Cons</button>
                     <button type="button" className="btn-insert-tag" data-tag="deal">⚡ Deal</button>
                     <button type="button" className="btn-insert-tag" data-tag="table">📊 Table</button>
+                    <button type="button" className="btn-insert-tag" data-tag="score">🏆 Scorecard</button>
+                    <button type="button" className="btn-insert-tag" data-tag="coupon">🎟️ Coupon</button>
                   </div>
                 </div>
                 <textarea
@@ -2585,10 +2589,12 @@ export const AdminDashboardView: FC<{
                   let snippet = '';
                   if (tag === 'h2') snippet = '\n\n## Section Title Here\n';
                   else if (tag === 'h3') snippet = '\n\n### Subheading Here\n';
-                  else if (tag === 'pros') snippet = '\n\n[pros]\n- High-resolution AMOLED 120Hz display\n- Official 1-year GenNext Nepal warranty\n- All-day battery endurance\n[/pros]\n';
-                  else if (tag === 'cons') snippet = '\n\n[cons]\n- Charger not included in retail package\n- Premium pricing in Nepal\n[/cons]\n';
-                  else if (tag === 'deal') snippet = '\n\n[deal: 18 | Daraz Mall | Rs. 84,999 | https://www.daraz.com.np/products/...]\n';
+                  else if (tag === 'pros') snippet = '\n\n[pros] High-resolution AMOLED 120Hz display; Official 1-year GenNext Nepal warranty; All-day battery endurance [/pros]\n';
+                  else if (tag === 'cons') snippet = '\n\n[cons] Charger not included in retail package; Premium pricing in Nepal [/cons]\n';
+                  else if (tag === 'deal') snippet = '\n\n[deal title="Apple iPhone 16 Pro Max (256GB)" price="Rs. 214,999" store="Daraz Mall" url="https://buyernepal.com/go/product/1"]\n';
                   else if (tag === 'table') snippet = '\n\n| Specification | Details |\n| :--- | :--- |\n| Processor | Apple A18 Pro 3nm |\n| Display | 6.9-inch Super Retina XDR OLED |\n| Battery | Up to 33 hours video playback |\n| Price in Nepal | Rs. 214,999 (256GB) |\n';
+                  else if (tag === 'score') snippet = '\n\n[score: 9.4 | Display: 9.6 | Performance: 9.8 | Cameras: 9.2 | Battery: 9.0 | Nepal Value: 9.4 | verdict: Nepal flagship benchmark with unmatched performance]\n';
+                  else if (tag === 'coupon') snippet = '\n\n[coupon: BUYERNEPAL | Daraz Nepal | 10% OFF up to Rs. 2,000 | https://buyernepal.com/go/coupon/1]\n';
 
                   const start = textarea.selectionStart;
                   const end = textarea.selectionEnd;

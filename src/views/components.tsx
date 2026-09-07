@@ -124,6 +124,22 @@ export const Header: FC<{
                   <span>All Deals</span>
                 </a>
                 <a
+                  href="/compare"
+                  className={`nav-pill ${activeSlug === 'compare' ? 'nav-pill-active' : ''}`}
+                  style={{ borderColor: 'rgba(99, 102, 241, 0.35)', background: activeSlug === 'compare' ? 'var(--primary)' : 'rgba(99, 102, 241, 0.08)' }}
+                >
+                  <span>⚖️</span>
+                  <span>Compare</span>
+                </a>
+                <a
+                  href="/charts"
+                  className={`nav-pill ${activeSlug === 'charts' ? 'nav-pill-active' : ''}`}
+                  style={{ borderColor: 'rgba(234, 179, 8, 0.35)', background: activeSlug === 'charts' ? 'var(--primary)' : 'rgba(234, 179, 8, 0.08)' }}
+                >
+                  <span>🏆</span>
+                  <span>Top Charts</span>
+                </a>
+                <a
                   href="/blog"
                   className={`nav-pill ${activeSlug === 'blog' ? 'nav-pill-active' : ''}`}
                   style={{ borderColor: 'rgba(217, 119, 6, 0.35)', background: activeSlug === 'blog' ? 'var(--primary)' : 'rgba(245, 158, 11, 0.08)' }}
@@ -199,10 +215,31 @@ export const Header: FC<{
           </div>
 
           <div className="mobile-drawer-content">
-            <span className="mobile-drawer-label">EXPLORE DEPARTMENTS</span>
+            <span className="mobile-drawer-label">EXPLORE DEPARTMENTS &amp; TOOLS</span>
             <nav className="mobile-nav-links">
               <a href="/" className={!activeSlug ? 'active' : ''}>
                 🏠 All Products &amp; Deals
+              </a>
+              <a href="/compare" className={activeSlug === 'compare' ? 'active' : ''}>
+                ⚖️ Head-to-Head Compare
+              </a>
+              <a href="/charts" className={activeSlug === 'charts' ? 'active' : ''}>
+                🏆 Top 10 Ranked Charts
+              </a>
+              <a href="/blog" className={activeSlug === 'blog' ? 'active' : ''}>
+                📰 Tech Blog &amp; Guides
+              </a>
+              <a href="/coupons" className={activeSlug === 'coupons' ? 'active' : ''}>
+                🎟️ Verified Promo Codes
+              </a>
+              <a href="/stores" className={activeSlug === 'stores' ? 'active' : ''}>
+                🏪 Verified Nepal Stores
+              </a>
+              <a href="/brands" className={activeSlug === 'brands' ? 'active' : ''}>
+                🏷️ Official Brands
+              </a>
+              <a href="/track-order" className={activeSlug === 'orders' ? 'active' : ''}>
+                📦 Track My Order
               </a>
               {categories.map((cat) => (
                 <a
@@ -543,6 +580,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
   const emiAvailable = product.emi_available === 1;
   const emiPrice = product.emi_starting_price || Math.round(price / 18);
   const brand = product.brand || '';
+  const catName = product.category_name || 'Tech';
 
   return (
     <article
@@ -574,17 +612,14 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
           )}
         </a>
 
-        {/* Floating Badges */}
-        <div className="product-card-badges">
-          {discountPercent > 0 ? (
-            <span className="product-badge-overlay deal-accent">🔥 -{discountPercent}% OFF</span>
-          ) : (
-            <span className="product-badge-overlay">{badge}</span>
-          )}
-          <span className="product-store-badge">✓ {storeName}</span>
-        </div>
+        {/* Discount Badge — top-left only when there's a deal */}
+        {discountPercent > 0 && (
+          <div className="product-card-badges">
+            <span className="product-badge-overlay deal-accent">-{discountPercent}%</span>
+          </div>
+        )}
 
-        {/* Quick Action Floating Circles: Wishlist Heart + Comparison Balance */}
+        {/* Quick Action Circles — top-right */}
         <div className="card-actions-float">
           <button
             type="button"
@@ -594,10 +629,10 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
             data-price={price}
             data-image={product.image_url}
             data-url={`/product/${product.id}`}
-            title="Add to Wishlist"
-            aria-label="Add to Wishlist"
+            title="Save to Wishlist"
+            aria-label="Save to Wishlist"
           >
-            ❤️
+            ♡
           </button>
           <button
             type="button"
@@ -608,54 +643,40 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
             data-image={product.image_url}
             data-store={storeName}
             data-warranty={product.specs?.['Official Warranty'] || '1 Year Official'}
-            title="Add to Compare"
+            title="Compare"
             aria-label="Add to Compare"
           >
-            ⚖️
+            ⇌
           </button>
         </div>
       </div>
 
+      {/* Card Body — Clean hierarchy, no clutter */}
       <div className="product-card-body">
-        <div className="product-meta-row">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-            <span className="product-category-tag">{product.category_name || 'Tech'}</span>
-            {brand && <span className="product-brand-chip">{brand}</span>}
-          </div>
-          <span className="product-rating">
-            ★ {rating.toFixed(1)} <small style={{ color: 'var(--muted)', fontWeight: 500 }}>({reviewCount})</small>
-          </span>
+        {/* Row 1: Category + Rating */}
+        <div className="pc-meta">
+          <span className="pc-cat">{catName}{brand ? ` · ${brand}` : ''}</span>
+          <span className="pc-rating">★ {rating.toFixed(1)}</span>
         </div>
 
+        {/* Row 2: Product Name */}
         <a href={`/product/${product.id}`} className="product-name" title={product.name}>
           {product.name}
         </a>
 
-        {/* 2026 Micro-Tags: Nepal Trust & Regulatory Badges */}
-        <div className="product-spec-pills">
-          <span className="spec-pill-mini">🇳🇵 MDMS Whitelisted</span>
-          <span className="spec-pill-mini">🛡️ Official VAT Bill</span>
-          {emiAvailable && <span className="spec-pill-mini emi">💳 0% EMI</span>}
+        {/* Row 3: Store verified tag */}
+        <div className="pc-store-row">
+          <span className="pc-store-chip">✓ {storeName}</span>
+          {emiAvailable && <span className="pc-emi-chip">0% EMI</span>}
         </div>
 
-        <p className="product-description">{product.description || 'Explore verified specifications and Nepal store pricing.'}</p>
-
-        {/* 0% EMI Monthly Installment Strip */}
-        {emiAvailable && (
-          <div className="product-card-emi-strip">
-            <span>💳 0% EMI from:</span> <strong>Rs. {emiPrice.toLocaleString()}/mo</strong>
-          </div>
-        )}
-
+        {/* Row 4: Price + CTA */}
         <div className="product-card-bottom">
           <div className="price-block">
-            {discountPercent > 0 && (
-              <div className="original-price-row">
-                <span className="original-price" data-base-npr={originalPrice}>
-                  Rs. {formattedOriginal}
-                </span>
-                <span className="discount-pill">Save Rs. {(originalPrice - price).toLocaleString()}</span>
-              </div>
+            {discountPercent > 0 && originalPrice > 0 && (
+              <span className="original-price" data-base-npr={originalPrice}>
+                Rs. {formattedOriginal}
+              </span>
             )}
             <strong className="product-price" data-base-npr={price}>
               Rs. {formattedPrice}
@@ -669,8 +690,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
             rel="noopener noreferrer nofollow"
             title={`View deal on ${storeName}`}
           >
-            <span>{product.affiliate_url ? 'View Deal' : 'Details'}</span>
-            <span className="buy-arrow">↗</span>
+            {product.affiliate_url ? 'Buy Now' : 'Details'}
           </a>
         </div>
       </div>
@@ -749,11 +769,19 @@ export const ComparisonDock: FC = () => (
           <span id="compareDockCount" style={{ fontSize: '12px', color: 'var(--muted)' }}>(0 of 3 items)</span>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button id="openCompareModalBtn" type="button" className="product-buy" style={{ padding: '6px 14px', fontSize: '12px' }}>
-            Compare Side-by-Side 🔍
+          <a
+            id="openComparePageDirectLink"
+            href="/compare"
+            className="product-buy"
+            style={{ padding: '6px 14px', fontSize: '12px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          >
+            Full Compare Page ⚖️
+          </a>
+          <button id="openCompareModalBtn" type="button" className="filter-pill" style={{ padding: '6px 12px', fontSize: '12px' }}>
+            Quick Pop-up 🔍
           </button>
-          <button id="closeCompareDockBtn" type="button" className="filter-pill" style={{ padding: '6px 12px' }}>
-            Close
+          <button id="closeCompareDockBtn" type="button" className="filter-pill" style={{ padding: '6px 10px' }}>
+            ✕
           </button>
         </div>
       </div>
@@ -965,7 +993,9 @@ export const Footer: FC<{ settings: SiteSettings; categories?: Category[] }> = (
         </div>
 
         <div>
-          <h3>Shopping Guides</h3>
+          <h3>Shopping Guides &amp; Tools</h3>
+          <a href="/compare">⚖️ Side-by-Side Comparison Matrix</a>
+          <a href="/charts">🏆 Top 10 Ranked Gadget Charts</a>
           <a href="/blog">📰 Tech Reviews &amp; Guides</a>
           <a href="/category/electronics">📱 Smartphone Buying Guide</a>
           <a href="/category/laptops-computing">💻 Laptop Price Guide Nepal</a>

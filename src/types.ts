@@ -138,6 +138,8 @@ export interface Review {
   comment: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
+  helpful_count?: number;
+  unhelpful_count?: number;
 }
 
 export interface Coupon {

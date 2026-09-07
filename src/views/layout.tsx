@@ -396,6 +396,15 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                     if (compareDock) compareDock.classList.remove('open');
                   }
 
+                  const openComparePageDirectLink = document.getElementById('openComparePageDirectLink');
+                  if (openComparePageDirectLink) {
+                    if (compareItems.length > 0) {
+                      openComparePageDirectLink.href = '/compare?ids=' + compareItems.map(i => i.id).join(',');
+                    } else {
+                      openComparePageDirectLink.href = '/compare';
+                    }
+                  }
+
                   if (!compareDockItems) return;
                   compareDockItems.innerHTML = compareItems.map(item => \`
                     <div class="compare-mini-card">
@@ -502,6 +511,11 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                             </tr>
                           </tbody>
                         </table>
+                        <div style="margin-top: 20px; text-align: center;">
+                          <a href="/compare?ids=\${compareItems.map(i => i.id).join(',')}" class="product-buy" style="display: inline-block; padding: 10px 24px; font-weight: 800; font-size: 13.5px; text-decoration: none;">
+                            Open Full REHub Comparison Matrix &amp; Labs Scores ➔
+                          </a>
+                        </div>
                       \`;
                     }
                     if (compareModalBackdrop) compareModalBackdrop.classList.add('open');

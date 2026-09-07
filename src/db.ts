@@ -1020,6 +1020,13 @@ export function enrichProduct(p: Product): Product {
   };
 }
 
+export async function getProductsForCompare(db: D1Database | undefined, ids: number[]): Promise<Product[]> {
+  if (!ids || ids.length === 0) return [];
+  const validIds = ids.filter((id) => id > 0).slice(0, 4);
+  const products = await Promise.all(validIds.map((id) => getProductById(db, id)));
+  return products.filter((p): p is Product => p !== null);
+}
+
 // Products
 export async function getProducts(db?: D1Database, categoryId?: number | null, limit = 100): Promise<Product[]> {
   if (!db) {
@@ -1272,6 +1279,8 @@ export async function getReviews(db: D1Database | undefined, productId: number):
       rating: 5,
       comment: 'Super fast delivery in Kathmandu within 24 hours. Genuine sealed pack with official Nepal warranty card included!',
       status: 'approved',
+      helpful_count: 14,
+      unhelpful_count: 1,
       created_at: new Date(Date.now() - 86400000 * 2).toISOString()
     },
     {
@@ -1281,6 +1290,8 @@ export async function getReviews(db: D1Database | undefined, productId: number):
       rating: 5,
       comment: 'Price was lower than the local store in Mahendrapool. Exactly as described, highly recommend BuyerNepal curation!',
       status: 'approved',
+      helpful_count: 9,
+      unhelpful_count: 0,
       created_at: new Date(Date.now() - 86400000 * 5).toISOString()
     }
   ];
@@ -1288,7 +1299,7 @@ export async function getReviews(db: D1Database | undefined, productId: number):
   if (!db) return sampleReviews;
   try {
     const r = await db
-      .prepare("SELECT id, product_id, user_name, rating, comment, status, created_at FROM reviews WHERE product_id = ? AND status = 'approved' ORDER BY created_at DESC LIMIT 50")
+      .prepare("SELECT id, product_id, user_name, rating, comment, status, COALESCE(helpful_count, 0) AS helpful_count, COALESCE(unhelpful_count, 0) AS unhelpful_count, created_at FROM reviews WHERE product_id = ? AND status = 'approved' ORDER BY created_at DESC LIMIT 50")
       .bind(productId)
       .all<Review>();
     const list = r.results || [];
@@ -2533,5 +2544,37 @@ export async function getOutboundClicksAdmin(db?: D1Database): Promise<any[]> {
     return [];
   }
 }
+
+// ============================================================================
+// COMPARISON & REVIEWS HELPERS
+// ============================================================================
+export async function voteReviewHelpful(
+  db: D1Database | undefined,
+  reviewId: number,
+  type: 'helpful' | 'unhelpful'
+): Promise<{ success: boolean; helpful_count: number; unhelpful_count: number }> {
+  if (!db) {
+    return { success: true, helpful_count: 1, unhelpful_count: 0 };
+  }
+  try {
+    const column = type === 'helpful' ? 'helpful_count' : 'unhelpful_count';
+    await db
+      .prepare(`UPDATE reviews SET ${column} = ${column} + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+      .bind(reviewId)
+      .run();
+    const row = await db
+      .prepare('SELECT helpful_count, unhelpful_count FROM reviews WHERE id = ?')
+      .bind(reviewId)
+      .first<{ helpful_count: number; unhelpful_count: number }>();
+    return {
+      success: true,
+      helpful_count: row?.helpful_count ?? 1,
+      unhelpful_count: row?.unhelpful_count ?? 0
+    };
+  } catch {
+    return { success: true, helpful_count: 1, unhelpful_count: 0 };
+  }
+}
+
 
 
