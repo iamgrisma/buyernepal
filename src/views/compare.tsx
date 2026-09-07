@@ -72,16 +72,16 @@ export const ComparePage: FC<{
       <div className="store-page compare-page-shell">
         <Header settings={settings} categories={categories} activeSlug="compare" />
 
-        <main className="store-shell" style={{ padding: '24px 0 60px' }}>
+        <main className="store-shell">
           {/* Breadcrumbs */}
           <div className="breadcrumbs">
-            <a href="/">🏠 Home</a>
+            <a href="/">Home</a>
             <span>/</span>
-            <span style={{ color: 'var(--ink)', fontWeight: 700 }}>Comparison Suite</span>
+            <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Comparison Matrix</span>
             {isComparing && (
               <>
                 <span>/</span>
-                <span style={{ color: 'var(--accent)', fontWeight: 700 }}>
+                <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
                   {productNames.join(' vs ')}
                 </span>
               </>
@@ -89,34 +89,31 @@ export const ComparePage: FC<{
           </div>
 
           {/* Hero Header */}
-          <div className="directory-header-hero" style={{ textAlign: 'left', background: 'var(--card-bg)', border: '1px solid var(--line)', borderRadius: 'var(--radius-lg)', padding: '28px', marginBottom: '28px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-              <div>
-                <div className="coupons-hero-badge">⚖️ REHUB HEAD-TO-HEAD COMPARISON MATRIX</div>
-                <h1 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--ink)', marginTop: '8px', letterSpacing: '-0.5px' }}>
-                  {isComparing ? `${productNames.join(' vs ')} Comparison` : 'Compare Gadgets, Prices & Hardware in Nepal'}
-                </h1>
-                <p style={{ color: 'var(--muted)', fontSize: '13.5px', marginTop: '6px', maxWidth: '680px', lineHeight: '1.5' }}>
-                  Side-by-side evaluation of technical specifications, verified Nepal prices across stores, 0% bank EMI installments, and lab performance scores.
-                </p>
-              </div>
-
-              {isComparing && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <label className="diff-toggle-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--bg)', border: '1px solid var(--line)', padding: '8px 14px', borderRadius: '24px', fontSize: '12.5px', fontWeight: 700 }}>
-                    <input type="checkbox" id="toggleDiffOnlyCheckbox" style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
-                    <span>Highlight Differences Only</span>
-                  </label>
-                  <a href="/compare" className="filter-pill" style={{ padding: '8px 14px', fontSize: '12px' }}>
-                    Reset ✕
-                  </a>
-                </div>
-              )}
+          <div className="page-hero-banner">
+            <div className="page-hero-banner-content">
+              <div className="page-hero-badge">HEAD-TO-HEAD COMPARISON MATRIX</div>
+              <h1 className="page-hero-title">
+                {isComparing ? `${productNames.join(' vs ')} Comparison` : 'Compare Gadgets, Prices & Hardware in Nepal'}
+              </h1>
+              <p className="page-hero-subtitle">
+                Side-by-side evaluation of technical specifications, verified Nepal prices across stores, 0% bank EMI installments, and lab performance scores.
+              </p>
             </div>
 
+            {isComparing && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <label className="diff-toggle-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--bg)', border: '1px solid var(--line)', padding: '8px 14px', borderRadius: '24px', fontSize: '12.5px', fontWeight: 600 }}>
+                  <input type="checkbox" id="toggleDiffOnlyCheckbox" style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
+                  <span>Highlight Differences Only</span>
+                </label>
+                <a href="/compare" className="filter-pill" style={{ padding: '8px 14px', fontSize: '12px' }}>
+                  Reset ✕
+                </a>
+              </div>
+            )}
             {/* Quick Add Product Dropdown Bar */}
-            <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>+ Add product to compare:</span>
+            <div style={{ width: '100%', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--ink)' }}>+ Add product to compare:</span>
               <select
                 id="compareProductSelect"
                 style={{ padding: '8px 12px', fontSize: '13px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)', maxWidth: '340px' }}
@@ -143,15 +140,17 @@ export const ComparePage: FC<{
 
           {/* MAIN COMPARISON MATRIX */}
           {isComparing ? (
-            <div className="compare-matrix-container" style={{ background: 'var(--card-bg)', border: '1px solid var(--line)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
-              <div style={{ overflowX: 'auto' }}>
+            <div className="compare-matrix-container" id="compareMatrixContainer">
+              <div className="compare-scroll-hint-bar">
+                <span className="compare-scroll-hint-icon">↔️</span>
+                <span>Swipe or scroll horizontally to inspect and compare all specifications side-by-side</span>
+              </div>
+              <div className="compare-table-scroller" id="compareTableScroller">
                 <table className="rehub-compare-table" id="rehubCompareTable">
                   <thead>
                     <tr>
-                      <th className="feature-col-header" style={{ width: '220px', minWidth: '180px', verticalAlign: 'bottom', padding: '20px' }}>
-                        <span style={{ fontSize: '12px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 800 }}>
-                          Comparing {products.length} Products
-                        </span>
+                      <th className="feature-col-header">
+                        <span>Comparing {products.length} Products</span>
                       </th>
                       {products.map((p) => {
                         const price = p.price;
@@ -160,7 +159,7 @@ export const ComparePage: FC<{
                         const rating = p.rating || 4.8;
 
                         return (
-                          <th key={p.id} className="compare-product-col-header" style={{ width: `${78 / products.length}%`, minWidth: '240px', padding: '20px', verticalAlign: 'top', textAlign: 'center', borderLeft: '1px solid var(--line)' }}>
+                          <th key={p.id} className="compare-product-col-header" style={{ width: `${78 / products.length}%`, minWidth: '240px' }}>
                             <div style={{ position: 'relative' }}>
                               <a
                                 href={`/compare?remove=${p.id}`}
@@ -171,38 +170,38 @@ export const ComparePage: FC<{
                                 ×
                               </a>
 
-                              <div style={{ width: '130px', height: '130px', margin: '0 auto 12px', background: 'var(--bg)', borderRadius: '12px', padding: '8px', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <div className="product-img-box">
                                 <img src={p.image_url} alt={p.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                               </div>
 
-                              <h3 style={{ fontSize: '15px', fontWeight: 800, lineHeight: '1.3', minHeight: '40px', marginBottom: '8px' }}>
-                                <a href={`/product/${p.id}`} style={{ color: 'var(--ink)', textDecoration: 'none' }}>{p.name}</a>
+                              <h3>
+                                <a href={`/product/${p.id}`}>{p.name}</a>
                               </h3>
 
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}>
                                 <span style={{ color: '#f59e0b', fontSize: '13px' }}>★ {rating.toFixed(1)}</span>
-                                <span style={{ color: 'var(--muted)', fontSize: '11.5px' }}>({p.review_count || 42} reviews)</span>
+                                <span style={{ color: 'var(--muted)', fontSize: '12px' }}>({p.review_count || 42} reviews)</span>
                               </div>
 
                               <div style={{ marginBottom: '14px' }}>
-                                <div style={{ fontSize: '18px', fontWeight: 900, color: 'var(--primary)' }} data-base-npr={price}>
+                                <div className="compare-price-val" data-base-npr={price}>
                                   Rs. {price.toLocaleString()}
                                 </div>
                                 {discount > 0 && (
-                                  <div style={{ fontSize: '11.5px', color: 'var(--muted)', textDecoration: 'line-through' }} data-base-npr={origPrice}>
+                                  <div className="compare-orig-price" data-base-npr={origPrice}>
                                     Rs. {origPrice.toLocaleString()} ({discount}% OFF)
                                   </div>
                                 )}
                               </div>
 
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 {p.affiliate_url && (
                                   <a
                                     href={`/go/product/${p.id}`}
                                     target="_blank"
                                     rel="noopener noreferrer nofollow"
                                     className="primary-action"
-                                    style={{ fontSize: '12px', padding: '8px 12px', justifyContent: 'center' }}
+                                    style={{ fontSize: '12.5px', padding: '9px 14px', justifyContent: 'center', fontWeight: 600 }}
                                   >
                                     View Deal on {p.store_name || 'Store'} ↗
                                   </a>
@@ -210,7 +209,7 @@ export const ComparePage: FC<{
                                 <a
                                   href={`/product/${p.id}`}
                                   className="detail-buy-btn"
-                                  style={{ fontSize: '12px', padding: '8px 12px', background: '#0f172a', marginBottom: 0, justifyContent: 'center' }}
+                                  style={{ fontSize: '12.5px', padding: '9px 14px', background: 'var(--ink)', color: 'var(--surface)', marginBottom: 0, justifyContent: 'center', fontWeight: 600 }}
                                 >
                                   ⚡ Buy Direct / COD
                                 </a>
@@ -225,7 +224,7 @@ export const ComparePage: FC<{
                   <tbody>
                     {/* SECTION: PRICE & AVAILABILITY */}
                     <tr className="compare-section-header-row">
-                      <td colSpan={products.length + 1} style={{ background: 'var(--bg)', padding: '10px 20px', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--muted)' }}>
+                      <td colSpan={products.length + 1}>
                         💰 Price, Warranty &amp; Fulfillment
                       </td>
                     </tr>
@@ -233,7 +232,7 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="price">
                       <td className="compare-feature-label">Verified Best Price</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center', fontWeight: 800, color: 'var(--primary)' }} data-base-npr={p.price}>
+                        <td key={p.id} className="compare-feature-val" style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '15px' }} data-base-npr={p.price}>
                           Rs. {p.price.toLocaleString()}
                         </td>
                       ))}
@@ -242,7 +241,7 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="store">
                       <td className="compare-feature-label">Authorized Nepal Retailer</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
+                        <td key={p.id} className="compare-feature-val">
                           <span className="store-pill-badge">🏬 {p.store_name || 'Daraz Mall Nepal'}</span>
                         </td>
                       ))}
@@ -251,8 +250,8 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="warranty">
                       <td className="compare-feature-label">Official Importer Warranty</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
-                          <span style={{ color: 'var(--emerald)', fontWeight: 700, fontSize: '12px' }}>
+                        <td key={p.id} className="compare-feature-val">
+                          <span style={{ color: 'var(--emerald)', fontWeight: 700, fontSize: '13px' }}>
                             ✓ Official Brand / Importer Warranty
                           </span>
                         </td>
@@ -262,13 +261,13 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="emi">
                       <td className="compare-feature-label">0% Bank EMI Installment</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
+                        <td key={p.id} className="compare-feature-val">
                           {p.emi_available ? (
-                            <div style={{ color: 'var(--emerald)', fontWeight: 700, fontSize: '12px' }}>
+                            <div style={{ color: 'var(--emerald)', fontWeight: 700, fontSize: '13px' }}>
                               💳 Rs. {Math.round(p.price / 18).toLocaleString()} / mo (18 Mos)
                             </div>
                           ) : (
-                            <span style={{ color: 'var(--muted)', fontSize: '12px' }}>Standard Cash / Fonepay</span>
+                            <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Standard Cash / Fonepay</span>
                           )}
                         </td>
                       ))}
@@ -277,7 +276,7 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="delivery">
                       <td className="compare-feature-label">Delivery Timeline</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center', fontSize: '12px' }}>
+                        <td key={p.id} className="compare-feature-val" style={{ fontSize: '13px' }}>
                           {p.delivery_info || 'Kathmandu: 24 Hours • Outside Valley: 2-3 Days'}
                         </td>
                       ))}
@@ -285,7 +284,7 @@ export const ComparePage: FC<{
 
                     {/* SECTION: 5-POINT LABS EVALUATION */}
                     <tr className="compare-section-header-row">
-                      <td colSpan={products.length + 1} style={{ background: 'var(--bg)', padding: '10px 20px', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--muted)' }}>
+                      <td colSpan={products.length + 1}>
                         🔬 BuyerNepal Labs 5-Point Benchmark Scores
                       </td>
                     </tr>
@@ -293,8 +292,8 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="score-overall">
                       <td className="compare-feature-label">Overall Rating</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
-                          <strong style={{ fontSize: '16px', color: 'var(--primary)' }}>
+                        <td key={p.id} className="compare-feature-val">
+                          <strong className="compare-score-badge" style={{ fontSize: '15px' }}>
                             {p.scores ? p.scores.overall_score.toFixed(1) : (p.rating || 4.8).toFixed(1)} / 10
                           </strong>
                         </td>
@@ -304,8 +303,8 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="score-display">
                       <td className="compare-feature-label">Display &amp; Build Quality</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
-                          <strong>{p.scores ? p.scores.display_score.toFixed(1) : '9.0'} / 10</strong>
+                        <td key={p.id} className="compare-feature-val">
+                          <strong className="compare-score-badge">{p.scores ? p.scores.display_score.toFixed(1) : '9.0'} / 10</strong>
                         </td>
                       ))}
                     </tr>
@@ -313,8 +312,8 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="score-perf">
                       <td className="compare-feature-label">Performance &amp; Chipset</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
-                          <strong>{p.scores ? p.scores.performance_score.toFixed(1) : '9.2'} / 10</strong>
+                        <td key={p.id} className="compare-feature-val">
+                          <strong className="compare-score-badge">{p.scores ? p.scores.performance_score.toFixed(1) : '9.2'} / 10</strong>
                         </td>
                       ))}
                     </tr>
@@ -322,8 +321,8 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="score-camera">
                       <td className="compare-feature-label">Camera / Audio Output</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
-                          <strong>{p.scores ? p.scores.camera_score.toFixed(1) : '8.8'} / 10</strong>
+                        <td key={p.id} className="compare-feature-val">
+                          <strong className="compare-score-badge">{p.scores ? p.scores.camera_score.toFixed(1) : '8.8'} / 10</strong>
                         </td>
                       ))}
                     </tr>
@@ -331,8 +330,8 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="score-battery">
                       <td className="compare-feature-label">Battery Endurance</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
-                          <strong>{p.scores ? p.scores.battery_score.toFixed(1) : '8.9'} / 10</strong>
+                        <td key={p.id} className="compare-feature-val">
+                          <strong className="compare-score-badge">{p.scores ? p.scores.battery_score.toFixed(1) : '8.9'} / 10</strong>
                         </td>
                       ))}
                     </tr>
@@ -340,8 +339,8 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="score-value">
                       <td className="compare-feature-label">Value for Money in Nepal</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
-                          <strong>{p.scores ? p.scores.value_score.toFixed(1) : '8.7'} / 10</strong>
+                        <td key={p.id} className="compare-feature-val">
+                          <strong className="compare-score-badge">{p.scores ? p.scores.value_score.toFixed(1) : '8.7'} / 10</strong>
                         </td>
                       ))}
                     </tr>
@@ -349,7 +348,7 @@ export const ComparePage: FC<{
                     {/* SECTION: HARDWARE & TECHNICAL SPECS */}
                     {allSpecKeys.length > 0 && (
                       <tr className="compare-section-header-row">
-                        <td colSpan={products.length + 1} style={{ background: 'var(--bg)', padding: '10px 20px', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--muted)' }}>
+                        <td colSpan={products.length + 1}>
                           ⚙️ Technical Specifications Side-by-Side
                         </td>
                       </tr>
@@ -363,7 +362,7 @@ export const ComparePage: FC<{
                         <tr key={key} className={`compare-row ${allSame ? 'row-same-value' : 'row-diff-value'}`} data-feature={key}>
                           <td className="compare-feature-label">{key}</td>
                           {values.map((v, idx) => (
-                            <td key={idx} className="compare-feature-val" style={{ textAlign: 'center', fontSize: '12.5px' }}>
+                            <td key={idx} className="compare-feature-val" style={{ fontSize: '13.5px' }}>
                               {v}
                             </td>
                           ))}
@@ -373,7 +372,7 @@ export const ComparePage: FC<{
 
                     {/* SECTION: PROS AND CONS */}
                     <tr className="compare-section-header-row">
-                      <td colSpan={products.length + 1} style={{ background: 'var(--bg)', padding: '10px 20px', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--muted)' }}>
+                      <td colSpan={products.length + 1}>
                         ⚖️ Editorial Strengths &amp; Trade-offs
                       </td>
                     </tr>
@@ -381,10 +380,13 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="pros">
                       <td className="compare-feature-label">Reasons to Buy 👍</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ verticalAlign: 'top', padding: '14px' }}>
-                          <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '12px', color: '#065f46', lineHeight: '1.5' }}>
+                        <td key={p.id} className="compare-feature-val" style={{ verticalAlign: 'top', textAlign: 'left' }}>
+                          <ul className="compare-pros-list">
                             {(p.pros || ['Authorized Nepal stock', 'Official distributor warranty']).map((pro, i) => (
-                              <li key={i} style={{ marginBottom: '4px' }}>✓ {pro}</li>
+                              <li key={i}>
+                                <span>✓</span>
+                                <span>{pro}</span>
+                              </li>
                             ))}
                           </ul>
                         </td>
@@ -394,10 +396,13 @@ export const ComparePage: FC<{
                     <tr className="compare-row" data-feature="cons">
                       <td className="compare-feature-label">Things to Consider ⚠️</td>
                       {products.map((p) => (
-                        <td key={p.id} className="compare-feature-val" style={{ verticalAlign: 'top', padding: '14px' }}>
-                          <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '12px', color: '#9f1239', lineHeight: '1.5' }}>
+                        <td key={p.id} className="compare-feature-val" style={{ verticalAlign: 'top', textAlign: 'left' }}>
+                          <ul className="compare-cons-list">
                             {(p.cons || ['High demand in Nepal market']).map((con, i) => (
-                              <li key={i} style={{ marginBottom: '4px' }}>• {con}</li>
+                              <li key={i}>
+                                <span>•</span>
+                                <span>{con}</span>
+                              </li>
                             ))}
                           </ul>
                         </td>
@@ -408,8 +413,8 @@ export const ComparePage: FC<{
                     <tr className="compare-action-sticky-row">
                       <td className="compare-feature-label" style={{ fontWeight: 800 }}>Choose Your Product</td>
                       {products.map((p) => (
-                        <td key={p.id} style={{ textAlign: 'center', padding: '16px', borderLeft: '1px solid var(--line)' }}>
-                          <a href={`/product/${p.id}`} className="primary-action" style={{ width: '100%', justifyContent: 'center' }}>
+                        <td key={p.id} style={{ textAlign: 'center', padding: '16px' }}>
+                          <a href={`/product/${p.id}`} className="primary-action" style={{ width: '100%', justifyContent: 'center', fontWeight: 600 }}>
                             View Product Page →
                           </a>
                         </td>
@@ -430,15 +435,15 @@ export const ComparePage: FC<{
           )}
 
           {/* POPULAR NEPAL HEAD-TO-HEAD SHOWDOWNS */}
-          <div style={{ marginTop: '48px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div className="popular-showdowns-container" style={{ marginTop: '48px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
               <div>
                 <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ink)' }}>🔥 Popular Head-to-Head Duels in Nepal</h2>
                 <span style={{ fontSize: '12.5px', color: 'var(--muted)' }}>Tested and compared side-by-side by BuyerNepal editors</span>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+            <div className="popular-showdowns-grid">
               {POPULAR_SHOWDOWNS.map((duel) => (
                 <a
                   key={duel.id}

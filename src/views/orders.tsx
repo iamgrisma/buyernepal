@@ -28,7 +28,14 @@ export const TrackOrderPage: FC<{
       <div className="store-page track-order-page">
         <Header settings={settings} categories={categories} activeSlug="orders" />
 
-        <main className="store-shell" style={{ padding: '32px 0 60px' }}>
+        <main className="store-shell">
+          {/* Breadcrumbs */}
+          <div className="breadcrumbs">
+            <a href="/">Home</a>
+            <span>/</span>
+            <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Order Tracking</span>
+          </div>
+
           {/* Header */}
           <div className="track-hero-box">
             <span style={{ fontSize: '36px', display: 'block', marginBottom: '8px' }}>📦</span>
@@ -171,7 +178,7 @@ export const OrderSuccessPage: FC<{
       <div className="store-page order-success-page">
         <Header settings={settings} categories={categories} />
 
-        <main className="store-shell" style={{ padding: '40px 0 60px', textAlign: 'center' }}>
+        <main className="store-shell" style={{ textAlign: 'center' }}>
           <div className="order-success-card">
             <span style={{ fontSize: '56px', display: 'block', marginBottom: '12px' }}>🎉</span>
             <h1 style={{ fontSize: '26px', fontWeight: 900 }}>Thank You! Your Order is Confirmed</h1>

@@ -31,33 +31,29 @@ export const TopChartsPage: FC<{
       <div className="store-page top-charts-page">
         <Header settings={settings} categories={categories} activeSlug="charts" />
 
-        <main className="store-shell" style={{ padding: '24px 0 60px' }}>
+        <main className="store-shell">
           {/* Breadcrumbs */}
           <div className="breadcrumbs">
-            <a href="/">🏠 Home</a>
+            <a href="/">Home</a>
             <span>/</span>
-            <span style={{ color: 'var(--ink)', fontWeight: 700 }}>Top Ranked Charts</span>
+            <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Top Ranked Charts</span>
           </div>
 
           {/* Hero Banner */}
-          <div className="directory-header-hero" style={{ textAlign: 'left', background: 'var(--card-bg)', border: '1px solid var(--line)', borderRadius: 'var(--radius-lg)', padding: '32px 28px', marginBottom: '28px' }}>
-            <div className="coupons-hero-badge">🏆 BUYERNEPAL LABS TOP LEADERBOARD</div>
-            <h1 style={{ fontSize: '26px', fontWeight: 900, color: 'var(--ink)', marginTop: '8px', letterSpacing: '-0.6px' }}>
-              Nepal Gadget Leaderboard &amp; Best-In-Class Charts
-            </h1>
-            <p style={{ color: 'var(--muted)', fontSize: '14px', marginTop: '6px', maxWidth: '720px', lineHeight: '1.5' }}>
-              Modeled after professional top-table benchmarks. Every gadget is evaluated through our standardized 5-point hardware lab scorecard and indexed against verified Nepal importer pricing.
-            </p>
+          <div className="page-hero-banner">
+            <div className="page-hero-banner-content">
+              <div className="page-hero-badge">BUYERNEPAL LABS LEADERBOARD</div>
+              <h1 className="page-hero-title">
+                Nepal Gadget Leaderboard &amp; Best-In-Class Charts
+              </h1>
+              <p className="page-hero-subtitle">
+                Modeled after professional top-table benchmarks. Every gadget is evaluated through our standardized 5-point hardware lab scorecard and indexed against verified Nepal importer pricing.
+              </p>
+            </div>
 
-            {/* Quick Metrics Strip */}
-            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '18px', fontSize: '12.5px', color: 'var(--muted)', fontWeight: 600 }}>
-              <span>✓ Verified Importer Pricing</span>
-              <span>•</span>
-              <span>⭐ Independent Lab Scores</span>
-              <span>•</span>
-              <span>💳 0% Bank EMI Comparison</span>
-              <span>•</span>
-              <span>🔄 Updated Weekly</span>
+            <div className="page-hero-stat-badge">
+              <span className="page-hero-stat-val">TOP 10</span>
+              <span className="page-hero-stat-lbl">Ranked Hardware</span>
             </div>
           </div>
 

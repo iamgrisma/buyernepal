@@ -118,176 +118,142 @@ export const Header: FC<{
           </div>
         </div>
 
-        {/* Tier 2: Dedicated Category Navigation Strip */}
+        {/* Tier 2: Smart Streamlined Navigation Strip (Two Master Hubs: Categories & Menu) */}
         <div className="store-nav-strip">
           <div className="store-shell store-nav-strip-inner">
-            {/* All Departments Drawer Toggle */}
-            <button
-              id="allDepartmentsBtn"
-              type="button"
-              className="nav-all-departments-btn"
-              title="Browse all departments & categories"
-              aria-label="Browse all departments"
-            >
-              <span className="nav-all-icon">☰</span>
-              <span>All Categories</span>
-            </button>
-
-            {/* Desktop Left Scroll Arrow */}
-            <button
-              id="navScrollPrevBtn"
-              type="button"
-              className="nav-scroll-btn nav-scroll-prev"
-              aria-label="Scroll categories left"
-              title="Scroll left"
-            >
-              ‹
-            </button>
-
-            <div id="storeNavScrollWrapper" className="store-nav-scroll-wrapper">
-              <nav className="store-nav-pills" aria-label="Department navigation">
-                {settings.menu_show_deals !== '0' && (
-                  <a href="/" className={`nav-pill ${!activeSlug ? 'nav-pill-active' : ''}`}>
-                    <span>🏠</span>
-                    <span>All Deals</span>
-                  </a>
-                )}
-                {settings.menu_show_compare !== '0' && (
-                  <a
-                    href="/compare"
-                    className={`nav-pill ${activeSlug === 'compare' ? 'nav-pill-active' : ''}`}
-                  >
-                    <span>⚖️</span>
-                    <span>Compare</span>
-                  </a>
-                )}
-                {settings.menu_show_charts !== '0' && (
-                  <a
-                    href="/charts"
-                    className={`nav-pill ${activeSlug === 'charts' ? 'nav-pill-active' : ''}`}
-                  >
-                    <span>🏆</span>
-                    <span>Top Charts</span>
-                  </a>
-                )}
-                {settings.menu_show_blog !== '0' && (
-                  <a
-                    href="/blog"
-                    className={`nav-pill ${activeSlug === 'blog' ? 'nav-pill-active' : ''}`}
-                  >
-                    <span>📰</span>
-                    <span>Tech Guides &amp; Blog</span>
-                  </a>
-                )}
-                {settings.menu_show_coupons !== '0' && (
-                  <a
-                    href="/coupons"
-                    className={`nav-pill ${activeSlug === 'coupons' ? 'nav-pill-active' : ''}`}
-                  >
-                    <span>🎟️</span>
-                    <span>Coupons &amp; Deals</span>
-                  </a>
-                )}
-                {settings.menu_show_stores !== '0' && (
-                  <a
-                    href="/stores"
-                    className={`nav-pill ${activeSlug === 'stores' ? 'nav-pill-active' : ''}`}
-                  >
-                    <span>🏪</span>
-                    <span>Stores</span>
-                  </a>
-                )}
-                {settings.menu_show_brands !== '0' && (
-                  <a
-                    href="/brands"
-                    className={`nav-pill ${activeSlug === 'brands' ? 'nav-pill-active' : ''}`}
-                  >
-                    <span>🏷️</span>
-                    <span>Brands</span>
-                  </a>
-                )}
-                {settings.custom_nav_1_label && settings.custom_nav_1_url && (
-                  <a href={settings.custom_nav_1_url} className="nav-pill">
-                    <span>🔗</span>
-                    <span>{settings.custom_nav_1_label}</span>
-                  </a>
-                )}
-                {settings.custom_nav_2_label && settings.custom_nav_2_url && (
-                  <a href={settings.custom_nav_2_url} className="nav-pill">
-                    <span>🔗</span>
-                    <span>{settings.custom_nav_2_label}</span>
-                  </a>
-                )}
-                {categories.map((cat) => (
-                  <a
-                    key={cat.id}
-                    href={`/category/${cat.slug}`}
-                    className={`nav-pill ${activeSlug === cat.slug ? 'nav-pill-active' : ''}`}
-                  >
-                    <span className="nav-pill-icon">{cat.icon || '🛍️'}</span>
-                    <span>{cat.name}</span>
-                  </a>
-                ))}
-              </nav>
-            </div>
-
-            {/* Desktop Right Scroll Arrow */}
-            <button
-              id="navScrollNextBtn"
-              type="button"
-              className="nav-scroll-btn nav-scroll-next"
-              aria-label="Scroll categories right"
-              title="Scroll right"
-            >
-              ›
-            </button>
-
-            {/* Quick "More ▾" Dropdown for instantaneous category jump */}
-            <div className="nav-more-dropdown-wrap">
-              <button
-                id="navMoreDropdownBtn"
-                type="button"
-                className="nav-more-pill"
-                aria-label="More categories"
-                title="View more categories"
-              >
-                <span>More</span>
-                <span className="nav-more-arrow">▾</span>
-              </button>
-              <div id="navMoreDropdownMenu" className="nav-more-dropdown-menu">
-                <div className="nav-more-dropdown-header">ALL CATEGORIES &amp; HUBS</div>
-                <div className="nav-more-dropdown-grid">
-                  {categories.map((cat) => (
-                    <a
-                      key={cat.id}
-                      href={`/category/${cat.slug}`}
-                      className="nav-more-dropdown-item"
-                    >
-                      <span className="nav-more-item-icon">{cat.icon || '🛍️'}</span>
-                      <span className="nav-more-item-name">{cat.name}</span>
-                    </a>
-                  ))}
-                  <div className="nav-more-dropdown-divider" />
-                  <a href="/stores" className="nav-more-dropdown-item">
-                    <span>🏪</span>
-                    <span className="nav-more-item-name">Verified Stores Directory</span>
-                  </a>
-                  <a href="/brands" className="nav-more-dropdown-item">
-                    <span>🏷️</span>
-                    <span className="nav-more-item-name">Official Brand Centers</span>
-                  </a>
-                  <a href="/coupons" className="nav-more-dropdown-item">
-                    <span>🎟️</span>
-                    <span className="nav-more-item-name">Active Discount Coupons</span>
-                  </a>
+            <div className="nav-strip-left-hubs">
+              {/* SMART HUB 1: All Categories Dropdown */}
+              <div className="nav-categories-dropdown-wrap">
+                <button
+                  id="allDepartmentsBtn"
+                  type="button"
+                  className="nav-smart-hub-btn nav-categories-hub-btn"
+                  title="Browse all product categories in Nepal"
+                  aria-label="Browse all categories"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <span className="nav-hub-icon">🏷️</span>
+                  <span className="nav-hub-label">All Categories</span>
+                  <span className="nav-hub-arrow">▾</span>
+                </button>
+                <div id="allCategoriesDropdownMenu" className="nav-categories-dropdown-menu">
+                  <div className="nav-dropdown-header">
+                    <span>🛍️ SHOP BY CATEGORY</span>
+                    <span className="nav-dropdown-badge">{categories.length} Categories</span>
+                  </div>
+                  <div className="nav-categories-grid">
+                    {categories.map((cat) => (
+                      <a
+                        key={cat.id}
+                        href={`/category/${cat.slug}`}
+                        className={`nav-category-card-item ${activeSlug === cat.slug ? 'active' : ''}`}
+                      >
+                        <span className="nav-cat-card-icon">{cat.icon || '🛍️'}</span>
+                        <div className="nav-cat-card-info">
+                          <strong className="nav-cat-card-name">{cat.name}</strong>
+                          <small className="nav-cat-card-desc">{cat.description || 'Verified Nepal specs & prices'}</small>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
+
+              {/* SMART HUB 2: Explore & Tools Menu Dropdown */}
+              <div className="nav-more-dropdown-wrap">
+                <button
+                  id="navMoreDropdownBtn"
+                  type="button"
+                  className="nav-smart-hub-btn nav-menu-hub-btn"
+                  aria-label="Explore tools, charts, and guides"
+                  title="Explore tools & directory"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <span className="nav-hub-icon">🧭</span>
+                  <span className="nav-hub-label">Explore &amp; Tools</span>
+                  <span className="nav-hub-arrow">▾</span>
+                </button>
+                <div id="navMoreDropdownMenu" className="nav-more-dropdown-menu">
+                  <div className="nav-dropdown-header">
+                    <span>⚡ TOOLS, GUIDES &amp; DIRECTORY</span>
+                  </div>
+                  <div className="nav-menu-list">
+                    <a href="/compare" className={`nav-menu-list-item ${activeSlug === 'compare' ? 'active' : ''}`}>
+                      <span className="nav-menu-item-icon">⚖️</span>
+                      <div className="nav-menu-item-text">
+                        <strong>Side-by-Side Compare</strong>
+                        <small>Head-to-head spec &amp; price matrix</small>
+                      </div>
+                    </a>
+                    <a href="/charts" className={`nav-menu-list-item ${activeSlug === 'charts' ? 'active' : ''}`}>
+                      <span className="nav-menu-item-icon">🏆</span>
+                      <div className="nav-menu-item-text">
+                        <strong>Top 10 Ranked Charts</strong>
+                        <small>Lab-evaluated Nepali buyer leaderboards</small>
+                      </div>
+                    </a>
+                    <a href="/coupons" className={`nav-menu-list-item ${activeSlug === 'coupons' ? 'active' : ''}`}>
+                      <span className="nav-menu-item-icon">🎟️</span>
+                      <div className="nav-menu-item-text">
+                        <strong>Coupons &amp; Promo Codes</strong>
+                        <small>Verified discount codes for Nepal stores</small>
+                      </div>
+                    </a>
+                    <a href="/stores" className={`nav-menu-list-item ${activeSlug === 'stores' ? 'active' : ''}`}>
+                      <span className="nav-menu-item-icon">🏪</span>
+                      <div className="nav-menu-item-text">
+                        <strong>Stores Directory</strong>
+                        <small>Daraz, Oliz Store, Hamrobazar &amp; more</small>
+                      </div>
+                    </a>
+                    <a href="/brands" className={`nav-menu-list-item ${activeSlug === 'brands' ? 'active' : ''}`}>
+                      <span className="nav-menu-item-icon">🏷️</span>
+                      <div className="nav-menu-item-text">
+                        <strong>Official Brand Hubs</strong>
+                        <small>Apple, Samsung, Xiaomi, Dell, Sony</small>
+                      </div>
+                    </a>
+                    <a href="/blog" className={`nav-menu-list-item ${activeSlug === 'blog' ? 'active' : ''}`}>
+                      <span className="nav-menu-item-icon">📰</span>
+                      <div className="nav-menu-item-text">
+                        <strong>Tech Guides &amp; Blog</strong>
+                        <small>Editorial reviews &amp; buying advice</small>
+                      </div>
+                    </a>
+                    <a href="/track-order" className={`nav-menu-list-item ${activeSlug === 'orders' ? 'active' : ''}`}>
+                      <span className="nav-menu-item-icon">📦</span>
+                      <div className="nav-menu-item-text">
+                        <strong>Track My Order Live</strong>
+                        <small>Real-time delivery progress &amp; courier</small>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick-Access Highlight Links */}
+            <div className="nav-strip-quick-links">
+              <a href="/" className={`nav-quick-link ${!activeSlug ? 'active' : ''}`}>
+                <span>🏠</span>
+                <span>Today's Deals</span>
+              </a>
+              <a href="/compare" className={`nav-quick-link nav-quick-link-highlight ${activeSlug === 'compare' ? 'active' : ''}`}>
+                <span>⚖️</span>
+                <span>Compare Matrix</span>
+              </a>
+              <a href="/charts" className={`nav-quick-link ${activeSlug === 'charts' ? 'active' : ''}`}>
+                <span>🏆</span>
+                <span>Rankings</span>
+              </a>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Navigation Drawer (mounted outside header to prevent backdrop-filter containing block overflow) */}
+      {/* Mobile Navigation Drawer */}
       <div id="mobileDrawerBackdrop" className="mobile-drawer-backdrop" />
       <div id="mobileDrawer" className="mobile-drawer">
         <div className="mobile-drawer-header">
@@ -330,43 +296,52 @@ export const Header: FC<{
             </button>
           </div>
 
-          <span className="mobile-drawer-label">EXPLORE DEPARTMENTS &amp; TOOLS</span>
-          <nav className="mobile-nav-links">
-            <a href="/" className={!activeSlug ? 'active' : ''}>
-              🏠 All Products &amp; Deals
-            </a>
-            <a href="/compare" className={activeSlug === 'compare' ? 'active' : ''}>
-              ⚖️ Head-to-Head Compare
-            </a>
-            <a href="/charts" className={activeSlug === 'charts' ? 'active' : ''}>
-              🏆 Top 10 Ranked Charts
-            </a>
-            <a href="/blog" className={activeSlug === 'blog' ? 'active' : ''}>
-              📰 Tech Blog &amp; Guides
-            </a>
-            <a href="/coupons" className={activeSlug === 'coupons' ? 'active' : ''}>
-              🎟️ Verified Promo Codes
-            </a>
-            <a href="/stores" className={activeSlug === 'stores' ? 'active' : ''}>
-              🏪 Verified Nepal Stores
-            </a>
-            <a href="/brands" className={activeSlug === 'brands' ? 'active' : ''}>
-              🏷️ Official Brands
-            </a>
-            <a href="/track-order" className={activeSlug === 'orders' ? 'active' : ''}>
-              📦 Track My Order
-            </a>
-            {categories.map((cat) => (
-              <a
-                key={cat.id}
-                href={`/category/${cat.slug}`}
-                className={activeSlug === cat.slug ? 'active' : ''}
-              >
-                <span>{cat.icon || '📁'}</span>
-                <span>{cat.name}</span>
+          {/* TWO SMART SECTIONS IN MOBILE DRAWER */}
+          <div className="mobile-drawer-section">
+            <span className="mobile-drawer-label">🛍️ SHOP BY CATEGORY</span>
+            <div className="mobile-nav-categories-grid">
+              {categories.map((cat) => (
+                <a
+                  key={cat.id}
+                  href={`/category/${cat.slug}`}
+                  className={`mobile-cat-pill ${activeSlug === cat.slug ? 'active' : ''}`}
+                >
+                  <span className="mobile-cat-pill-icon">{cat.icon || '📁'}</span>
+                  <span>{cat.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="mobile-drawer-section" style={{ marginTop: '22px' }}>
+            <span className="mobile-drawer-label">🧭 EXPLORE &amp; TOOLS MENU</span>
+            <nav className="mobile-nav-links">
+              <a href="/" className={!activeSlug ? 'active' : ''}>
+                <span>🏠</span> All Deals &amp; Price Cuts
               </a>
-            ))}
-          </nav>
+              <a href="/compare" className={activeSlug === 'compare' ? 'active' : ''}>
+                <span>⚖️</span> Head-to-Head Compare Matrix
+              </a>
+              <a href="/charts" className={activeSlug === 'charts' ? 'active' : ''}>
+                <span>🏆</span> Top 10 Ranked Gadget Charts
+              </a>
+              <a href="/coupons" className={activeSlug === 'coupons' ? 'active' : ''}>
+                <span>🎟️</span> Verified Promo Codes
+              </a>
+              <a href="/stores" className={activeSlug === 'stores' ? 'active' : ''}>
+                <span>🏪</span> Verified Nepal Stores
+              </a>
+              <a href="/brands" className={activeSlug === 'brands' ? 'active' : ''}>
+                <span>🏷️</span> Official Brands
+              </a>
+              <a href="/blog" className={activeSlug === 'blog' ? 'active' : ''}>
+                <span>📰</span> Tech Blog &amp; Buying Guides
+              </a>
+              <a href="/track-order" className={activeSlug === 'orders' ? 'active' : ''}>
+                <span>📦</span> Track My Order Live
+              </a>
+            </nav>
+          </div>
 
           <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
             <span className="mobile-drawer-label">MANAGEMENT &amp; SUPPORT</span>
@@ -709,7 +684,7 @@ export const CouponsStrip: FC<{ coupons: Coupon[] }> = ({ coupons }) => {
         <h3>
           <span>🏷️</span> Exclusive Nepali Promo Codes &amp; Vouchers
         </h3>
-        <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Click code to copy</span>
+        <span className="coupons-hint">Click code to copy</span>
       </div>
       <div className="coupons-grid">
         {coupons.map((c) => (
@@ -1221,7 +1196,7 @@ export const Footer: FC<{ settings: SiteSettings; categories?: Category[] }> = (
         </div>
       </div>
 
-      <div className="store-shell" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '16px 0', fontSize: '11.5px', color: '#94a3b8', lineHeight: '1.6' }}>
+      <div className="store-shell" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px', paddingBottom: '16px', fontSize: '11.5px', color: '#94a3b8', lineHeight: '1.6' }}>
         <strong style={{ color: '#cbd5e1' }}>Affiliate Transparency Disclosure:</strong> {disclosure}
       </div>
 

@@ -1379,10 +1379,9 @@ export const AdminDashboardView: FC<{
                     {/* Font Family */}
                     <div className="form-group" style={{ margin: 0 }}>
                       <label>Typography / Primary Font Family</label>
-                      <select name="theme_font" defaultValue={settings.theme_font || 'Outfit'}>
-                        <option value="Outfit">Outfit (Modern Geometric Brand Sans)</option>
+                      <select name="theme_font" defaultValue={settings.theme_font || 'Plus Jakarta Sans'}>
+                        <option value="Plus Jakarta Sans">Plus Jakarta Sans (Modern Clean Sans — Recommended)</option>
                         <option value="Inter">Inter (Ultra-Clean Digital Editorial)</option>
-                        <option value="Plus Jakarta Sans">Plus Jakarta Sans (High-End SaaS &amp; Tech)</option>
                         <option value="Poppins">Poppins (Friendly Display &amp; E-commerce)</option>
                         <option value="Roboto">Roboto (Universal Standard Web Sans)</option>
                       </select>

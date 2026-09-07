@@ -66,7 +66,8 @@ export const HomePage: FC<{
     >
       <div className="store-page">
         <Header settings={settings} categories={categories} />
-        {settings.hero_enabled !== '0' && <Hero settings={settings} />}
+        <main id="mainContent" className="store-main-flow">
+          {settings.hero_enabled !== '0' && <Hero settings={settings} />}
         {settings.trust_strip_enabled !== '0' && <TrustStrip settings={settings} />}
 
         {/* Live Flash Sale Showcase */}
@@ -232,6 +233,7 @@ export const HomePage: FC<{
         {settings.editorial_banner_enabled !== '0' && (
           <EditorialBanner count={products.length} settings={settings} />
         )}
+        </main>
 
         <Footer settings={settings} categories={categories} />
         <MobileBottomBar activeTab="home" />

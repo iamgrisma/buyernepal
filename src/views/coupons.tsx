@@ -21,20 +21,27 @@ export const CouponsPage: FC<{
       <div className="store-page coupons-page">
         <Header settings={settings} categories={categories} activeSlug="coupons" />
 
-        <main className="store-shell" style={{ padding: '24px 0 60px' }}>
+        <main className="store-shell">
+          {/* Breadcrumbs */}
+          <div className="breadcrumbs">
+            <a href="/">Home</a>
+            <span>/</span>
+            <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Deals &amp; Promo Codes</span>
+          </div>
+
           {/* Hero Banner */}
-          <div className="coupons-hero-card">
-            <div className="coupons-hero-badge">🎟️ VERIFIED SAVINGS DIRECTORY</div>
-            <h1 className="coupons-hero-title">Verified Nepal Coupons, Promo Codes & Store Deals</h1>
-            <p className="coupons-hero-subtitle">
-              Never pay full retail price. Discover hand-tested voucher codes for Daraz Mall, partner tech stores, and Nepali bank debit/credit card offers.
-            </p>
-            <div className="coupons-hero-meta">
-              <span>✓ {activeCoupons.length} Active Vouchers Today</span>
-              <span>•</span>
-              <span>🔄 Updated Daily by Editors</span>
-              <span>•</span>
-              <span>🛡️ 100% Free & No Registration</span>
+          <div className="page-hero-banner">
+            <div className="page-hero-banner-content">
+              <div className="page-hero-badge">VERIFIED SAVINGS DIRECTORY</div>
+              <h1 className="page-hero-title">Verified Nepal Coupons &amp; Store Deals</h1>
+              <p className="page-hero-subtitle">
+                Never pay full retail price. Discover hand-tested voucher codes for Daraz Mall, partner tech stores, and Nepali bank debit/credit card offers.
+              </p>
+            </div>
+
+            <div className="page-hero-stat-badge">
+              <span className="page-hero-stat-val">{activeCoupons.length}</span>
+              <span className="page-hero-stat-lbl">Active Vouchers</span>
             </div>
           </div>
 

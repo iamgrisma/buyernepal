@@ -77,7 +77,7 @@ export const ProductPage: FC<{
 
         <main className="store-shell">
           <div className="breadcrumbs">
-            <a href="/">🏠 Home</a>
+            <a href="/">Home</a>
             <span>/</span>
             {product.category_name && (
               <>
@@ -85,7 +85,7 @@ export const ProductPage: FC<{
                 <span>/</span>
               </>
             )}
-            <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{product.name}</span>
+            <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{product.name}</span>
           </div>
 
           {/* Affiliate Disclosure Banner */}

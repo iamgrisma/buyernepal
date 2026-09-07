@@ -60,7 +60,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
 
@@ -98,9 +98,13 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                     --accent-hover: ${settings.theme_accent_color}ee;
                     --accent-soft: ${settings.theme_accent_color}18;
                   ` : ''}
-                  ${settings.theme_font ? `
-                    --font-main: '${settings.theme_font}', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                  ` : ''}
+                  ${settings.theme_font && settings.theme_font !== 'Outfit' ? `
+                    --font-main: '${settings.theme_font}', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    --font-display: '${settings.theme_font}', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                  ` : `
+                    --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                  `}
                 }
                 ${settings.theme_container_width ? `
                   .store-shell, .page-shell { max-width: ${settings.theme_container_width} !important; }
@@ -623,73 +627,50 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                 }
 
                 if (menuBtn) menuBtn.addEventListener('click', openDrawer);
-                const allDepartmentsBtn = document.getElementById('allDepartmentsBtn');
-                if (allDepartmentsBtn) allDepartmentsBtn.addEventListener('click', openDrawer);
-
                 if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
                 if (backdrop) backdrop.addEventListener('click', closeDrawer);
 
-                // Desktop Nav Strip Horizontal Scroll Controls & Wheel Support
-                const navScrollWrapper = document.getElementById('storeNavScrollWrapper');
-                const navScrollPrev = document.getElementById('navScrollPrevBtn');
-                const navScrollNext = document.getElementById('navScrollNextBtn');
-
-                function updateNavScrollIndicators() {
-                  if (!navScrollWrapper) return;
-                  const { scrollLeft, scrollWidth, clientWidth } = navScrollWrapper;
-                  if (navScrollPrev) {
-                    navScrollPrev.style.opacity = scrollLeft > 10 ? '1' : '0.35';
-                    navScrollPrev.style.pointerEvents = scrollLeft > 10 ? 'auto' : 'none';
-                  }
-                  if (navScrollNext) {
-                    const isEnd = scrollLeft >= scrollWidth - clientWidth - 10;
-                    navScrollNext.style.opacity = isEnd ? '0.35' : '1';
-                    navScrollNext.style.pointerEvents = isEnd ? 'none' : 'auto';
-                  }
-                }
-
-                if (navScrollWrapper) {
-                  navScrollWrapper.addEventListener('scroll', updateNavScrollIndicators);
-                  navScrollWrapper.addEventListener('wheel', (e) => {
-                    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                      e.preventDefault();
-                      navScrollWrapper.scrollLeft += e.deltaY;
-                    }
-                  }, { passive: false });
-                  window.addEventListener('resize', updateNavScrollIndicators);
-                  setTimeout(updateNavScrollIndicators, 150);
-                }
-
-                if (navScrollPrev) {
-                  navScrollPrev.addEventListener('click', () => {
-                    if (navScrollWrapper) navScrollWrapper.scrollBy({ left: -260, behavior: 'smooth' });
-                  });
-                }
-                if (navScrollNext) {
-                  navScrollNext.addEventListener('click', () => {
-                    if (navScrollWrapper) navScrollWrapper.scrollBy({ left: 260, behavior: 'smooth' });
-                  });
-                }
-
-                // Nav More Dropdown Click Toggle for touch/click
+                // Two Smart Hub Dropdowns (Categories Hub & Explore Menu Hub)
+                const allDepartmentsBtn = document.getElementById('allDepartmentsBtn');
+                const categoriesWrap = document.querySelector('.nav-categories-dropdown-wrap');
                 const navMoreBtn = document.getElementById('navMoreDropdownBtn');
                 const navMoreWrap = document.querySelector('.nav-more-dropdown-wrap');
+
+                if (allDepartmentsBtn && categoriesWrap) {
+                  allDepartmentsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (window.innerWidth <= 768) {
+                      openDrawer();
+                    } else {
+                      if (navMoreWrap) navMoreWrap.classList.remove('open');
+                      categoriesWrap.classList.toggle('open');
+                    }
+                  });
+                }
+
                 if (navMoreBtn && navMoreWrap) {
                   navMoreBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    if (categoriesWrap) categoriesWrap.classList.remove('open');
                     navMoreWrap.classList.toggle('open');
                   });
-                  document.addEventListener('click', (e) => {
-                    if (!navMoreWrap.contains(e.target)) {
-                      navMoreWrap.classList.remove('open');
-                    }
-                  });
                 }
+
+                // Global outside click handler to close open dropdowns
+                document.addEventListener('click', (e) => {
+                  if (categoriesWrap && !categoriesWrap.contains(e.target)) {
+                    categoriesWrap.classList.remove('open');
+                  }
+                  if (navMoreWrap && !navMoreWrap.contains(e.target)) {
+                    navMoreWrap.classList.remove('open');
+                  }
+                });
 
                 document.addEventListener('keydown', (e) => {
                   if (e.key === 'Escape') {
                     closeDrawer();
                     closeWishlist();
+                    if (categoriesWrap) categoriesWrap.classList.remove('open');
                     if (navMoreWrap) navMoreWrap.classList.remove('open');
                     if (compareModalBackdrop) compareModalBackdrop.classList.remove('open');
                   }

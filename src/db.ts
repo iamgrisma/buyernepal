@@ -731,7 +731,7 @@ export async function getSettings(db?: D1Database): Promise<SiteSettings> {
 
     // 1. Visual Theme & Layout
     theme_accent_color: '#dc2626',
-    theme_font: 'Outfit',
+    theme_font: 'Plus Jakarta Sans',
     theme_container_width: '1240px',
     card_style: 'modern',
     catalog_default_view: 'grid',
@@ -823,6 +823,10 @@ export async function getSettings(db?: D1Database): Promise<SiteSettings> {
     const settings: Record<string, string> = { ...defaults };
     for (const row of r.results || []) {
       settings[row.key] = row.value;
+    }
+    // Normalize font: migrate any legacy 'Outfit' to 'Plus Jakarta Sans'
+    if (settings.theme_font === 'Outfit' || !settings.theme_font) {
+      settings.theme_font = 'Plus Jakarta Sans';
     }
     return settings;
   } catch {

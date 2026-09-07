@@ -42,52 +42,30 @@ export const CategoryPage: FC<{
       <div className="store-page">
         <Header settings={settings} categories={categories} activeSlug={category.slug} />
 
-        <main className="store-shell" style={{ padding: '32px 0 60px' }}>
+        <main className="store-shell">
           <div className="breadcrumbs">
-            <a href="/">🏠 Home</a>
+            <a href="/">Home</a>
             <span>/</span>
             <span>Departments</span>
             <span>/</span>
-            <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{category.name}</span>
+            <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{category.name}</span>
           </div>
 
-          <div
-            style={{
-              background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
-              color: '#ffffff',
-              borderRadius: 'var(--radius-lg)',
-              padding: '40px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '24px',
-              marginBottom: '32px',
-              boxShadow: 'var(--shadow-lg)'
-            }}
-          >
-            <div>
-              <span className="eyebrow" style={{ color: '#fda4af' }}>VERIFIED DEPARTMENT</span>
-              <h1 style={{ fontSize: '36px', fontWeight: 900, letterSpacing: '-1.5px', margin: '8px 0 12px' }}>
-                <span style={{ marginRight: '10px' }}>{icon}</span> {category.name}
+          <div className="page-hero-banner">
+            <div className="page-hero-banner-content">
+              <div className="page-hero-badge">VERIFIED DEPARTMENT</div>
+              <h1 className="page-hero-title">
+                {category.name}
               </h1>
-              <p style={{ maxWidth: '560px', color: '#94a3b8', fontSize: '15px', lineHeight: '1.6' }}>
+              <p className="page-hero-subtitle">
                 {description}
               </p>
             </div>
-            <div
-              style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: 'var(--radius-md)',
-                padding: '18px 28px',
-                textAlign: 'center'
-              }}
-            >
-              <strong style={{ display: 'block', fontSize: '32px', fontWeight: 900, color: '#fda4af' }}>
+            <div className="page-hero-stat-badge">
+              <span className="page-hero-stat-val">
                 {products.length}
-              </strong>
-              <span style={{ fontSize: '12px', color: '#cbd5e1', fontWeight: 600 }}>Products Curated</span>
+              </span>
+              <span className="page-hero-stat-lbl">Products Curated</span>
             </div>
           </div>
 
