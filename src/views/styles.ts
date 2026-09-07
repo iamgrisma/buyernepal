@@ -2711,6 +2711,116 @@ button { font-family: inherit; }
   position: relative;
 }
 
+/* Direct Express Checkout Modal */
+.direct-order-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(5px);
+  z-index: 10000;
+  display: none;
+  place-items: center;
+  padding: 20px;
+}
+.direct-order-modal-backdrop.open {
+  display: grid;
+}
+.direct-order-modal-box {
+  background: var(--card-bg);
+  color: var(--ink);
+  width: min(560px, 95vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  padding: 24px;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+
+/* Search Autocomplete Live Dropdown */
+.header-search-wrap {
+  position: relative;
+  width: 100%;
+}
+.search-autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
+  z-index: 1000;
+  display: none;
+  max-height: 440px;
+  overflow-y: auto;
+}
+.search-autocomplete-dropdown.open {
+  display: block;
+}
+.search-group-title {
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.search-result-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--ink);
+  transition: background 0.15s ease;
+}
+.search-result-row:hover {
+  background: var(--bg);
+}
+.search-result-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.search-result-info {
+  flex: 1;
+  min-width: 0;
+}
+.search-result-title {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.search-result-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.search-result-price {
+  font-weight: 700;
+  color: var(--primary);
+}
+.search-autocomplete-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 /* Nepal Shopping FAQ Accordion */
 .faq-container {
   margin: 48px 0;

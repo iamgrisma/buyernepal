@@ -909,6 +909,133 @@ export const ProductPage: FC<{
           </div>
         </div>
 
+        {/* Direct Express Checkout Modal (COD / Digital Goods) */}
+        <div id="directOrderModalBackdrop" className="direct-order-modal-backdrop">
+          <div className="direct-order-modal-box">
+            <button
+              id="closeDirectOrderModalBtn"
+              type="button"
+              className="mobile-drawer-close"
+              style={{ position: 'absolute', top: '14px', right: '14px' }}
+            >
+              ×
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '20px' }}>⚡</span>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>
+                {product.product_type === 'digital' ? 'Instant Digital Purchase' : 'Direct Order / Cash on Delivery'}
+              </h3>
+            </div>
+            <p style={{ fontSize: '12.5px', color: 'var(--muted)', marginBottom: '16px', lineHeight: '1.4' }}>
+              {product.product_type === 'digital'
+                ? 'Get your instant license key and download link sent immediately to your email & SMS.'
+                : 'Order directly from BuyerNepal partner fulfillment. Pay cash upon delivery or via Fonepay / eSewa.'}
+            </p>
+
+            {/* Product Quick Recap Card */}
+            <div style={{ display: 'flex', gap: '14px', alignItems: 'center', background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', padding: '12px', marginBottom: '16px' }}>
+              <img
+                src={product.image_url}
+                alt={product.name}
+                style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--line)' }}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {product.name}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                  <strong style={{ fontSize: '14.5px', color: 'var(--primary)' }}>Rs. {formattedPrice}</strong>
+                  <span style={{ fontSize: '10.5px', color: 'var(--emerald)', background: 'var(--emerald-soft)', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                    {product.product_type === 'digital' ? 'Instant Access' : 'In Stock'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <form id="directOrderForm" method="post" action="/api/orders/create">
+              <input type="hidden" name="product_id" value={product.id} />
+              <input type="hidden" name="product_name" value={product.name} />
+              <input type="hidden" name="product_price" value={price} />
+              <input type="hidden" name="product_type" value={product.product_type || 'physical'} />
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                <div className="form-group" style={{ marginBottom: '12px' }}>
+                  <label>Full Name *</label>
+                  <input type="text" name="customer_name" placeholder="e.g. Ramesh Shrestha" required />
+                </div>
+                <div className="form-group" style={{ marginBottom: '12px' }}>
+                  <label>Mobile Number (SMS Updates) *</label>
+                  <input type="tel" name="customer_phone" placeholder="98XXXXXXXX" pattern="[0-9]{10}" required />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '12px' }}>
+                <label>Email Address (Order Confirmation) *</label>
+                <input type="email" name="customer_email" placeholder="ramesh@example.com" required />
+              </div>
+
+              {product.product_type !== 'digital' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                  <div className="form-group" style={{ marginBottom: '12px' }}>
+                    <label>City / District *</label>
+                    <select name="city" required style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)' }}>
+                      <option value="Kathmandu">Kathmandu (Same Day / 24h)</option>
+                      <option value="Lalitpur">Lalitpur (24 Hours)</option>
+                      <option value="Bhaktapur">Bhaktapur (24 Hours)</option>
+                      <option value="Pokhara">Pokhara (1-2 Days)</option>
+                      <option value="Chitwan">Chitwan (1-2 Days)</option>
+                      <option value="Butwal">Butwal (2 Days)</option>
+                      <option value="Biratnagar">Biratnagar (2 Days)</option>
+                      <option value="Dharan">Dharan (2 Days)</option>
+                      <option value="Nepalgunj">Nepalgunj (2-3 Days)</option>
+                      <option value="Other District">Other (Courier across 77 Districts)</option>
+                    </select>
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '12px' }}>
+                    <label>Street / Tole / House No. *</label>
+                    <input type="text" name="delivery_address" placeholder="e.g. Baneshwor, near Eye Hospital" required />
+                  </div>
+                </div>
+              )}
+
+              <div className="form-group" style={{ marginBottom: '14px' }}>
+                <label>Payment Method *</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px', marginTop: '4px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', padding: '8px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
+                    <input type="radio" name="payment_method" value="cod" defaultChecked />
+                    <span>💵 Cash on Delivery</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', padding: '8px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
+                    <input type="radio" name="payment_method" value="fonepay" />
+                    <span>📱 eSewa / Fonepay</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', padding: '8px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
+                    <input type="radio" name="payment_method" value="bank" />
+                    <span>🏦 Bank Transfer</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label>Special Instructions / Delivery Landmark (Optional)</label>
+                <input type="text" name="notes" placeholder="e.g. Call before coming, deliver after 2 PM" />
+              </div>
+
+              <button type="submit" className="primary-action" style={{ width: '100%', padding: '14px', fontSize: '15px', fontWeight: 800 }}>
+                Confirm &amp; Place Order (Rs. {formattedPrice}) 🛍️
+              </button>
+
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '12px', fontSize: '11px', color: 'var(--muted)' }}>
+                <span>🔒 Secure Checkout</span>
+                <span>•</span>
+                <span>🛡️ 100% Tax-Paid Warranty</span>
+                <span>•</span>
+                <span>📦 Free 7-Day Returns</span>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <Footer settings={settings} categories={categories} />
         <MobileBottomBar activeTab="home" />
       </div>
@@ -1021,6 +1148,23 @@ export const ProductPage: FC<{
         if (window.bnShowToast) window.bnShowToast('Price alert set! 🔔');
         if (alertBackdrop) alertBackdrop.classList.remove('open');
       }
+    });
+  }
+
+  // 2.1 Direct Order Modal
+  const directOrderBtn = document.getElementById('openDirectOrderBtn');
+  const directOrderBackdrop = document.getElementById('directOrderModalBackdrop');
+  const closeDirectOrderBtn = document.getElementById('closeDirectOrderModalBtn');
+
+  if (directOrderBtn && directOrderBackdrop) {
+    directOrderBtn.addEventListener('click', () => directOrderBackdrop.classList.add('open'));
+  }
+  if (closeDirectOrderBtn && directOrderBackdrop) {
+    closeDirectOrderBtn.addEventListener('click', () => directOrderBackdrop.classList.remove('open'));
+  }
+  if (directOrderBackdrop) {
+    directOrderBackdrop.addEventListener('click', (e) => {
+      if (e.target === directOrderBackdrop) directOrderBackdrop.classList.remove('open');
     });
   }
 

@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { Env } from './types';
+import { Env, Order } from './types';
 import {
   getSettings,
   updateSettings,
@@ -45,13 +45,26 @@ import {
   saveProductVariant,
   deleteProductVariant,
   saveStoreOffer,
-  deleteStoreOffer
+  deleteStoreOffer,
+  getStores,
+  getStoreBySlug,
+  getBrands,
+  getBrandBySlug,
+  createOrder,
+  getOrdersAdmin,
+  getOrderByIdOrNumber,
+  updateOrderStatus,
+  recordOutboundClick,
+  getOutboundClicksAdmin
 } from './db';
 import { getSession, createSession, clearSession, passwordHash, safeEqual, digest } from './auth';
 import { HomePage } from './views/home';
 import { CategoryPage } from './views/category';
 import { ProductPage } from './views/product';
 import { BlogIndexPage, ArticleDetailPage } from './views/blog';
+import { CouponsPage } from './views/coupons';
+import { StoresListPage, StoreDetailPage, BrandsListPage, BrandDetailPage } from './views/directory';
+import { TrackOrderPage, OrderSuccessPage } from './views/orders';
 import { AdminLoginView, AdminDashboardView } from './views/admin';
 import { api } from './api';
 
@@ -72,23 +85,32 @@ app.route('/api', api);
 // SEO: robots.txt
 app.get('/robots.txt', (c) => {
   return c.text(
-    `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/admin\nSitemap: https://buyernepal.iamgrisma.workers.dev/sitemap.xml\n`
+    `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/admin\nSitemap: https://buyernepal.com/sitemap.xml\n`
   );
 });
 
 // SEO: dynamic sitemap.xml for Google/Bing indexing
 app.get('/sitemap.xml', async (c) => {
-  const [categories, products, articles] = await Promise.all([
+  const [categories, products, articles, stores, brands] = await Promise.all([
     getCategories(c.env?.DB),
     getProducts(c.env?.DB),
-    getArticles(c.env?.DB, { limit: 100 })
+    getArticles(c.env?.DB, { limit: 100 }),
+    getStores(c.env?.DB),
+    getBrands(c.env?.DB)
   ]);
+  const baseUrl = 'https://buyernepal.com';
   const urls = [
-    'https://buyernepal.iamgrisma.workers.dev/',
-    'https://buyernepal.iamgrisma.workers.dev/blog',
-    ...articles.map((art) => `https://buyernepal.iamgrisma.workers.dev/blog/${art.slug}`),
-    ...categories.map((cat) => `https://buyernepal.iamgrisma.workers.dev/category/${cat.slug}`),
-    ...products.map((prod) => `https://buyernepal.iamgrisma.workers.dev/product/${prod.id}`)
+    baseUrl + '/',
+    baseUrl + '/blog',
+    baseUrl + '/coupons',
+    baseUrl + '/stores',
+    baseUrl + '/brands',
+    baseUrl + '/track-order',
+    ...articles.map((art) => `${baseUrl}/blog/${art.slug}`),
+    ...categories.map((cat) => `${baseUrl}/category/${cat.slug}`),
+    ...products.map((prod) => `${baseUrl}/product/${prod.id}`),
+    ...stores.map((s) => `${baseUrl}/store/${s.slug}`),
+    ...brands.map((b) => `${baseUrl}/brand/${b.slug}`)
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -206,6 +228,315 @@ app.get('/product/:id', async (c) => {
       reviews={reviews}
     />
   );
+});
+
+// SSR: Coupons & Deals Directory
+app.get('/coupons', async (c) => {
+  const [settings, categories, coupons] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB),
+    getCoupons(c.env?.DB)
+  ]);
+  const activeStore = c.req.query('store') || 'all';
+  return c.html(
+    <CouponsPage
+      coupons={coupons}
+      settings={settings}
+      categories={categories}
+      activeStore={activeStore}
+    />
+  );
+});
+
+// SSR: Verified Stores Directory
+app.get('/stores', async (c) => {
+  const [settings, categories, stores] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB),
+    getStores(c.env?.DB)
+  ]);
+  return c.html(
+    <StoresListPage
+      stores={stores}
+      settings={settings}
+      categories={categories}
+    />
+  );
+});
+
+// SSR: Single Store Profile & Deals
+app.get('/store/:slug', async (c) => {
+  const slug = c.req.param('slug');
+  const [settings, categories, store, allProducts] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB),
+    getStoreBySlug(c.env?.DB, slug),
+    getProducts(c.env?.DB, undefined, 40)
+  ]);
+
+  if (!store) {
+    return c.redirect('/stores');
+  }
+
+  const storeKey = store.name.toLowerCase().split(' ')[0];
+  const storeProducts = allProducts.filter(
+    (p) =>
+      (p.store_name && p.store_name.toLowerCase().includes(storeKey)) ||
+      (p.store_offers && p.store_offers.some((o) => o.store_name.toLowerCase().includes(storeKey)))
+  );
+
+  return c.html(
+    <StoreDetailPage
+      store={store}
+      products={storeProducts.length > 0 ? storeProducts : allProducts.slice(0, 6)}
+      settings={settings}
+      categories={categories}
+    />
+  );
+});
+
+// SSR: Official Brands Directory
+app.get('/brands', async (c) => {
+  const [settings, categories, brands] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB),
+    getBrands(c.env?.DB)
+  ]);
+  return c.html(
+    <BrandsListPage
+      brands={brands}
+      settings={settings}
+      categories={categories}
+    />
+  );
+});
+
+// SSR: Single Brand Profile & Catalog
+app.get('/brand/:slug', async (c) => {
+  const slug = c.req.param('slug');
+  const [settings, categories, brand, allProducts] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB),
+    getBrandBySlug(c.env?.DB, slug),
+    getProducts(c.env?.DB, undefined, 50)
+  ]);
+
+  if (!brand) {
+    return c.redirect('/brands');
+  }
+
+  const brandProducts = allProducts.filter(
+    (p) =>
+      p.name.toLowerCase().includes(brand.name.toLowerCase()) ||
+      (p.brand && p.brand.toLowerCase().includes(brand.name.toLowerCase()))
+  );
+
+  return c.html(
+    <BrandDetailPage
+      brand={brand}
+      products={brandProducts.length > 0 ? brandProducts : allProducts.slice(0, 4)}
+      settings={settings}
+      categories={categories}
+    />
+  );
+});
+
+// SSR: Live Order Tracking
+app.get('/track-order', async (c) => {
+  const q = c.req.query('q') || '';
+  const [settings, categories] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB)
+  ]);
+
+  let order: Order | null = null;
+  if (q.trim()) {
+    order = await getOrderByIdOrNumber(c.env?.DB, q.trim());
+  }
+
+  return c.html(
+    <TrackOrderPage
+      order={order}
+      searchedQuery={q}
+      settings={settings}
+      categories={categories}
+    />
+  );
+});
+
+// Outbound Cloaked Affiliate Engine (/go/:type/:id)
+app.get('/go/:type/:id', async (c) => {
+  const type = c.req.param('type');
+  const idStr = c.req.param('id');
+  const id = Number(idStr);
+
+  let targetUrl = 'https://buyernepal.com';
+  let storeName = 'Partner Store';
+  let productId: number | undefined = undefined;
+
+  if (type === 'product' && id) {
+    const prod = await getProductById(c.env?.DB, id);
+    if (prod && prod.affiliate_url) {
+      targetUrl = prod.affiliate_url;
+      storeName = prod.store_name || 'Daraz';
+      productId = prod.id;
+    }
+  } else if (type === 'coupon' && id) {
+    const coupons = await getCoupons(c.env?.DB);
+    const coupon = coupons.find((cp) => cp.id === id);
+    if (coupon && coupon.store_url) {
+      targetUrl = coupon.store_url;
+      storeName = coupon.store_name || 'Store';
+    }
+  } else if (type === 'store' && idStr) {
+    const store = await getStoreBySlug(c.env?.DB, idStr);
+    if (store && (store.affiliate_url || store.website_url)) {
+      targetUrl = store.affiliate_url || store.website_url || 'https://buyernepal.com';
+      storeName = store.name;
+    }
+  }
+
+  try {
+    const cf = (c.req.raw as any)?.cf;
+    const country = cf?.country || 'NP';
+    const userAgent = c.req.header('user-agent') || '';
+    const referrer = c.req.header('referer') || '';
+
+    await recordOutboundClick(c.env?.DB, {
+      product_id: productId,
+      target_type: (['product', 'store_offer', 'coupon'].includes(type) ? type : 'custom') as any,
+      store_name: storeName,
+      target_url: targetUrl,
+      referrer,
+      user_agent: userAgent,
+      ip_country: country
+    });
+  } catch {
+    // Non-blocking tracking
+  }
+
+  return c.redirect(targetUrl, 302);
+});
+
+// API: Direct Purchase Order Placement (COD / eSewa)
+app.post('/api/orders/create', async (c) => {
+  try {
+    const body = await c.req.parseBody();
+    const productId = Number(body['product_id']);
+    const productName = String(body['product_name'] || 'Product').trim();
+    const unitPrice = Number(body['product_price'] || 0);
+    const quantity = Number(body['quantity'] || 1);
+    const totalAmount = unitPrice * quantity;
+    const customerName = String(body['customer_name'] || '').trim();
+    const customerEmail = String(body['customer_email'] || '').trim();
+    const customerPhone = String(body['customer_phone'] || '').trim();
+    const shippingAddress = String(body['delivery_address'] || '').trim();
+    const city = String(body['city'] || 'Kathmandu').trim();
+    const rawPayment = String(body['payment_method'] || 'cod').trim();
+    const paymentMethod = (rawPayment === 'fonepay' ? 'fonepay' : rawPayment === 'bank' ? 'bank_transfer' : 'cod') as 'cod' | 'esewa' | 'khalti' | 'fonepay' | 'bank_transfer';
+    const productType = String(body['product_type'] || 'physical').trim();
+    const notes = String(body['notes'] || '').trim();
+
+    if (!customerName || !customerPhone || !customerEmail) {
+      return c.text('Please provide Name, Phone, and Email to complete your order.', 400);
+    }
+
+    const orderResult = await createOrder(c.env?.DB, {
+      customer_name: customerName,
+      customer_email: customerEmail,
+      customer_phone: customerPhone,
+      shipping_address: shippingAddress,
+      city: city,
+      district: city,
+      product_id: productId,
+      product_name: productName,
+      quantity,
+      unit_price: unitPrice,
+      total_amount: totalAmount,
+      payment_method: paymentMethod,
+      delivery_type: productType === 'digital' ? 'digital' : 'physical',
+      notes
+    });
+
+    if (!orderResult.success) {
+      return c.text('Order creation failed: ' + (orderResult.error || 'Unknown error'), 500);
+    }
+
+    const [settings, categories] = await Promise.all([
+      getSettings(c.env?.DB),
+      getCategories(c.env?.DB)
+    ]);
+
+    return c.html(
+      <OrderSuccessPage
+        orderNumber={orderResult.order_number}
+        productName={productName}
+        totalAmount={totalAmount}
+        paymentMethod={paymentMethod}
+        isDigital={productType === 'digital'}
+        digitalCode={orderResult.digital_code}
+        settings={settings}
+        categories={categories}
+      />
+    );
+  } catch (err: any) {
+    return c.text('Order failed: ' + err?.message, 500);
+  }
+});
+
+// API: Instant Live Search Autocomplete
+app.get('/api/search/live', async (c) => {
+  const query = (c.req.query('q') || '').trim().toLowerCase();
+  if (!query || query.length < 2) {
+    return c.json({ products: [], articles: [], stores: [] });
+  }
+
+  const [products, articles, stores] = await Promise.all([
+    getProducts(c.env?.DB, undefined, 30),
+    getArticles(c.env?.DB, { limit: 20 }),
+    getStores(c.env?.DB)
+  ]);
+
+  const matchedProducts = products
+    .filter((p) => p.name.toLowerCase().includes(query) || (p.description && p.description.toLowerCase().includes(query)))
+    .slice(0, 5)
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      image_url: p.image_url,
+      store_name: p.store_name,
+      url: `/product/${p.id}`
+    }));
+
+  const matchedArticles = articles
+    .filter((a) => a.title.toLowerCase().includes(query) || a.excerpt.toLowerCase().includes(query))
+    .slice(0, 3)
+    .map((a) => ({
+      id: a.id,
+      title: a.title,
+      slug: a.slug,
+      cover_image: a.cover_image,
+      category: a.category,
+      url: `/blog/${a.slug}`
+    }));
+
+  const matchedStores = stores
+    .filter((s) => s.name.toLowerCase().includes(query) || (s.description && s.description.toLowerCase().includes(query)))
+    .slice(0, 3)
+    .map((s) => ({
+      id: s.id,
+      name: s.name,
+      slug: s.slug,
+      logo_url: s.logo_url,
+      url: `/store/${s.slug}`
+    }));
+
+  return c.json({
+    products: matchedProducts,
+    articles: matchedArticles,
+    stores: matchedStores
+  });
 });
 
 // API: Submit Customer Review
@@ -336,7 +667,7 @@ app.get('/admin', async (c) => {
     ? { type: 'error' as const, message: err }
     : undefined;
 
-  const [settings, categories, products, stats, users, reviews, coupons, articles] = await Promise.all([
+  const [settings, categories, products, stats, users, reviews, coupons, articles, orders, outboundClicks] = await Promise.all([
     getSettings(c.env?.DB),
     getCategories(c.env?.DB, false),
     getAllProductsAdmin(c.env?.DB),
@@ -344,7 +675,9 @@ app.get('/admin', async (c) => {
     getUsers(c.env?.DB),
     getAllReviewsAdmin(c.env?.DB),
     getCoupons(c.env?.DB),
-    getAllArticlesAdmin(c.env?.DB)
+    getAllArticlesAdmin(c.env?.DB),
+    getOrdersAdmin(c.env?.DB),
+    getOutboundClicksAdmin(c.env?.DB)
   ]);
 
   return c.html(
@@ -357,11 +690,27 @@ app.get('/admin', async (c) => {
       reviews={reviews}
       coupons={coupons}
       articles={articles}
+      orders={orders}
+      outboundClicks={outboundClicks}
       settings={settings}
       activeTab={tab}
       notice={notice}
     />
   );
+});
+
+// Admin Action: Update Order Status
+app.post('/admin/orders/:id/status', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  const body = await c.req.parseBody();
+  const status = String(body['status'] || 'placed');
+  const paymentStatus = body['payment_status'] ? String(body['payment_status']) : undefined;
+
+  await updateOrderStatus(c.env?.DB, id, status, paymentStatus);
+  return c.redirect(`/admin?tab=orders&msg=${encodeURIComponent(`Order #${id} status updated to ${status}`)}`);
 });
 
 // Admin Logout

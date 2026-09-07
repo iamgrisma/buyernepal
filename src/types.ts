@@ -150,6 +150,8 @@ export interface Coupon {
   max_uses?: number | null;
   expires_at?: string | null;
   is_active: number;
+  store_name?: string;
+  store_url?: string;
 }
 
 export interface PriceAlert {

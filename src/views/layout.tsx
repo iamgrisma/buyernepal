@@ -607,6 +607,94 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                     if (activePane) activePane.style.display = 'block';
                   });
                 });
+
+                // 11. Instant Live Search Autocomplete Engine
+                const searchInput = document.getElementById('headerSearchInput');
+                const searchDropdown = document.getElementById('headerSearchDropdown');
+                let searchDebounceTimer;
+
+                if (searchInput && searchDropdown) {
+                  searchInput.addEventListener('input', (e) => {
+                    clearTimeout(searchDebounceTimer);
+                    const q = e.target.value.trim();
+                    if (q.length < 2) {
+                      searchDropdown.classList.remove('open');
+                      searchDropdown.innerHTML = '';
+                      return;
+                    }
+                    searchDebounceTimer = setTimeout(async () => {
+                      try {
+                        const res = await fetch('/api/search/live?q=' + encodeURIComponent(q));
+                        if (!res.ok) return;
+                        const data = await res.json();
+                        const { products = [], articles = [], stores = [] } = data;
+
+                        if (products.length === 0 && articles.length === 0 && stores.length === 0) {
+                          searchDropdown.innerHTML = '<div class="search-autocomplete-empty">No results found for "<strong>' + q + '</strong>"</div>';
+                          searchDropdown.classList.add('open');
+                          return;
+                        }
+
+                        let html = '';
+                        if (products.length > 0) {
+                          html += '<div class="search-group-title">Products & Deals (' + products.length + ')</div>';
+                          products.forEach(p => {
+                            html += '<a href="' + p.url + '" class="search-result-row">' +
+                              '<img src="' + (p.image_url || '') + '" class="search-result-img" alt="' + p.name + '" />' +
+                              '<div class="search-result-info">' +
+                                '<div class="search-result-title">' + p.name + '</div>' +
+                                '<div class="search-result-meta">' +
+                                  '<span class="search-result-price">Rs. ' + p.price.toLocaleString() + '</span>' +
+                                  '<span>•</span>' +
+                                  '<span>' + (p.store_name || 'Store') + '</span>' +
+                                '</div>' +
+                              '</div>' +
+                            '</a>';
+                          });
+                        }
+
+                        if (articles.length > 0) {
+                          html += '<div class="search-group-title">Editorial Reviews & Guides (' + articles.length + ')</div>';
+                          articles.forEach(a => {
+                            html += '<a href="' + a.url + '" class="search-result-row">' +
+                              '<img src="' + (a.cover_image || '') + '" class="search-result-img" alt="' + a.title + '" />' +
+                              '<div class="search-result-info">' +
+                                '<div class="search-result-title">' + a.title + '</div>' +
+                                '<div class="search-result-meta">' +
+                                  '<span>' + (a.category || 'Review') + '</span>' +
+                                '</div>' +
+                              '</div>' +
+                            '</a>';
+                          });
+                        }
+
+                        if (stores.length > 0) {
+                          html += '<div class="search-group-title">Authorized Stores (' + stores.length + ')</div>';
+                          stores.forEach(s => {
+                            html += '<a href="' + s.url + '" class="search-result-row">' +
+                              '<img src="' + (s.logo_url || '') + '" class="search-result-img" alt="' + s.name + '" />' +
+                              '<div class="search-result-info">' +
+                                '<div class="search-result-title">' + s.name + '</div>' +
+                                '<div class="search-result-meta"><span>Verified Retailer</span></div>' +
+                              '</div>' +
+                            '</a>';
+                          });
+                        }
+
+                        searchDropdown.innerHTML = html;
+                        searchDropdown.classList.add('open');
+                      } catch (err) {
+                        console.error('Search error:', err);
+                      }
+                    }, 220);
+                  });
+
+                  document.addEventListener('click', (e) => {
+                    if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+                      searchDropdown.classList.remove('open');
+                    }
+                  });
+                }
               });
             `
           }}

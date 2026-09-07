@@ -1,5 +1,5 @@
 import { FC } from 'hono/jsx';
-import { Category, Product, Review, SiteSettings, User, Coupon, Article } from '../types';
+import { Category, Product, Review, SiteSettings, User, Coupon, Article, Order } from '../types';
 import { Layout } from './layout';
 
 export const AdminLoginView: FC<{ error?: string; success?: string }> = ({ error, success }) => {
@@ -62,13 +62,15 @@ export const AdminLoginView: FC<{ error?: string; success?: string }> = ({ error
 
 export const AdminDashboardView: FC<{
   currentUser: { id: number | string; username: string; email: string; role: string };
-  stats: { products: number; categories: number; users: number; pendingReviews: number; activeCoupons: number; articles?: number };
+  stats: { products: number; categories: number; users: number; pendingReviews: number; activeCoupons: number; articles?: number; orders?: number };
   products: Product[];
   categories: Category[];
   users: User[];
   reviews: Review[];
   coupons: Coupon[];
   articles?: Article[];
+  orders?: Order[];
+  outboundClicks?: any[];
   settings: SiteSettings;
   activeTab?: string;
   notice?: { type: 'success' | 'error'; message: string };
@@ -81,6 +83,8 @@ export const AdminDashboardView: FC<{
   reviews,
   coupons,
   articles = [],
+  orders = [],
+  outboundClicks = [],
   settings,
   activeTab = 'overview',
   notice
@@ -160,6 +164,24 @@ export const AdminDashboardView: FC<{
             </div>
 
             <div className="admin-nav-group">
+              <span className="admin-nav-section-title">E-Commerce &amp; Affiliates</span>
+              <a
+                href="/admin?tab=orders"
+                className={`admin-nav-item ${activeTab === 'orders' ? 'active' : ''}`}
+              >
+                <span>📦 Orders &amp; Direct COD</span>
+                <span className="admin-nav-badge" style={{ background: '#059669' }}>{orders.length}</span>
+              </a>
+              <a
+                href="/admin?tab=clicks"
+                className={`admin-nav-item ${activeTab === 'clicks' ? 'active' : ''}`}
+              >
+                <span>🔗 Affiliate Clicks</span>
+                <span className="admin-nav-badge" style={{ background: '#8b5cf6' }}>{outboundClicks.length}</span>
+              </a>
+            </div>
+
+            <div className="admin-nav-group">
               <span className="admin-nav-section-title">Store &amp; System</span>
               <a
                 href="/admin?tab=customizer"
@@ -213,6 +235,8 @@ export const AdminDashboardView: FC<{
                   {activeTab === 'coupons' && 'Promo Coupons'}
                   {activeTab === 'blog' && 'Tech Guides CMS'}
                   {activeTab === 'users' && 'Staff & Access'}
+                  {activeTab === 'orders' && 'Orders & Fulfillment'}
+                  {activeTab === 'clicks' && 'Affiliate Outbound Clicks'}
                   {activeTab === 'customizer' && 'Store Customizer'}
                   {activeTab === 'settings' && 'Global Settings'}
                 </span>
@@ -225,6 +249,8 @@ export const AdminDashboardView: FC<{
                 {activeTab === 'coupons' && 'Promo Coupons & Discount Codes'}
                 {activeTab === 'blog' && 'Tech Guides & Editorial CMS'}
                 {activeTab === 'users' && 'Staff & User Access Control'}
+                {activeTab === 'orders' && 'Direct Purchase Orders & Nepal COD Fulfillment'}
+                {activeTab === 'clicks' && 'Outbound Affiliate Click Tracking & Referrals'}
                 {activeTab === 'customizer' && 'Store Customizer & Feature Flags'}
                 {activeTab === 'settings' && 'Store Branding & Global Settings'}
               </h1>
@@ -1460,6 +1486,214 @@ export const AdminDashboardView: FC<{
               </form>
             </div>
           )}
+
+          {/* TAB: ORDERS & FULFILLMENT */}
+          {activeTab === 'orders' && (
+            <div>
+              <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--card-bg)' }}>
+                  <div>
+                    <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>Customer Orders &amp; Fulfillment</h2>
+                    <span style={{ fontSize: '12px', color: '#64748b' }}>
+                      Cash on Delivery across 77 districts in Nepal and Instant Digital Key dispatch
+                    </span>
+                  </div>
+                  <span className="badge badge-active" style={{ background: '#059669', color: '#ffffff' }}>
+                    {orders.length} Total Orders
+                  </span>
+                </div>
+
+                {orders.length === 0 ? (
+                  <div style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--muted)' }}>
+                    <span style={{ fontSize: '40px', display: 'block', marginBottom: '12px' }}>📦</span>
+                    <strong style={{ fontSize: '16px', color: 'var(--ink)' }}>No orders placed yet.</strong>
+                    <p style={{ fontSize: '13px', marginTop: '6px' }}>Orders from the storefront "⚡ Buy Direct / COD" modal will appear here in real-time.</p>
+                  </div>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>Order # &amp; Date</th>
+                          <th>Customer Details</th>
+                          <th>Location</th>
+                          <th>Product &amp; Amount</th>
+                          <th>Payment</th>
+                          <th>Fulfillment Status</th>
+                          <th style={{ textAlign: 'right' }}>Update Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {orders.map((o) => (
+                          <tr key={o.id}>
+                            <td>
+                              <strong style={{ color: 'var(--accent)', fontSize: '13px' }}>{o.order_number}</strong>
+                              <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>
+                                {o.created_at ? new Date(o.created_at).toLocaleDateString() : 'Recent'}
+                              </div>
+                              <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', background: o.delivery_type === 'digital' ? '#ede9fe' : '#e0f2fe', color: o.delivery_type === 'digital' ? '#6d28d9' : '#0369a1', fontWeight: 700 }}>
+                                {o.delivery_type === 'digital' ? '⚡ DIGITAL' : '🚚 PHYSICAL'}
+                              </span>
+                            </td>
+                            <td>
+                              <strong style={{ fontSize: '13px' }}>{o.customer_name}</strong>
+                              <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>📞 {o.customer_phone}</div>
+                              <div style={{ fontSize: '11px', color: 'var(--muted)' }}>✉️ {o.customer_email}</div>
+                            </td>
+                            <td>
+                              <strong style={{ fontSize: '12.5px' }}>{o.city || 'Kathmandu'}</strong>
+                              <div style={{ fontSize: '11px', color: 'var(--muted)', maxWidth: '160px' }}>
+                                {o.shipping_address || 'Not specified'}
+                              </div>
+                            </td>
+                            <td>
+                              <div style={{ fontWeight: 600, fontSize: '13px', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {o.product_name}
+                              </div>
+                              <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--ink)' }}>
+                                Rs. {o.total_amount.toLocaleString()} <span style={{ fontWeight: 400, color: 'var(--muted)' }}>({o.quantity}x)</span>
+                              </div>
+                              {o.digital_download_code && (
+                                <div style={{ fontSize: '10.5px', color: '#6d28d9', marginTop: '2px' }}>
+                                  Key: <code>{o.digital_download_code}</code>
+                                </div>
+                              )}
+                            </td>
+                            <td>
+                              <span style={{ textTransform: 'uppercase', fontSize: '11.5px', fontWeight: 700 }}>
+                                {o.payment_method}
+                              </span>
+                              <div style={{ fontSize: '10.5px', color: o.payment_status === 'paid' ? '#059669' : '#d97706', fontWeight: 700 }}>
+                                {o.payment_status === 'paid' ? '✓ Paid' : '⏳ Pending'}
+                              </div>
+                            </td>
+                            <td>
+                              <span
+                                className="badge"
+                                style={{
+                                  background:
+                                    o.order_status === 'delivered'
+                                      ? 'rgba(16, 185, 129, 0.15)'
+                                      : o.order_status === 'shipped'
+                                      ? 'rgba(59, 130, 246, 0.15)'
+                                      : o.order_status === 'cancelled'
+                                      ? 'rgba(239, 68, 68, 0.15)'
+                                      : 'rgba(245, 158, 11, 0.15)',
+                                  color:
+                                    o.order_status === 'delivered'
+                                      ? '#059669'
+                                      : o.order_status === 'shipped'
+                                      ? '#2563eb'
+                                      : o.order_status === 'cancelled'
+                                      ? '#dc2626'
+                                      : '#d97706'
+                                }}
+                              >
+                                {o.order_status}
+                              </span>
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                              <form method="post" action={`/admin/orders/${o.id}/status`} style={{ display: 'inline-flex', gap: '4px', alignItems: 'center' }}>
+                                <select
+                                  name="status"
+                                  defaultValue={o.order_status}
+                                  style={{ padding: '4px 6px', fontSize: '11px', borderRadius: '4px', border: '1px solid var(--line)' }}
+                                >
+                                  <option value="placed">placed</option>
+                                  <option value="processing">processing</option>
+                                  <option value="shipped">shipped</option>
+                                  <option value="delivered">delivered</option>
+                                  <option value="cancelled">cancelled</option>
+                                </select>
+                                <button
+                                  type="submit"
+                                  className="primary-action"
+                                  style={{ padding: '4px 8px', fontSize: '11px' }}
+                                >
+                                  Save
+                                </button>
+                              </form>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: OUTBOUND CLICKS ANALYTICS */}
+          {activeTab === 'clicks' && (
+            <div>
+              <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--card-bg)' }}>
+                  <div>
+                    <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>Affiliate Outbound Clicks</h2>
+                    <span style={{ fontSize: '12px', color: '#64748b' }}>
+                      Cloaked link redirects (/go/:type/:id) tracked across Daraz, partner stores and vouchers
+                    </span>
+                  </div>
+                  <span className="badge badge-active" style={{ background: '#8b5cf6', color: '#ffffff' }}>
+                    {outboundClicks.length} Clicks Tracked
+                  </span>
+                </div>
+
+                {outboundClicks.length === 0 ? (
+                  <div style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--muted)' }}>
+                    <span style={{ fontSize: '40px', display: 'block', marginBottom: '12px' }}>🔗</span>
+                    <strong style={{ fontSize: '16px', color: 'var(--ink)' }}>No outbound clicks logged yet.</strong>
+                    <p style={{ fontSize: '13px', marginTop: '6px' }}>When visitors click "View Deal" on any product, their outbound transition is logged here.</p>
+                  </div>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>Timestamp</th>
+                          <th>Target Type</th>
+                          <th>Store Name</th>
+                          <th>Destination URL</th>
+                          <th>Visitor Country</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {outboundClicks.map((c: any, idx: number) => (
+                          <tr key={c.id || idx}>
+                            <td style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                              {c.created_at ? new Date(c.created_at).toLocaleString() : 'Recent'}
+                            </td>
+                            <td>
+                              <span style={{ fontSize: '11px', textTransform: 'uppercase', padding: '2px 6px', background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: '4px', fontWeight: 700 }}>
+                                {c.target_type}
+                              </span>
+                            </td>
+                            <td>
+                              <strong>{c.store_name}</strong>
+                            </td>
+                            <td>
+                              <a
+                                href={c.target_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ fontSize: '12px', color: '#3b82f6', maxWidth: '320px', display: 'inline-block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                              >
+                                {c.target_url}
+                              </a>
+                            </td>
+                            <td>
+                              <span style={{ fontSize: '12px', fontWeight: 700 }}>🇳🇵 {c.ip_country || 'NP'}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
@@ -1884,7 +2118,17 @@ export const AdminDashboardView: FC<{
               </div>
 
               <div className="form-group">
-                <label>Content (Markdown) *</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ margin: 0 }}>Content (Markdown &amp; REHub Review Blocks) *</label>
+                  <div className="article-formatting-toolbar" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                    <button type="button" className="btn-insert-tag" data-tag="h2">H2</button>
+                    <button type="button" className="btn-insert-tag" data-tag="h3">H3</button>
+                    <button type="button" className="btn-insert-tag" data-tag="pros">👍 Pros</button>
+                    <button type="button" className="btn-insert-tag" data-tag="cons">⚠️ Cons</button>
+                    <button type="button" className="btn-insert-tag" data-tag="deal">⚡ Deal</button>
+                    <button type="button" className="btn-insert-tag" data-tag="table">📊 Table</button>
+                  </div>
+                </div>
                 <textarea id="editArticleContent" name="content" rows={8} required></textarea>
               </div>
 
@@ -1963,7 +2207,17 @@ export const AdminDashboardView: FC<{
               </div>
 
               <div className="form-group">
-                <label>Article Body (Markdown supported) *</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ margin: 0 }}>Article Body (Markdown &amp; REHub Review Blocks) *</label>
+                  <div className="article-formatting-toolbar" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                    <button type="button" className="btn-insert-tag" data-tag="h2">H2</button>
+                    <button type="button" className="btn-insert-tag" data-tag="h3">H3</button>
+                    <button type="button" className="btn-insert-tag" data-tag="pros">👍 Pros</button>
+                    <button type="button" className="btn-insert-tag" data-tag="cons">⚠️ Cons</button>
+                    <button type="button" className="btn-insert-tag" data-tag="deal">⚡ Deal</button>
+                    <button type="button" className="btn-insert-tag" data-tag="table">📊 Table</button>
+                  </div>
+                </div>
                 <textarea
                   name="content"
                   rows={9}
@@ -2316,6 +2570,32 @@ export const AdminDashboardView: FC<{
                   const pubEl = document.getElementById('editArticlePublished');
                   if (pubEl) pubEl.checked = btn.getAttribute('data-published') === '1';
                   if (editArtModal) editArtModal.classList.add('open');
+                });
+              });
+
+              // 6. Article Formatting Toolbar Snippet Inserter
+              document.querySelectorAll('.btn-insert-tag').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  const tag = btn.getAttribute('data-tag');
+                  const formGroup = btn.closest('.form-group');
+                  if (!formGroup) return;
+                  const textarea = formGroup.querySelector('textarea');
+                  if (!textarea) return;
+
+                  let snippet = '';
+                  if (tag === 'h2') snippet = '\n\n## Section Title Here\n';
+                  else if (tag === 'h3') snippet = '\n\n### Subheading Here\n';
+                  else if (tag === 'pros') snippet = '\n\n[pros]\n- High-resolution AMOLED 120Hz display\n- Official 1-year GenNext Nepal warranty\n- All-day battery endurance\n[/pros]\n';
+                  else if (tag === 'cons') snippet = '\n\n[cons]\n- Charger not included in retail package\n- Premium pricing in Nepal\n[/cons]\n';
+                  else if (tag === 'deal') snippet = '\n\n[deal: 18 | Daraz Mall | Rs. 84,999 | https://www.daraz.com.np/products/...]\n';
+                  else if (tag === 'table') snippet = '\n\n| Specification | Details |\n| :--- | :--- |\n| Processor | Apple A18 Pro 3nm |\n| Display | 6.9-inch Super Retina XDR OLED |\n| Battery | Up to 33 hours video playback |\n| Price in Nepal | Rs. 214,999 (256GB) |\n';
+
+                  const start = textarea.selectionStart;
+                  const end = textarea.selectionEnd;
+                  const text = textarea.value;
+                  textarea.value = text.substring(0, start) + snippet + text.substring(end);
+                  textarea.focus();
+                  textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
                 });
               });
 
