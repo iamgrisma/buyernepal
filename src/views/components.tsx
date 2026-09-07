@@ -230,6 +230,32 @@ export const Header: FC<{
         </div>
 
         <div className="mobile-drawer-content">
+          {/* Quick Theme Switcher in Drawer */}
+          <div style={{ marginBottom: '18px', paddingBottom: '14px', borderBottom: '1px solid var(--line)' }}>
+            <button
+              id="drawerThemeToggleBtn"
+              type="button"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                border: '1px solid var(--line)',
+                background: 'var(--line-subtle)',
+                color: 'var(--ink)',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              <span id="drawerThemeIcon">🌙</span>
+              <span id="drawerThemeLabel">Toggle Dark / Light Mode</span>
+            </button>
+          </div>
+
           <span className="mobile-drawer-label">EXPLORE DEPARTMENTS &amp; TOOLS</span>
           <nav className="mobile-nav-links">
             <a href="/" className={!activeSlug ? 'active' : ''}>

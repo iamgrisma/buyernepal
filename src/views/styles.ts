@@ -115,9 +115,14 @@ img { max-width: 100%; height: auto; display: block; }
 button { font-family: inherit; cursor: pointer; }
 
 .store-shell {
-  width: min(1200px, calc(100% - 36px));
+  width: min(1200px, calc(100% - 32px));
   margin-left: auto;
   margin-right: auto;
+}
+@media (max-width: 640px) {
+  .store-shell {
+    width: calc(100% - 20px);
+  }
 }
 
 /* Announcement Topbar */
@@ -1522,6 +1527,10 @@ button { font-family: inherit; cursor: pointer; }
   z-index: 80;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
 }
+[data-theme="dark"] .mobile-bottom-bar {
+  background: #0b1120;
+  border-top-color: #1e293b;
+}
 .mobile-bottom-inner {
   height: 100%;
   display: grid;
@@ -1542,6 +1551,12 @@ button { font-family: inherit; cursor: pointer; }
 .mobile-bottom-item.active, .mobile-bottom-item:active {
   color: var(--accent);
 }
+[data-theme="dark"] .mobile-bottom-item {
+  color: #94a3b8;
+}
+[data-theme="dark"] .mobile-bottom-item.active {
+  color: #f43f5e;
+}
 .mobile-bottom-item span:first-child { font-size: 18px; }
 
 @media (max-width: 992px) {
@@ -1550,16 +1565,221 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 @media (max-width: 768px) {
-  .store-admin-link span { display: none; }
-  .store-admin-link { padding: 8px 10px; }
-  .mobile-bottom-bar { display: block; }
-  .store-menu { display: block; }
-  .hero-grid { grid-template-columns: 1fr; gap: 32px; }
-  .hero-card { order: -1; min-height: auto; padding: 24px; }
-  .trust-strip { grid-template-columns: 1fr; }
-  .footer-grid { grid-template-columns: 1fr; gap: 28px; }
-  .editorial-banner { flex-direction: column; padding: 32px 24px; text-align: center; }
-  .editorial-banner p { margin: auto; }
+  /* Announcement topbar on mobile */
+  .store-topbar {
+    font-size: 11px;
+  }
+  .store-topbar-inner {
+    min-height: 28px;
+    padding: 3px 0;
+    justify-content: center;
+    gap: 6px;
+  }
+  .store-topbar-note {
+    font-size: 11px;
+    gap: 8px;
+  }
+  .store-topbar-inner > div:last-child {
+    display: none;
+  }
+
+  /* Header Main Bar */
+  .store-header-main {
+    min-height: 52px;
+    gap: 8px;
+  }
+  .store-brand {
+    gap: 8px;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+  .store-logo-mark {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .store-brand strong {
+    font-size: 15px;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+  }
+  .store-brand small {
+    display: none !important;
+  }
+
+  /* Header Actions on mobile: ensure dark mode button and menu are PROMINENT */
+  .store-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+  .store-admin-link {
+    display: none !important;
+  }
+  .wishlist-btn-header {
+    display: none !important;
+  }
+  .currency-dropdown-wrap {
+    display: flex !important;
+    align-items: center !important;
+  }
+  .currency-dropdown {
+    height: 32px !important;
+    font-size: 11px !important;
+    padding: 2px 18px 2px 6px !important;
+    border-radius: 8px !important;
+  }
+  .theme-toggle-btn {
+    display: flex !important;
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 15px !important;
+    flex-shrink: 0 !important;
+    border-radius: 50% !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid var(--line) !important;
+    background: var(--surface) !important;
+    color: var(--ink) !important;
+    cursor: pointer !important;
+  }
+  .store-menu {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    padding: 6px !important;
+    flex-shrink: 0 !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--line) !important;
+    background: var(--surface) !important;
+    cursor: pointer !important;
+  }
+  .store-menu span {
+    display: block !important;
+    width: 18px !important;
+    height: 2px !important;
+    background: var(--ink) !important;
+    margin: 2px 0 !important;
+    border-radius: 2px !important;
+  }
+
+  /* Category pills */
+  .store-nav-strip {
+    padding: 4px 0;
+  }
+  .nav-pill {
+    padding: 5px 10px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  /* Hero Section: Remove hero-card taking over the screen */
+  .store-hero {
+    padding: 20px 0 16px;
+  }
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .hero-copy {
+    order: 1;
+  }
+  .hero-copy h1 {
+    font-size: 22px;
+    letter-spacing: -0.8px;
+    margin: 6px 0 8px;
+    line-height: 1.18;
+  }
+  .hero-copy p {
+    font-size: 13px;
+    line-height: 1.45;
+    margin-bottom: 12px;
+  }
+  .hero-search-wrapper {
+    margin-bottom: 10px;
+  }
+  .hero-search {
+    height: 46px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .hero-search input {
+    font-size: 13.5px;
+  }
+  .hero-tags {
+    margin-bottom: 10px;
+    gap: 6px;
+  }
+  .quick-tag {
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+  .hero-points {
+    display: none;
+  }
+  /* Hide decorative hero card on mobile so product items are immediately visible */
+  .hero-card {
+    display: none !important;
+  }
+
+  /* Trust Strip on mobile */
+  .trust-strip {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px 0;
+  }
+  .trust-item {
+    padding: 10px;
+    gap: 8px;
+  }
+  .trust-icon {
+    font-size: 18px;
+  }
+  .trust-item strong {
+    font-size: 11.5px;
+  }
+  .trust-item p {
+    font-size: 10px;
+  }
+
+  /* Products Section & Grid on mobile */
+  .products-section {
+    margin-top: 20px;
+  }
+  .section-heading h2 {
+    font-size: 18px;
+  }
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .product-card-top-stage {
+    height: 200px;
+    padding: 14px;
+  }
+
+  /* Bottom bar and footer */
+  .mobile-bottom-bar {
+    display: block !important;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .editorial-banner {
+    flex-direction: column;
+    padding: 28px 18px;
+    text-align: center;
+  }
+  .editorial-banner p {
+    margin: auto;
+  }
 }
 
 /* Toast Notification */

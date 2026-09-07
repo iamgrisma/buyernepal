@@ -144,22 +144,29 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                 // 2. Dark Mode Toggle
                 const themeBtn = document.getElementById('themeToggleBtn');
                 const themeIcon = document.getElementById('themeIcon');
+                const drawerThemeBtn = document.getElementById('drawerThemeToggleBtn');
+                const drawerThemeIcon = document.getElementById('drawerThemeIcon');
+                const drawerThemeLabel = document.getElementById('drawerThemeLabel');
+
                 function updateThemeIcon() {
                   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
                   if (themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
+                  if (drawerThemeIcon) drawerThemeIcon.textContent = isDark ? '☀️' : '🌙';
+                  if (drawerThemeLabel) drawerThemeLabel.textContent = isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
                 }
                 updateThemeIcon();
 
-                if (themeBtn) {
-                  themeBtn.addEventListener('click', () => {
-                    const current = document.documentElement.getAttribute('data-theme');
-                    const next = current === 'dark' ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-theme', next);
-                    localStorage.setItem('bn_theme', next);
-                    updateThemeIcon();
-                    showToast(next === 'dark' ? 'OLED Dark Mode Enabled 🌙' : 'Light Mode Enabled ☀️');
-                  });
+                function toggleTheme() {
+                  const current = document.documentElement.getAttribute('data-theme');
+                  const next = current === 'dark' ? 'light' : 'dark';
+                  document.documentElement.setAttribute('data-theme', next);
+                  localStorage.setItem('bn_theme', next);
+                  updateThemeIcon();
+                  showToast(next === 'dark' ? 'OLED Dark Mode Enabled 🌙' : 'Light Mode Enabled ☀️');
                 }
+
+                if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+                if (drawerThemeBtn) drawerThemeBtn.addEventListener('click', toggleTheme);
                 // 3. Multi-Currency Live Switcher (NPR default, dropdown UI)
                 // Rates always fetched live from /api/forex (GrismaInfo/NRB).
                 // FALLBACK-ONLY: these values are used ONLY if the API call fails completely.
