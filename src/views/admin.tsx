@@ -544,6 +544,25 @@ export const AdminDashboardView: FC<{
                               <a href={`/product/${p.id}`} target="_blank" className="primary-action" style={{ padding: '4px 8px', fontSize: '11px', background: '#0f172a' }}>
                                 View ↗
                               </a>
+                              <button
+                                type="button"
+                                className="btn-edit-product primary-action"
+                                style={{ padding: '4px 8px', fontSize: '11px', background: '#2563eb', border: 0, cursor: 'pointer' }}
+                                data-id={p.id}
+                                data-name={p.name}
+                                data-price={p.price}
+                                data-original-price={p.original_price || ''}
+                                data-category-id={p.category_id || ''}
+                                data-store={p.store_name || 'Daraz Mall'}
+                                data-badge={p.badge || ''}
+                                data-brand={p.brand || ''}
+                                data-affiliate={p.affiliate_url || ''}
+                                data-image={p.image_url || ''}
+                                data-desc={p.description || ''}
+                                data-active={p.is_active ? '1' : '0'}
+                              >
+                                ✏️ Edit
+                              </button>
                               <form method="post" action={`/admin/products/${p.id}/delete`} onsubmit="return confirm('Delete this product?');" style={{ display: 'inline' }}>
                                 <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>
                                   Delete
@@ -608,11 +627,26 @@ export const AdminDashboardView: FC<{
                         <td style={{ color: '#64748b' }}>{c.slug}</td>
                         <td style={{ fontSize: '12px', color: '#64748b', maxWidth: '280px' }}>{c.description}</td>
                         <td style={{ textAlign: 'right' }}>
-                          <form method="post" action={`/admin/categories/${c.id}/delete`} onsubmit="return confirm('Delete this category?');" style={{ display: 'inline' }}>
-                            <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>
-                              Delete
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                            <button
+                              type="button"
+                              className="btn-edit-category primary-action"
+                              style={{ padding: '4px 8px', fontSize: '11px', background: '#2563eb', border: 0, cursor: 'pointer' }}
+                              data-id={c.id}
+                              data-name={c.name}
+                              data-slug={c.slug}
+                              data-icon={c.icon || '📁'}
+                              data-desc={c.description || ''}
+                              data-active={c.is_active ? '1' : '0'}
+                            >
+                              ✏️ Edit
                             </button>
-                          </form>
+                            <form method="post" action={`/admin/categories/${c.id}/delete`} onsubmit="return confirm('Delete this category?');" style={{ display: 'inline' }}>
+                              <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>
+                                Delete
+                              </button>
+                            </form>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -767,11 +801,27 @@ export const AdminDashboardView: FC<{
                         <td>Rs. {c.min_purchase.toLocaleString('en-NP')}</td>
                         <td style={{ fontSize: '12px', color: '#64748b' }}>{c.description}</td>
                         <td style={{ textAlign: 'right' }}>
-                          <form method="post" action={`/admin/coupons/${c.id}/delete`} onsubmit="return confirm('Delete coupon?');" style={{ display: 'inline' }}>
-                            <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>
-                              Delete
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                            <button
+                              type="button"
+                              className="btn-edit-coupon primary-action"
+                              style={{ padding: '4px 8px', fontSize: '11px', background: '#2563eb', border: 0, cursor: 'pointer' }}
+                              data-id={c.id}
+                              data-code={c.code}
+                              data-type={c.discount_type}
+                              data-value={c.discount_value}
+                              data-min={c.min_purchase}
+                              data-desc={c.description || ''}
+                              data-active={c.is_active ? '1' : '0'}
+                            >
+                              ✏️ Edit
                             </button>
-                          </form>
+                            <form method="post" action={`/admin/coupons/${c.id}/delete`} onsubmit="return confirm('Delete coupon?');" style={{ display: 'inline' }}>
+                              <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>
+                                Delete
+                              </button>
+                            </form>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1090,6 +1140,297 @@ export const AdminDashboardView: FC<{
           )}
         </main>
       </div>
+
+      {/* Modal: Edit Curated Product */}
+      <div id="editProductModal" className="admin-modal-backdrop">
+        <div className="admin-modal-content">
+          <div className="admin-modal-header">
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)' }}>✏️ Edit Curated Product</h3>
+            <button type="button" className="close-admin-modal" style={{ background: 'transparent', border: 0, fontSize: '24px', cursor: 'pointer', color: 'var(--muted)', lineHeight: 1 }}>×</button>
+          </div>
+          <form id="editProductForm" method="post" action="/admin/products/0/edit">
+            <div className="admin-modal-body">
+              <input type="hidden" id="editProdId" name="id" />
+              
+              <div className="form-group">
+                <label>Product Title *</label>
+                <input id="editProdName" name="name" type="text" required />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Deal Price (NPR) *</label>
+                  <input id="editProdPrice" name="price" type="number" required />
+                </div>
+                <div className="form-group">
+                  <label>Original MRP (NPR)</label>
+                  <input id="editProdOriginalPrice" name="original_price" type="number" />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Department / Category</label>
+                  <select id="editProdCategory" name="category_id">
+                    <option value="">-- Select Department --</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Store Name</label>
+                  <input id="editProdStore" name="store_name" type="text" />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Badge Tag</label>
+                  <input id="editProdBadge" name="badge" type="text" placeholder="e.g. 🔥 Hot Deal" />
+                </div>
+                <div className="form-group">
+                  <label>Brand</label>
+                  <input id="editProdBrand" name="brand" type="text" placeholder="e.g. Apple" />
+                </div>
+                <div className="form-group">
+                  <label>Catalog Status</label>
+                  <select id="editProdActive" name="is_active">
+                    <option value="1">Active (Published)</option>
+                    <option value="0">Draft (Hidden)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Store / Affiliate URL</label>
+                <input id="editProdAffiliate" name="affiliate_url" type="url" />
+              </div>
+
+              <div className="form-group">
+                <label>Image URL</label>
+                <input id="editProdImage" name="image_url" type="url" />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Description &amp; Specs Highlights</label>
+                <textarea id="editProdDesc" name="description" rows={3}></textarea>
+              </div>
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+                Cancel
+              </button>
+              <button type="submit" className="primary-action">
+                Save Product Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Modal: Edit Department */}
+      <div id="editCategoryModal" className="admin-modal-backdrop">
+        <div className="admin-modal-content" style={{ maxWidth: '520px' }}>
+          <div className="admin-modal-header">
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)' }}>✏️ Edit Department</h3>
+            <button type="button" className="close-admin-modal" style={{ background: 'transparent', border: 0, fontSize: '24px', cursor: 'pointer', color: 'var(--muted)', lineHeight: 1 }}>×</button>
+          </div>
+          <form id="editCategoryForm" method="post" action="/admin/categories/0/edit">
+            <div className="admin-modal-body">
+              <input type="hidden" id="editCatId" name="id" />
+              <div className="form-group">
+                <label>Department Name *</label>
+                <input id="editCatName" name="name" type="text" required />
+              </div>
+              <div className="form-group">
+                <label>URL Slug *</label>
+                <input id="editCatSlug" name="slug" type="text" required />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Icon Emoji</label>
+                  <input id="editCatIcon" name="icon" type="text" />
+                </div>
+                <div className="form-group">
+                  <label>Status</label>
+                  <select id="editCatActive" name="is_active">
+                    <option value="1">Active (In Menu)</option>
+                    <option value="0">Disabled</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Description</label>
+                <textarea id="editCatDesc" name="description" rows={3}></textarea>
+              </div>
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+                Cancel
+              </button>
+              <button type="submit" className="primary-action">
+                Update Department
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Modal: Edit Promo Voucher */}
+      <div id="editCouponModal" className="admin-modal-backdrop">
+        <div className="admin-modal-content" style={{ maxWidth: '520px' }}>
+          <div className="admin-modal-header">
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)' }}>✏️ Edit Promo Voucher</h3>
+            <button type="button" className="close-admin-modal" style={{ background: 'transparent', border: 0, fontSize: '24px', cursor: 'pointer', color: 'var(--muted)', lineHeight: 1 }}>×</button>
+          </div>
+          <form id="editCouponForm" method="post" action="/admin/coupons/0/edit">
+            <div className="admin-modal-body">
+              <input type="hidden" id="editCouponId" name="id" />
+              <div className="form-group">
+                <label>Voucher Code *</label>
+                <input id="editCouponCode" name="code" type="text" required style={{ textTransform: 'uppercase' }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Discount Type</label>
+                  <select id="editCouponType" name="discount_type">
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="fixed">Fixed NPR (Rs.)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Discount Value *</label>
+                  <input id="editCouponValue" name="discount_value" type="number" required />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Min Purchase (NPR)</label>
+                  <input id="editCouponMin" name="min_purchase" type="number" />
+                </div>
+                <div className="form-group">
+                  <label>Status</label>
+                  <select id="editCouponActive" name="is_active">
+                    <option value="1">Active</option>
+                    <option value="0">Expired / Disabled</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Description</label>
+                <input id="editCouponDesc" name="description" type="text" />
+              </div>
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+                Cancel
+              </button>
+              <button type="submit" className="primary-action">
+                Update Voucher
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Admin Interactive Script for Modals */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            document.addEventListener('DOMContentLoaded', () => {
+              // 1. Edit Product Modal Triggers
+              const editProdModal = document.getElementById('editProductModal');
+              const editProdForm = document.getElementById('editProductForm');
+              document.querySelectorAll('.btn-edit-product').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  const id = btn.getAttribute('data-id');
+                  if (editProdForm) editProdForm.action = '/admin/products/' + id + '/edit';
+                  const setVal = (elId, attr) => {
+                    const el = document.getElementById(elId);
+                    if (el) el.value = btn.getAttribute(attr) || '';
+                  };
+                  setVal('editProdId', 'data-id');
+                  setVal('editProdName', 'data-name');
+                  setVal('editProdPrice', 'data-price');
+                  setVal('editProdOriginalPrice', 'data-original-price');
+                  setVal('editProdCategory', 'data-category-id');
+                  setVal('editProdStore', 'data-store');
+                  setVal('editProdBadge', 'data-badge');
+                  setVal('editProdBrand', 'data-brand');
+                  setVal('editProdAffiliate', 'data-affiliate');
+                  setVal('editProdImage', 'data-image');
+                  setVal('editProdDesc', 'data-desc');
+                  setVal('editProdActive', 'data-active');
+                  if (editProdModal) editProdModal.classList.add('open');
+                });
+              });
+
+              // 2. Edit Category Modal Triggers
+              const editCatModal = document.getElementById('editCategoryModal');
+              const editCatForm = document.getElementById('editCategoryForm');
+              document.querySelectorAll('.btn-edit-category').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  const id = btn.getAttribute('data-id');
+                  if (editCatForm) editCatForm.action = '/admin/categories/' + id + '/edit';
+                  const setVal = (elId, attr) => {
+                    const el = document.getElementById(elId);
+                    if (el) el.value = btn.getAttribute(attr) || '';
+                  };
+                  setVal('editCatId', 'data-id');
+                  setVal('editCatName', 'data-name');
+                  setVal('editCatSlug', 'data-slug');
+                  setVal('editCatIcon', 'data-icon');
+                  setVal('editCatDesc', 'data-desc');
+                  setVal('editCatActive', 'data-active');
+                  if (editCatModal) editCatModal.classList.add('open');
+                });
+              });
+
+              // 3. Edit Coupon Modal Triggers
+              const editCouponModal = document.getElementById('editCouponModal');
+              const editCouponForm = document.getElementById('editCouponForm');
+              document.querySelectorAll('.btn-edit-coupon').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  const id = btn.getAttribute('data-id');
+                  if (editCouponForm) editCouponForm.action = '/admin/coupons/' + id + '/edit';
+                  const setVal = (elId, attr) => {
+                    const el = document.getElementById(elId);
+                    if (el) el.value = btn.getAttribute(attr) || '';
+                  };
+                  setVal('editCouponId', 'data-id');
+                  setVal('editCouponCode', 'data-code');
+                  setVal('editCouponType', 'data-type');
+                  setVal('editCouponValue', 'data-value');
+                  setVal('editCouponMin', 'data-min');
+                  setVal('editCouponDesc', 'data-desc');
+                  setVal('editCouponActive', 'data-active');
+                  if (editCouponModal) editCouponModal.classList.add('open');
+                });
+              });
+
+              // Modal close helpers
+              document.querySelectorAll('.close-admin-modal').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  document.querySelectorAll('.admin-modal-backdrop').forEach(m => m.classList.remove('open'));
+                });
+              });
+
+              document.querySelectorAll('.admin-modal-backdrop').forEach(backdrop => {
+                backdrop.addEventListener('click', (e) => {
+                  if (e.target === backdrop) backdrop.classList.remove('open');
+                });
+              });
+
+              document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                  document.querySelectorAll('.admin-modal-backdrop').forEach(m => m.classList.remove('open'));
+                }
+              });
+            });
+          `
+        }}
+      />
     </Layout>
   );
 };

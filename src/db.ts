@@ -629,6 +629,48 @@ export async function deleteCategory(db: D1Database | undefined, id: number): Pr
   }
 }
 
+export async function updateCategory(
+  db: D1Database | undefined,
+  id: number,
+  data: {
+    name?: string;
+    slug?: string;
+    icon?: string;
+    description?: string;
+    isActive?: number;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  // Update in-memory fallback list
+  const idx = DEFAULT_CATEGORIES.findIndex((c) => c.id === id);
+  if (idx > -1) {
+    DEFAULT_CATEGORIES[idx] = {
+      ...DEFAULT_CATEGORIES[idx],
+      name: data.name ? data.name.trim() : DEFAULT_CATEGORIES[idx].name,
+      slug: data.slug ? data.slug.trim().toLowerCase() : DEFAULT_CATEGORIES[idx].slug,
+      icon: data.icon || DEFAULT_CATEGORIES[idx].icon,
+      description: data.description !== undefined ? data.description.trim() : DEFAULT_CATEGORIES[idx].description,
+      is_active: data.isActive !== undefined ? data.isActive : DEFAULT_CATEGORIES[idx].is_active
+    };
+  }
+
+  if (!db) return { success: true };
+  try {
+    const existing = await db.prepare('SELECT * FROM categories WHERE id = ?').bind(id).first<Category>();
+    const finalName = data.name ? data.name.trim() : (existing?.name || '');
+    const finalSlug = data.slug ? data.slug.trim().toLowerCase() : (existing?.slug || '');
+    const finalDesc = data.description !== undefined ? data.description : (existing?.description || '');
+    const finalActive = data.isActive !== undefined ? data.isActive : (existing?.is_active ?? 1);
+
+    await db
+      .prepare('UPDATE categories SET name = ?, slug = ?, description = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+      .bind(finalName, finalSlug, finalDesc ?? '', finalActive, id)
+      .run();
+    return { success: true };
+  } catch (e: any) {
+    return { success: false, error: e?.message || 'Failed to update category' };
+  }
+}
+
 // Product Enrichment Helper for 2026 Features (EMI, Flash Deals, Specs, Price History, Delivery)
 export function enrichProduct(p: Product): Product {
   const origPrice = p.original_price || Math.round(p.price * 1.15);
@@ -935,6 +977,76 @@ export async function toggleProductStatus(db: D1Database | undefined, id: number
   }
 }
 
+export async function updateProduct(
+  db: D1Database | undefined,
+  id: number,
+  data: {
+    name: string;
+    price: number;
+    originalPrice?: number;
+    description?: string;
+    imageUrl?: string;
+    affiliateUrl?: string;
+    categoryId?: number | null;
+    isActive?: number;
+    storeName?: string;
+    badge?: string;
+    brand?: string;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  // Update in-memory fallback catalog
+  const idx = DEFAULT_PRODUCTS.findIndex((p) => p.id === id);
+  if (idx > -1) {
+    DEFAULT_PRODUCTS[idx] = {
+      ...DEFAULT_PRODUCTS[idx],
+      name: data.name.trim(),
+      price: data.price,
+      original_price: data.originalPrice !== undefined ? data.originalPrice : DEFAULT_PRODUCTS[idx].original_price,
+      description: data.description !== undefined ? data.description.trim() : DEFAULT_PRODUCTS[idx].description,
+      image_url: data.imageUrl !== undefined ? data.imageUrl.trim() : DEFAULT_PRODUCTS[idx].image_url,
+      affiliate_url: data.affiliateUrl !== undefined ? data.affiliateUrl.trim() : DEFAULT_PRODUCTS[idx].affiliate_url,
+      category_id: data.categoryId !== undefined ? data.categoryId : DEFAULT_PRODUCTS[idx].category_id,
+      store_name: data.storeName ? data.storeName.trim() : DEFAULT_PRODUCTS[idx].store_name,
+      badge: data.badge ? data.badge.trim() : DEFAULT_PRODUCTS[idx].badge,
+      brand: data.brand !== undefined ? data.brand.trim() : DEFAULT_PRODUCTS[idx].brand,
+      is_active: data.isActive ?? DEFAULT_PRODUCTS[idx].is_active
+    };
+  }
+
+  if (!db) return { success: true };
+  try {
+    const existing = await db.prepare('SELECT * FROM products WHERE id = ?').bind(id).first<Product>();
+    const finalName = data.name ? data.name.trim() : (existing?.name || '');
+    const finalDesc = data.description !== undefined ? data.description : (existing?.description || '');
+    const finalPrice = typeof data.price === 'number' && !isNaN(data.price) ? data.price : (existing?.price || 0);
+    const finalImg = data.imageUrl !== undefined ? data.imageUrl : (existing?.image_url || '');
+    const finalAff = data.affiliateUrl !== undefined ? data.affiliateUrl : (existing?.affiliate_url || '');
+    const finalCat = data.categoryId !== undefined ? (data.categoryId ? Number(data.categoryId) : null) : (existing?.category_id ?? null);
+    const finalActive = data.isActive !== undefined ? data.isActive : (existing?.is_active ?? 1);
+
+    await db
+      .prepare(
+        `UPDATE products
+         SET name = ?, description = ?, price = ?, image_url = ?, affiliate_url = ?, category_id = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`
+      )
+      .bind(
+        finalName,
+        finalDesc ?? '',
+        finalPrice,
+        finalImg ?? '',
+        finalAff ?? '',
+        finalCat ?? null,
+        finalActive,
+        id
+      )
+      .run();
+    return { success: true };
+  } catch (e: any) {
+    return { success: false, error: e?.message || 'Failed to update product' };
+  }
+}
+
 // Reviews
 export async function getReviews(db: D1Database | undefined, productId: number): Promise<Review[]> {
   const sampleReviews: Review[] = [
@@ -1153,6 +1265,56 @@ export async function deleteCoupon(db: D1Database | undefined, id: number): Prom
     return true;
   } catch {
     return false;
+  }
+}
+
+export async function updateCoupon(
+  db: D1Database | undefined,
+  id: number,
+  data: {
+    code: string;
+    discountType: 'fixed' | 'percentage';
+    discountValue: number;
+    minPurchase?: number;
+    description?: string;
+    isActive?: number;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  // Update in-memory fallback list
+  const idx = DEFAULT_COUPONS.findIndex((c) => c.id === id);
+  if (idx > -1) {
+    DEFAULT_COUPONS[idx] = {
+      ...DEFAULT_COUPONS[idx],
+      code: data.code.toUpperCase().trim(),
+      discount_type: data.discountType,
+      discount_value: data.discountValue,
+      min_purchase: data.minPurchase !== undefined ? data.minPurchase : DEFAULT_COUPONS[idx].min_purchase,
+      description: data.description !== undefined ? data.description : DEFAULT_COUPONS[idx].description,
+      is_active: data.isActive ?? DEFAULT_COUPONS[idx].is_active
+    };
+  }
+
+  if (!db) return { success: true };
+  try {
+    const existing = await db.prepare('SELECT * FROM coupons WHERE id = ?').bind(id).first<Coupon>();
+    const finalCode = data.code ? data.code.toUpperCase().trim() : (existing?.code || '');
+    const finalType = data.discountType || existing?.discount_type || 'percentage';
+    const finalVal = typeof data.discountValue === 'number' && !isNaN(data.discountValue) ? data.discountValue : (existing?.discount_value || 0);
+    const finalMin = data.minPurchase !== undefined ? data.minPurchase : (existing?.min_purchase || 0);
+    const finalDesc = data.description !== undefined ? data.description : (existing?.description || '');
+    const finalActive = data.isActive !== undefined ? data.isActive : (existing?.is_active ?? 1);
+
+    await db
+      .prepare(
+        `UPDATE coupons
+         SET code = ?, discount_type = ?, discount_value = ?, min_purchase = ?, description = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`
+      )
+      .bind(finalCode, finalType, finalVal, finalMin, finalDesc ?? '', finalActive, id)
+      .run();
+    return { success: true };
+  } catch (e: any) {
+    return { success: false, error: e?.message || 'Failed to update coupon' };
   }
 }
 

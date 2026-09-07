@@ -1499,6 +1499,59 @@ button { font-family: inherit; }
 .alert-success { background: var(--emerald-soft); color: var(--emerald); border: 1px solid #a7f3d0; }
 .alert-error { background: #ffe4e6; color: #be123c; border: 1px solid #fecdd3; }
 
+/* Admin Edit Modals */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  place-items: center;
+  z-index: 9999;
+  padding: 20px;
+  overflow-y: auto;
+}
+.admin-modal-backdrop.open {
+  display: grid;
+}
+.admin-modal-content {
+  background: var(--card-bg, #ffffff);
+  color: var(--ink, #0f172a);
+  border-radius: var(--radius-lg, 16px);
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--line);
+  animation: adminModalIn 0.2s ease-out;
+}
+@keyframes adminModalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.admin-modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.admin-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+.admin-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: var(--line-subtle, #f8fafc);
+  border-radius: 0 0 var(--radius-lg, 16px) var(--radius-lg, 16px);
+}
+
 /* ==========================================================================
    2026 FEATURE SUITE: THEME, CURRENCY, FLASH SALE, WISHLIST, COMPARISON, EMI
    ========================================================================== */

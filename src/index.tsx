@@ -7,11 +7,13 @@ import {
   getCategories,
   getCategoryBySlug,
   createCategory,
+  updateCategory,
   deleteCategory,
   getProducts,
   getAllProductsAdmin,
   getProductById,
   createProduct,
+  updateProduct,
   deleteProduct,
   toggleProductStatus,
   getReviews,
@@ -25,6 +27,7 @@ import {
   deleteUser,
   getCoupons,
   createCoupon,
+  updateCoupon,
   deleteCoupon,
   getAdminStats,
   seedCatalog,
@@ -399,6 +402,55 @@ app.post('/admin/products/:id/delete', async (c) => {
   return c.redirect('/admin?tab=products&msg=Product+deleted');
 });
 
+// Admin Action: Edit / Update Product
+app.post('/admin/products/:id/edit', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (!id) return c.redirect('/admin?tab=products&err=Invalid+product+ID');
+
+  try {
+    const body = await c.req.parseBody();
+    const name = String(body['name'] || '').trim();
+    const price = Number(body['price']);
+    const originalPrice = body['original_price'] ? Number(body['original_price']) : 0;
+    const categoryId = body['category_id'] ? Number(body['category_id']) : null;
+    const affiliateUrl = String(body['affiliate_url'] || '').trim();
+    const imageUrl = String(body['image_url'] || '').trim();
+    const description = String(body['description'] || '').trim();
+    const storeName = String(body['store_name'] || 'Daraz Mall').trim();
+    const badge = String(body['badge'] || '').trim();
+    const brand = String(body['brand'] || '').trim();
+    const isActive = body['is_active'] !== undefined ? (Number(body['is_active']) === 1 ? 1 : 0) : 1;
+
+    if (!name || isNaN(price) || price < 0) {
+      return c.redirect('/admin?tab=products&err=Invalid+product+title+or+price');
+    }
+
+    const res = await updateProduct(c.env?.DB, id, {
+      name,
+      price,
+      originalPrice,
+      categoryId,
+      affiliateUrl,
+      imageUrl,
+      description,
+      storeName,
+      badge,
+      brand,
+      isActive
+    });
+
+    if (!res.success) {
+      return c.redirect(`/admin?tab=products&err=${encodeURIComponent(res.error || 'Failed to update product')}`);
+    }
+    return c.redirect('/admin?tab=products&msg=Product+updated+successfully');
+  } catch (err: any) {
+    return c.redirect(`/admin?tab=products&err=${encodeURIComponent(err?.message || 'Failed to update product')}`);
+  }
+});
+
 // Admin Action: Add Category
 app.post('/admin/categories/new', async (c) => {
   const s = await getSession(c);
@@ -421,6 +473,43 @@ app.post('/admin/categories/new', async (c) => {
     return c.redirect('/admin?tab=categories&msg=Department+created+successfully');
   } catch {
     return c.redirect('/admin?tab=categories&err=Failed+to+process+request');
+  }
+});
+
+// Admin Action: Edit / Update Category
+app.post('/admin/categories/:id/edit', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (!id) return c.redirect('/admin?tab=categories&err=Invalid+category+ID');
+
+  try {
+    const body = await c.req.parseBody();
+    const name = String(body['name'] || '').trim();
+    let slug = String(body['slug'] || '').trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    const icon = String(body['icon'] || '📁').trim();
+    const description = String(body['description'] || '').trim();
+    const isActive = body['is_active'] !== undefined ? (Number(body['is_active']) === 1 ? 1 : 0) : 1;
+
+    if (!name || !slug) {
+      return c.redirect('/admin?tab=categories&err=Department+name+and+slug+are+required');
+    }
+
+    const res = await updateCategory(c.env?.DB, id, {
+      name,
+      slug,
+      icon,
+      description,
+      isActive
+    });
+
+    if (!res.success) {
+      return c.redirect(`/admin?tab=categories&err=${encodeURIComponent(res.error || 'Failed to update department')}`);
+    }
+    return c.redirect('/admin?tab=categories&msg=Department+updated+successfully');
+  } catch (err: any) {
+    return c.redirect(`/admin?tab=categories&err=${encodeURIComponent(err?.message || 'Failed to update department')}`);
   }
 });
 
@@ -506,6 +595,45 @@ app.post('/admin/coupons/:id/delete', async (c) => {
     await deleteCoupon(c.env?.DB, id);
   }
   return c.redirect('/admin?tab=coupons&msg=Coupon+deleted');
+});
+
+// Admin Action: Edit / Update Coupon
+app.post('/admin/coupons/:id/edit', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (!id) return c.redirect('/admin?tab=coupons&err=Invalid+coupon+ID');
+
+  try {
+    const body = await c.req.parseBody();
+    const code = String(body['code'] || '').trim().toUpperCase();
+    const discountType = (body['discount_type'] as 'fixed' | 'percentage') || 'percentage';
+    const discountValue = Number(body['discount_value']);
+    const minPurchase = Number(body['min_purchase'] || 0);
+    const description = String(body['description'] || '').trim();
+    const isActive = body['is_active'] !== undefined ? (Number(body['is_active']) === 1 ? 1 : 0) : 1;
+
+    if (!code || isNaN(discountValue) || discountValue <= 0) {
+      return c.redirect('/admin?tab=coupons&err=Invalid+coupon+code+or+discount+value');
+    }
+
+    const res = await updateCoupon(c.env?.DB, id, {
+      code,
+      discountType,
+      discountValue,
+      minPurchase,
+      description,
+      isActive
+    });
+
+    if (!res.success) {
+      return c.redirect(`/admin?tab=coupons&err=${encodeURIComponent(res.error || 'Failed to update coupon')}`);
+    }
+    return c.redirect('/admin?tab=coupons&msg=Promo+voucher+updated+successfully');
+  } catch (err: any) {
+    return c.redirect(`/admin?tab=coupons&err=${encodeURIComponent(err?.message || 'Failed to update coupon')}`);
+  }
 });
 
 // Admin Action: Delete User

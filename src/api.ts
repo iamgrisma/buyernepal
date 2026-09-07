@@ -4,8 +4,15 @@ import {
   getSettings,
   getCategories,
   getCategoryBySlug,
+  createCategory,
+  updateCategory,
+  deleteCategory,
   getProducts,
   getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  updateCoupon,
   getReviews,
   getAdminStats
 } from './db';
@@ -242,4 +249,92 @@ api.post('/admin/products', async (c) => {
     .run();
 
   return c.json({ id: r.meta.last_row_id }, 201);
+});
+
+api.put('/admin/products/:id', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.json({ error: 'Unauthorized' }, 403);
+  const id = Number(c.req.param('id'));
+  if (!id) return c.json({ error: 'Invalid product id' }, 400);
+
+  const body = await c.req.json().catch(() => ({}));
+  const name = String(body.name || '').trim();
+  const price = Number(body.price);
+  if (!name || isNaN(price) || price < 0) return c.json({ error: 'Name and valid price are required' }, 400);
+
+  const res = await updateProduct(c.env?.DB, id, {
+    name,
+    price,
+    originalPrice: body.original_price ? Number(body.original_price) : undefined,
+    description: body.description !== undefined ? String(body.description) : undefined,
+    imageUrl: body.image_url !== undefined ? String(body.image_url) : undefined,
+    affiliateUrl: body.affiliate_url !== undefined ? String(body.affiliate_url) : undefined,
+    categoryId: body.category_id !== undefined ? (body.category_id ? Number(body.category_id) : null) : undefined,
+    storeName: body.store_name ? String(body.store_name) : undefined,
+    badge: body.badge ? String(body.badge) : undefined,
+    brand: body.brand !== undefined ? String(body.brand) : undefined,
+    isActive: body.is_active !== undefined ? (Number(body.is_active) ? 1 : 0) : undefined
+  });
+
+  if (!res.success) return c.json({ error: res.error || 'Failed to update' }, 500);
+  return c.json({ success: true, id });
+});
+
+api.delete('/admin/products/:id', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.json({ error: 'Unauthorized' }, 403);
+  const id = Number(c.req.param('id'));
+  if (!id) return c.json({ error: 'Invalid product id' }, 400);
+  await deleteProduct(c.env?.DB, id);
+  return c.json({ success: true, id });
+});
+
+// Admin Categories API
+api.put('/admin/categories/:id', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.json({ error: 'Unauthorized' }, 403);
+  const id = Number(c.req.param('id'));
+  if (!id) return c.json({ error: 'Invalid category id' }, 400);
+
+  const body = await c.req.json().catch(() => ({}));
+  const name = String(body.name || '').trim();
+  const slug = String(body.slug || '').trim().toLowerCase();
+  if (!name || !slug) return c.json({ error: 'Name and slug required' }, 400);
+
+  const res = await updateCategory(c.env?.DB, id, {
+    name,
+    slug,
+    icon: body.icon ? String(body.icon) : undefined,
+    description: body.description !== undefined ? String(body.description) : undefined,
+    isActive: body.is_active !== undefined ? (Number(body.is_active) ? 1 : 0) : undefined
+  });
+
+  if (!res.success) return c.json({ error: res.error || 'Failed to update category' }, 500);
+  return c.json({ success: true, id });
+});
+
+// Admin Coupons API
+api.put('/admin/coupons/:id', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.json({ error: 'Unauthorized' }, 403);
+  const id = Number(c.req.param('id'));
+  if (!id) return c.json({ error: 'Invalid coupon id' }, 400);
+
+  const body = await c.req.json().catch(() => ({}));
+  const code = String(body.code || '').trim().toUpperCase();
+  const discountType = (body.discount_type as 'fixed' | 'percentage') || 'percentage';
+  const discountValue = Number(body.discount_value);
+  if (!code || isNaN(discountValue) || discountValue <= 0) return c.json({ error: 'Code and valid discount value required' }, 400);
+
+  const res = await updateCoupon(c.env?.DB, id, {
+    code,
+    discountType,
+    discountValue,
+    minPurchase: body.min_purchase ? Number(body.min_purchase) : 0,
+    description: body.description ? String(body.description) : '',
+    isActive: body.is_active !== undefined ? (Number(body.is_active) ? 1 : 0) : 1
+  });
+
+  if (!res.success) return c.json({ error: res.error || 'Failed to update coupon' }, 500);
+  return c.json({ success: true, id });
 });
