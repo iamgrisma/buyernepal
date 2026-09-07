@@ -141,19 +141,16 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
 
                   if (cur === 'USD') {
                     const usdRate = forexRates.USD || 151.48;
-                    // Ceiling to 1 decimal place: 100.01 -> 100.1, 100.11 -> 100.2
-                    const rawUsd = val / usdRate;
-                    const usdCeil = Math.ceil(rawUsd * 10) / 10;
-                    const str = usdCeil % 1 === 0
-                      ? usdCeil.toLocaleString('en-US')
-                      : usdCeil.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-                    return '$' + str;
+                    // Ceiling to 1 whole dollar (e.g. 100.01 -> 101, 1500.20 -> 1501)
+                    const usdCeil = Math.ceil(val / usdRate);
+                    return '$' + usdCeil.toLocaleString('en-US');
                   }
 
                   if (cur === 'INR') {
                     const inrRate = forexRates.INR || 1.6;
-                    // Pegged rate: 1 INR = 1.6 NPR. Ceiling to whole rupees (e.g. 16000 NPR -> 10000 INR)
-                    const inrCeil = Math.ceil(val / inrRate);
+                    // Ceiling to next multiple of 5 INR (e.g. 461 -> 465, 497 -> 500)
+                    const inrRaw = val / inrRate;
+                    const inrCeil = Math.ceil(inrRaw / 5) * 5;
                     return '₹' + inrCeil.toLocaleString('en-IN');
                   }
 
@@ -187,12 +184,6 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                     const c = btn.getAttribute('data-currency');
                     if (c) {
                       setCurrency(c);
-                      const detail = c === 'NPR'
-                        ? '🇳🇵 NPR (Base Currency)'
-                        : c === 'USD'
-                        ? '🇺🇸 USD ($1 = Rs. ' + (forexRates.USD || 151.48) + ', ceiling 0.1)'
-                        : '🇮🇳 INR (₹1 = Rs. ' + (forexRates.INR || 1.6).toFixed(2) + ' Pegged, ceiling ₹1)';
-                      showToast('Prices converted to ' + detail);
                     }
                   });
                 });
