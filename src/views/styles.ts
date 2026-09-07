@@ -1801,7 +1801,7 @@ button { font-family: inherit; cursor: pointer; }
    2026 Executive Management Portal Suite
    ========================================================================== */
 .admin-shell {
-  display: flex;
+  display: flex; overflow-x: hidden;
   min-height: 100vh;
   background: #f8fafc;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -1822,7 +1822,7 @@ button { font-family: inherit; cursor: pointer; }
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow-y: auto;
+  overflow-y: auto; overflow-x: hidden;
 }
 .admin-sidebar-header {
   padding: 24px 20px;
@@ -1916,7 +1916,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .admin-main {
-  flex: 1;
+  flex: 1; min-width: 0;
   padding: 32px 40px;
   overflow-y: auto;
   max-width: 1600px;
