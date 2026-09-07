@@ -1,24 +1,21 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import fs from 'fs';
 
 export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
+  plugins: [
+    {
+      name: 'hono-ssr-dist',
+      buildStart() {
+        fs.mkdirSync('dist', { recursive: true });
+        fs.writeFileSync('dist/.gitkeep', '');
+      }
+    }
+  ],
   build: {
+    emptyOutDir: false,
     outDir: 'dist',
-    sourcemap: true,
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8787',
-        changeOrigin: true,
-      },
-    },
-  },
+    rollupOptions: {
+      input: 'src/types.ts'
+    }
+  }
 });

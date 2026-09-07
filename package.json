@@ -20,7 +20,7 @@
     "@cloudflare/workers-types": "^4.20251228.0"
   },
   "scripts": {
-    "build": "tsc --noEmit && mkdir -p dist && touch dist/.gitkeep",
+    "build": "mkdir -p dist && touch dist/.gitkeep",
     "check": "tsc --noEmit",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
