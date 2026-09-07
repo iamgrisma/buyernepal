@@ -95,21 +95,26 @@ export const ProductPage: FC<{
             </div>
           </div>
 
-          <div className="product-detail-grid">
-            {/* Gallery Media Column */}
-            <div className="product-detail-gallery">
-              <div style={{ position: 'relative' }}>
+          {/* SECTION 1: HERO SHOWCASE & PURCHASE STAGE */}
+          <div className="product-hero-stage">
+            {/* Left Media Column */}
+            <div className="product-hero-media">
+              <div className="product-stage-box">
                 {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} />
+                  <img src={product.image_url} alt={product.name} id="mainProductImage" />
                 ) : (
                   <div className="product-image-placeholder">BN</div>
                 )}
-                <span className="product-badge-overlay">{badge}</span>
-                <span className="product-store-badge">Verified on {storeName}</span>
+                {discountPercent > 0 ? (
+                  <span className="product-badge-overlay deal-accent">🔥 Save Rs. {(originalPrice - price).toLocaleString()}</span>
+                ) : (
+                  <span className="product-badge-overlay">{badge}</span>
+                )}
+                <span className="product-store-badge">✓ Verified on {storeName}</span>
               </div>
 
-              {/* Action Buttons: Wishlist, Compare & Price Alert */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px' }}>
+              {/* Action Buttons: Wishlist & Compare */}
+              <div className="product-media-actions">
                 <button
                   type="button"
                   className="filter-pill btn-wishlist-add"
@@ -118,7 +123,7 @@ export const ProductPage: FC<{
                   data-price={price}
                   data-image={product.image_url}
                   data-url={`/product/${product.id}`}
-                  style={{ padding: '10px', width: '100%', justifyContent: 'center' }}
+                  style={{ flex: 1, padding: '11px', justifyContent: 'center' }}
                 >
                   ❤️ Save to Wishlist
                 </button>
@@ -131,7 +136,7 @@ export const ProductPage: FC<{
                   data-image={product.image_url}
                   data-store={storeName}
                   data-warranty={product.specs?.['Official Warranty'] || '1 Year Official'}
-                  style={{ padding: '10px', width: '100%', justifyContent: 'center' }}
+                  style={{ flex: 1, padding: '11px', justifyContent: 'center' }}
                 >
                   ⚖️ Compare Item
                 </button>
@@ -141,70 +146,53 @@ export const ProductPage: FC<{
                 id="openPriceAlertBtn"
                 type="button"
                 className="filter-pill"
-                style={{ width: '100%', marginTop: '8px', padding: '10px', justifyContent: 'center', borderColor: 'var(--accent)', color: 'var(--accent)' }}
+                style={{ width: '100%', padding: '11px', justifyContent: 'center', borderColor: 'var(--accent)', color: 'var(--accent)' }}
               >
-                🔔 Notify Me When Price Drops
+                🔔 Set Free Price Drop Alert
               </button>
 
-              {/* 6-Month Price History Chart */}
-              <div className="price-history-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <strong style={{ fontSize: '14px' }}>📈 6-Month Price Trend in Nepal</strong>
-                  <span style={{ fontSize: '11px', color: 'var(--emerald)', fontWeight: 800, background: 'var(--emerald-soft)', padding: '2px 8px', borderRadius: '12px' }}>
-                    All-Time Low!
-                  </span>
+              {/* Nepal Regulatory & Trust Guarantees */}
+              <div className="product-trust-card">
+                <div className="trust-card-title">🇳🇵 BUYERNEPAL VERIFIED PURCHASE GUARANTEES</div>
+                <div className="trust-item">
+                  <span className="trust-icon">🛡️</span>
+                  <div>
+                    <strong>100% NTA MDMS Registered</strong>
+                    <p>Officially cleared IMEI on Nepal Telecommunications Authority database.</p>
+                  </div>
                 </div>
-                <div className="price-history-svg-wrap">
-                  <svg viewBox="0 0 400 120" style={{ width: '100%', height: '110px' }} preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#e11d48" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="#e11d48" stopOpacity="0.0" />
-                      </linearGradient>
-                    </defs>
-                    {/* Trend Line & Fill Area */}
-                    <path
-                      d="M 20,25 L 90,40 L 160,55 L 230,70 L 300,85 L 370,100 L 370,115 L 20,115 Z"
-                      fill="url(#priceGrad)"
-                    />
-                    <path
-                      d="M 20,25 L 90,40 L 160,55 L 230,70 L 300,85 L 370,100"
-                      fill="none"
-                      stroke="#e11d48"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                    />
-                    {/* Points */}
-                    <circle cx="20" cy="25" r="4" fill="#e11d48" />
-                    <circle cx="90" cy="40" r="4" fill="#e11d48" />
-                    <circle cx="160" cy="55" r="4" fill="#e11d48" />
-                    <circle cx="230" cy="70" r="4" fill="#e11d48" />
-                    <circle cx="300" cy="85" r="4" fill="#e11d48" />
-                    <circle cx="370" cy="100" r="5" fill="#ffffff" stroke="#e11d48" strokeWidth="3" />
-                  </svg>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--muted)', fontWeight: 700, padding: '0 10px' }}>
-                    {priceHistory.map((item, idx) => (
-                      <span key={idx}>{item.month.split(' ')[0]}</span>
-                    ))}
+                <div className="trust-item">
+                  <span className="trust-icon">🧾</span>
+                  <div>
+                    <strong>Authentic 13% VAT Bill Included</strong>
+                    <p>Authorized Nepal tax invoice eligible for official brand service center claims.</p>
+                  </div>
+                </div>
+                <div className="trust-item">
+                  <span className="trust-icon">🚚</span>
+                  <div>
+                    <strong>Fast Express Delivery Across Nepal</strong>
+                    <p>Same-day / 24h inside Kathmandu Valley; 2-3 business days across 77 districts.</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Product Meta & Details Column */}
-            <div className="product-detail-info">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            {/* Right Summary & Purchase Column */}
+            <div className="product-hero-summary">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
                 <span className="section-kicker">VERIFIED NEPAL LISTING</span>
-                {brand && (
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', background: 'var(--line-subtle)', padding: '2px 8px', borderRadius: '4px' }}>
-                    Brand: {brand}
+                {brand && <span className="product-brand-chip">{brand}</span>}
+                {product.scores && (
+                  <span style={{ fontSize: '11.5px', fontWeight: 800, color: 'var(--emerald)', background: 'var(--emerald-soft)', padding: '2px 8px', borderRadius: '4px' }}>
+                    ★ Score: {product.scores.overall_score.toFixed(1)} / 10
                   </span>
                 )}
               </div>
 
               <h1>{product.name}</h1>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '12px 0 18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '10px 0 16px', flexWrap: 'wrap' }}>
                 <span style={{ color: 'var(--amber)', fontWeight: 800, fontSize: '15px' }}>
                   ★ {rating.toFixed(1)}
                 </span>
@@ -212,7 +200,7 @@ export const ProductPage: FC<{
                   ({reviews.length} verified customer reviews)
                 </span>
                 <span style={{ fontSize: '12px', color: 'var(--emerald)', background: 'var(--emerald-soft)', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontWeight: 700 }}>
-                  ✓ In Stock in Nepal
+                  ✓ In Stock (Official Nepal Stock)
                 </span>
               </div>
 
@@ -243,10 +231,11 @@ export const ProductPage: FC<{
                 </div>
               )}
 
+              {/* Verified Price Box */}
               <div className="detail-price-box">
                 <div>
-                  <span style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase' }}>
-                    Best Verified Price
+                  <span style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Verified Best Price in Nepal
                   </span>
                   <strong className="detail-main-price" data-base-npr={price}>Rs. {formattedPrice}</strong>
                 </div>
@@ -259,7 +248,7 @@ export const ProductPage: FC<{
                 )}
               </div>
 
-              <p style={{ fontSize: '14px', color: 'var(--ink-secondary)', lineHeight: '1.65', marginBottom: '24px' }}>
+              <p style={{ fontSize: '14.5px', color: 'var(--ink-secondary)', lineHeight: '1.65', marginBottom: '20px' }}>
                 {product.description}
               </p>
 
@@ -272,7 +261,7 @@ export const ProductPage: FC<{
                     rel="noopener noreferrer nofollow"
                     className="detail-buy-btn"
                   >
-                    <span>View Deal on {storeName}</span> <span>↗</span>
+                    <span>View Deal on {storeName}</span> <span className="buy-arrow">↗</span>
                   </a>
                   <div className="affiliate-redirect-notice">
                     <span>🔒</span>
@@ -291,13 +280,140 @@ export const ProductPage: FC<{
                 </div>
               )}
 
-              {/* In-Depth Review Scorecard Breakdown */}
+              {/* 6-Month Historical Price Fluctuation Trend Card */}
+              <div className="price-history-card" style={{ marginTop: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <strong style={{ fontSize: '13px' }}>📈 6-Month Price Movement in Nepal</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--emerald)', fontWeight: 800, background: 'var(--emerald-soft)', padding: '2px 8px', borderRadius: '12px' }}>
+                    All-Time Low!
+                  </span>
+                </div>
+                <div className="price-history-svg-wrap">
+                  <svg viewBox="0 0 400 110" style={{ width: '100%', height: '100px' }} preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#e11d48" stopOpacity="0.25" />
+                        <stop offset="100%" stopColor="#e11d48" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d="M 20,25 L 90,40 L 160,55 L 230,70 L 300,85 L 370,95 L 370,110 L 20,110 Z"
+                      fill="url(#priceGrad)"
+                    />
+                    <path
+                      d="M 20,25 L 90,40 L 160,55 L 230,70 L 300,85 L 370,95"
+                      fill="none"
+                      stroke="#e11d48"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    />
+                    <circle cx="20" cy="25" r="3.5" fill="#e11d48" />
+                    <circle cx="90" cy="40" r="3.5" fill="#e11d48" />
+                    <circle cx="160" cy="55" r="3.5" fill="#e11d48" />
+                    <circle cx="230" cy="70" r="3.5" fill="#e11d48" />
+                    <circle cx="300" cy="85" r="3.5" fill="#e11d48" />
+                    <circle cx="370" cy="95" r="4.5" fill="#ffffff" stroke="#e11d48" strokeWidth="2.5" />
+                  </svg>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--muted)', fontWeight: 700, padding: '0 10px' }}>
+                    {priceHistory.map((item, idx) => (
+                      <span key={idx}>{item.month.split(' ')[0]}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 2: "WHERE TO BUY IN NEPAL" MULTI-STORE COMPARISON MATRIX (FULL WIDTH) */}
+          <section className="price-comparison-card" style={{ marginTop: '40px' }}>
+            <div className="price-comparison-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '20px' }}>🏪</span>
+                <div>
+                  <strong>Where to Buy in Nepal (Authorized Stores &amp; Marketplaces)</strong>
+                  <div style={{ fontSize: '11.5px', color: 'var(--muted)', fontWeight: 500, marginTop: '2px' }}>
+                    Compare verified prices, physical pickup vs online delivery, and official importer warranty coverage
+                  </div>
+                </div>
+              </div>
+              <span className="price-match-guarantee">🛡️ VAT Bills &amp; MDMS Verified</span>
+            </div>
+
+            <div className="stores-matrix-table">
+              {(product.store_offers && product.store_offers.length > 0
+                ? product.store_offers
+                : [
+                    {
+                      id: 1,
+                      product_id: product.id,
+                      store_name: storeName,
+                      price: price,
+                      store_url: product.affiliate_url || '#',
+                      badge: 'Official Distributor',
+                      in_stock: 1,
+                      delivery_time: '24h Kathmandu Express',
+                      warranty_info: 'Official Nepal Warranty'
+                    },
+                    {
+                      id: 2,
+                      product_id: product.id,
+                      store_name: 'New Road Offline Outlets',
+                      price: Math.round(price * 1.03),
+                      store_url: product.affiliate_url || '#',
+                      badge: 'Authorized Retailer',
+                      in_stock: 1,
+                      delivery_time: 'Immediate Walk-in Pickup',
+                      warranty_info: 'Official Distributor Bill'
+                    }
+                  ]
+              ).map((offer, idx) => (
+                <div key={offer.id || idx} className="store-matrix-row">
+                  <div className="store-identity">
+                    <div className="store-title-row">
+                      <span className="store-icon">🏬</span>
+                      <strong>{offer.store_name}</strong>
+                      {offer.badge && <span className="store-pill-badge">{offer.badge}</span>}
+                    </div>
+                    <div className="store-subtext">
+                      <span>🚚 {offer.delivery_time || 'Express Delivery'}</span>
+                      <span>•</span>
+                      <span>🛡️ {offer.warranty_info || '1 Year Official Warranty'}</span>
+                    </div>
+                  </div>
+
+                  <div className="store-pricing-action">
+                    <div className="store-price-display">
+                      <span className="store-price-val" data-base-npr={offer.price}>
+                        Rs. {offer.price.toLocaleString()}
+                      </span>
+                      <span className="store-stock-indicator">
+                        {offer.in_stock ? '🟢 In Stock' : '🔴 Pre-Order'}
+                      </span>
+                    </div>
+                    <a
+                      href={offer.store_url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="store-visit-btn"
+                    >
+                      View Store Deal ↗
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* SECTION 3: TECH INTELLIGENCE & BANKING SUITE (2-COLUMN BALANCED GRID) */}
+          <div className="product-intelligence-grid" style={{ marginTop: '40px' }}>
+            {/* Left Column: 5-Point Scorecard & Verdict */}
+            <div>
               {product.scores ? (
                 <div className="editorial-scorecard-card">
                   <div className="scorecard-header">
                     <div className="scorecard-title-group">
                       <span className="scorecard-badge">🔬 BUYERNEPAL LABS EVALUATION</span>
-                      <h3 className="scorecard-title">Performance & Hardware Evaluation</h3>
+                      <h3 className="scorecard-title">Performance &amp; Hardware Scorecard</h3>
                     </div>
                     <div className="scorecard-overall-badge">
                       <div className="overall-val">{product.scores.overall_score.toFixed(1)}</div>
@@ -309,7 +425,7 @@ export const ProductPage: FC<{
                   <div className="scorecard-bars-grid">
                     <div className="score-bar-item">
                       <div className="score-bar-label">
-                        <span>🖥️ Display Quality</span>
+                        <span>🖥️ Display &amp; Design Quality</span>
                         <strong>{product.scores.display_score.toFixed(1)} / 10</strong>
                       </div>
                       <div className="score-progress-track">
@@ -319,7 +435,7 @@ export const ProductPage: FC<{
 
                     <div className="score-bar-item">
                       <div className="score-bar-label">
-                        <span>⚡ Processor & Gaming</span>
+                        <span>⚡ Processor &amp; Multitasking</span>
                         <strong>{product.scores.performance_score.toFixed(1)} / 10</strong>
                       </div>
                       <div className="score-progress-track">
@@ -329,7 +445,7 @@ export const ProductPage: FC<{
 
                     <div className="score-bar-item">
                       <div className="score-bar-label">
-                        <span>📸 Camera & Video</span>
+                        <span>📸 Camera &amp; Video Capabilities</span>
                         <strong>{product.scores.camera_score.toFixed(1)} / 10</strong>
                       </div>
                       <div className="score-progress-track">
@@ -339,7 +455,7 @@ export const ProductPage: FC<{
 
                     <div className="score-bar-item">
                       <div className="score-bar-label">
-                        <span>🔋 Battery & Charging</span>
+                        <span>🔋 Battery &amp; Fast Charging</span>
                         <strong>{product.scores.battery_score.toFixed(1)} / 10</strong>
                       </div>
                       <div className="score-progress-track">
@@ -349,7 +465,7 @@ export const ProductPage: FC<{
 
                     <div className="score-bar-item">
                       <div className="score-bar-label">
-                        <span>💰 Nepal Value for Money</span>
+                        <span>💰 Value for Money in Nepal</span>
                         <strong>{product.scores.value_score.toFixed(1)} / 10</strong>
                       </div>
                       <div className="score-progress-track">
@@ -387,7 +503,7 @@ export const ProductPage: FC<{
                       </span>
                     ) : (
                       <span className="verdict-highlight-pill">
-                        💵 Standard Cash / Card / Fonepay
+                        💵 Cash / Card / Fonepay
                       </span>
                     )}
                     <span className="verdict-highlight-pill">🚚 Express Delivery in Nepal</span>
@@ -395,12 +511,41 @@ export const ProductPage: FC<{
                 </div>
               )}
 
+              {/* Pros and Cons Grid */}
+              {(product.pros || product.cons) && (
+                <div className="pros-cons-grid" style={{ marginTop: '20px' }}>
+                  {product.pros && product.pros.length > 0 && (
+                    <div className="pros-card">
+                      <strong style={{ color: '#065f46', fontSize: '13px' }}>👍 Reasons to Buy</strong>
+                      <ul className="pros-list">
+                        {product.pros.map((p, idx) => (
+                          <li key={idx}>✓ {p}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {product.cons && product.cons.length > 0 && (
+                    <div className="cons-card">
+                      <strong style={{ color: '#9f1239', fontSize: '13px' }}>⚠️ Things to Consider</strong>
+                      <ul className="cons-list">
+                        {product.cons.map((c, idx) => (
+                          <li key={idx}>• {c}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Right Column: 0% EMI Calculator & Delivery City Estimator */}
+            <div>
               {/* Interactive Nepal Bank 0% EMI Calculator Widget */}
               {emiAvailable && (
                 <div className="emi-calculator-card">
                   <div className="emi-calculator-header">
                     <div>
-                      <strong style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <strong style={{ fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         💳 Nepal Bank 0% Credit Card EMI Calculator
                       </strong>
                       <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
@@ -409,7 +554,7 @@ export const ProductPage: FC<{
                     </div>
                   </div>
 
-                  <div style={{ fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: 'var(--ink)' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, margin: '12px 0 6px', color: 'var(--ink)' }}>
                     Select Your Bank:
                   </div>
                   <div className="emi-bank-tabs">
@@ -420,7 +565,7 @@ export const ProductPage: FC<{
                     <button type="button" className="emi-bank-btn" data-bank="Sanima Bank">Sanima Bank</button>
                   </div>
 
-                  <div style={{ fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: 'var(--ink)' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, margin: '12px 0 6px', color: 'var(--ink)' }}>
                     Select Tenure:
                   </div>
                   <div className="emi-tenure-group">
@@ -446,142 +591,75 @@ export const ProductPage: FC<{
                 </div>
               )}
 
-              {/* Multi-Store Price Comparison Matrix ("Where to Buy in Nepal") */}
-              <div className="price-comparison-card" style={{ marginTop: '20px' }}>
-                <div className="price-comparison-header">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '18px' }}>🏪</span>
-                    <strong>Where to Buy in Nepal (Authorized Stores)</strong>
+              {/* Nepal City Delivery Estimator */}
+              <div className="delivery-estimator-card" style={{ marginTop: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '20px' }}>🚚</span>
+                  <div>
+                    <strong style={{ fontSize: '14px' }}>Nepal City Delivery &amp; Speed Estimator</strong>
+                    <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>Select your location to check transit time &amp; courier charges</div>
                   </div>
-                  <span className="price-match-guarantee">🛡️ VAT Bills &amp; MDMS Verified</span>
                 </div>
-
-                <div className="stores-matrix-table">
-                  {(product.store_offers && product.store_offers.length > 0
-                    ? product.store_offers
-                    : [
-                        {
-                          id: 1,
-                          product_id: product.id,
-                          store_name: storeName,
-                          price: price,
-                          store_url: product.affiliate_url || '#',
-                          badge: 'Official Distributor',
-                          in_stock: 1,
-                          delivery_time: '24h Kathmandu Express',
-                          warranty_info: 'Official Nepal Warranty'
-                        },
-                        {
-                          id: 2,
-                          product_id: product.id,
-                          store_name: 'New Road Offline Outlets',
-                          price: Math.round(price * 1.04),
-                          store_url: product.affiliate_url || '#',
-                          badge: 'Authorized Retailer',
-                          in_stock: 1,
-                          delivery_time: 'Immediate Walk-in Pickup',
-                          warranty_info: 'Official Distributor Bill'
-                        }
-                      ]
-                  ).map((offer, idx) => (
-                    <div key={offer.id || idx} className="store-matrix-row">
-                      <div className="store-identity">
-                        <div className="store-title-row">
-                          <span className="store-icon">🏬</span>
-                          <strong>{offer.store_name}</strong>
-                          {offer.badge && <span className="store-pill-badge">{offer.badge}</span>}
-                        </div>
-                        <div className="store-subtext">
-                          <span>🚚 {offer.delivery_time || 'Express Delivery'}</span>
-                          <span>•</span>
-                          <span>🛡️ {offer.warranty_info || '1 Year Official Warranty'}</span>
-                        </div>
-                      </div>
-
-                      <div className="store-pricing-action">
-                        <div className="store-price-display">
-                          <span className="store-price-val" data-base-npr={offer.price}>
-                            Rs. {offer.price.toLocaleString()}
-                          </span>
-                          <span className="store-stock-indicator">
-                            {offer.in_stock ? '🟢 In Stock' : '🔴 Pre-Order'}
-                          </span>
-                        </div>
-                        <a
-                          href={offer.store_url}
-                          target="_blank"
-                          rel="noopener noreferrer nofollow"
-                          className="store-visit-btn"
-                        >
-                          Go to Store ↗
-                        </a>
-                      </div>
-                    </div>
-                  ))}
+                <div className="form-group" style={{ marginBottom: '10px' }}>
+                  <select id="detailCitySelect" style={{ padding: '9px 12px', borderRadius: '8px', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)', width: '100%', fontSize: '13px' }}>
+                    <option value="ktm">Kathmandu Valley (Kathmandu, Lalitpur, Bhaktapur)</option>
+                    <option value="pkr">Pokhara (Kaski District)</option>
+                    <option value="ctw">Chitwan (Bharatpur &amp; Narayangarh)</option>
+                    <option value="brt">Biratnagar (Morang District)</option>
+                    <option value="btl">Butwal &amp; Bhairahawa</option>
+                    <option value="dhr">Dharan &amp; Itahari</option>
+                    <option value="all">All Other 71 Districts (Courier Door Delivery)</option>
+                  </select>
+                </div>
+                <div id="detailCityResult" style={{ background: 'var(--card-subtle, #f8fafc)', padding: '12px 14px', borderRadius: '8px', fontSize: '12.5px', border: '1px solid var(--line)' }}>
+                  <div>⏱️ <strong>Estimated Transit:</strong> <span id="detailTransitTime">Same-Day / 24 Hours Express</span></div>
+                  <div style={{ marginTop: '4px' }}>💰 <strong>Courier Fee:</strong> <span id="detailCourierFee" style={{ color: 'var(--emerald)', fontWeight: 700 }}>FREE (Kathmandu Valley Order)</span></div>
+                  <div style={{ marginTop: '4px' }}>💵 <strong>Payment:</strong> <span>Cash on Delivery (COD) &amp; Fonepay Accepted</span></div>
                 </div>
               </div>
-
-              {/* Technical Specifications Table */}
-              <div style={{ marginTop: '24px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '8px' }}>
-                  📋 Technical Specifications &amp; Warranty
-                </h3>
-                <table className="specs-table">
-                  <tbody>
-                    {product.specs ? (
-                      Object.entries(product.specs).map(([key, val]) => (
-                        <tr key={key}>
-                          <td>{key}</td>
-                          <td>{val}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <>
-                        <tr>
-                          <td>Authorized Distributor</td>
-                          <td>{storeName}</td>
-                        </tr>
-                        <tr>
-                          <td>Official Nepal Warranty</td>
-                          <td>1 Year Authorized Warranty</td>
-                        </tr>
-                        <tr>
-                          <td>Delivery Window</td>
-                          <td>Kathmandu 24h Express • Nationwide Courier 2-3 Days</td>
-                        </tr>
-                      </>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pros and Cons Grid */}
-              {(product.pros || product.cons) && (
-                <div className="pros-cons-grid">
-                  {product.pros && product.pros.length > 0 && (
-                    <div className="pros-card">
-                      <strong style={{ color: '#065f46', fontSize: '13px' }}>👍 Reasons to Buy</strong>
-                      <ul className="pros-list">
-                        {product.pros.map((p, idx) => (
-                          <li key={idx}>✓ {p}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {product.cons && product.cons.length > 0 && (
-                    <div className="cons-card">
-                      <strong style={{ color: '#9f1239', fontSize: '13px' }}>⚠️ Things to Consider</strong>
-                      <ul className="cons-list">
-                        {product.cons.map((c, idx) => (
-                          <li key={idx}>• {c}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
+
+          {/* SECTION 4: TECHNICAL SPECIFICATIONS & PACKAGING (FULL WIDTH) */}
+          <section className="specs-section-card" style={{ marginTop: '40px' }}>
+            <div className="specs-section-header">
+              <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>
+                📋 Detailed Technical Specifications &amp; Nepal Warranty Terms
+              </h3>
+              <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Verified against official manufacturer spec sheets</span>
+            </div>
+            <table className="specs-table">
+              <tbody>
+                {product.specs ? (
+                  Object.entries(product.specs).map(([key, val]) => (
+                    <tr key={key}>
+                      <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>{key}</td>
+                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>{val}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <>
+                    <tr>
+                      <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Authorized Importer / Reseller</td>
+                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>{storeName}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Official Nepal Warranty</td>
+                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>1 Year Authorized Importer Warranty with VAT Bill</td>
+                    </tr>
+                    <tr>
+                      <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>NTA MDMS Status</td>
+                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>100% Registered &amp; Whitelisted on mdms.nta.gov.np</td>
+                    </tr>
+                    <tr>
+                      <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Delivery Window</td>
+                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Kathmandu Valley: 24h Express • Nationwide: 2-3 Days</td>
+                    </tr>
+                  </>
+                )}
+              </tbody>
+            </table>
+          </section>
 
           {/* Related Curated Products */}
           {relatedProducts.length > 0 && (
@@ -968,6 +1046,29 @@ export const ProductPage: FC<{
           submitBtn.disabled = false;
           submitBtn.textContent = 'Submit Customer Review';
         }
+      }
+    });
+  }
+
+  // 4. City Delivery Estimator Interactivity
+  const citySelect = document.getElementById('detailCitySelect');
+  const transitEl = document.getElementById('detailTransitTime');
+  const feeEl = document.getElementById('detailCourierFee');
+  if (citySelect && transitEl && feeEl) {
+    citySelect.addEventListener('change', () => {
+      const v = citySelect.value;
+      if (v === 'ktm') {
+        transitEl.textContent = 'Same-Day / 24 Hours Express';
+        feeEl.textContent = 'FREE (Kathmandu Valley Order)';
+        feeEl.style.color = 'var(--emerald)';
+      } else if (v === 'pkr' || v === 'ctw') {
+        transitEl.textContent = '1-2 Business Days';
+        feeEl.textContent = 'Rs. 100 (Subsidized Courier)';
+        feeEl.style.color = 'var(--ink)';
+      } else {
+        transitEl.textContent = '2-3 Business Days';
+        feeEl.textContent = 'Rs. 150 (Air / Surface Cargo)';
+        feeEl.style.color = 'var(--ink)';
       }
     });
   }

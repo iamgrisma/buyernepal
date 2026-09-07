@@ -101,80 +101,95 @@ export const AdminDashboardView: FC<{
                 <small style={{ color: '#94a3b8' }}>MANAGEMENT SUITE</small>
               </span>
             </a>
+            <div className="admin-telemetry-badge">
+              <span className="admin-telemetry-dot"></span>
+              <span>Cloudflare D1 (APAC)</span>
+            </div>
           </div>
 
           <nav className="admin-nav">
-            <a
-              href="/admin?tab=overview"
-              className={`admin-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
-            >
-              <span>📊 Executive Overview</span>
-            </a>
-            <a
-              href="/admin?tab=products"
-              className={`admin-nav-item ${activeTab === 'products' ? 'active' : ''}`}
-            >
-              <span>🛍️ Products Catalog</span>
-              <span className="admin-nav-badge" style={{ background: '#3b82f6' }}>{products.length}</span>
-            </a>
-            <a
-              href="/admin?tab=categories"
-              className={`admin-nav-item ${activeTab === 'categories' ? 'active' : ''}`}
-            >
-              <span>📂 Departments &amp; Menu</span>
-              <span className="admin-nav-badge" style={{ background: '#6366f1' }}>{categories.length}</span>
-            </a>
-            <a
-              href="/admin?tab=reviews"
-              className={`admin-nav-item ${activeTab === 'reviews' ? 'active' : ''}`}
-            >
-              <span>⭐ Review Moderation</span>
-              {pendingReviews.length > 0 && (
-                <span className="admin-nav-badge">{pendingReviews.length} new</span>
-              )}
-            </a>
-            <a
-              href="/admin?tab=coupons"
-              className={`admin-nav-item ${activeTab === 'coupons' ? 'active' : ''}`}
-            >
-              <span>🏷️ Promo Vouchers</span>
-              <span className="admin-nav-badge" style={{ background: '#10b981' }}>{coupons.length}</span>
-            </a>
-            <a
-              href="/admin?tab=blog"
-              className={`admin-nav-item ${activeTab === 'blog' ? 'active' : ''}`}
-            >
-              <span>📰 Tech Guides CMS</span>
-              <span className="admin-nav-badge" style={{ background: '#f59e0b' }}>{articles.length}</span>
-            </a>
-            <a
-              href="/admin?tab=users"
-              className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`}
-            >
-              <span>👥 User Access</span>
-              <span className="admin-nav-badge" style={{ background: '#64748b' }}>{users.length}</span>
-            </a>
-            <a
-              href="/admin?tab=customizer"
-              className={`admin-nav-item ${activeTab === 'customizer' ? 'active' : ''}`}
-            >
-              <span>🎨 Store Customizer</span>
-              <span className="admin-nav-badge" style={{ background: '#f43f5e' }}>2026</span>
-            </a>
-            <a
-              href="/admin?tab=settings"
-              className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-            >
-              <span>⚙️ Store Settings</span>
-            </a>
+            <div className="admin-nav-group">
+              <span className="admin-nav-section-title">Core Workspace</span>
+              <a
+                href="/admin?tab=overview"
+                className={`admin-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
+              >
+                <span>📊 Executive Overview</span>
+              </a>
+              <a
+                href="/admin?tab=products"
+                className={`admin-nav-item ${activeTab === 'products' ? 'active' : ''}`}
+              >
+                <span>🛍️ Products Catalog</span>
+                <span className="admin-nav-badge" style={{ background: '#3b82f6' }}>{products.length}</span>
+              </a>
+              <a
+                href="/admin?tab=categories"
+                className={`admin-nav-item ${activeTab === 'categories' ? 'active' : ''}`}
+              >
+                <span>📂 Departments &amp; Menu</span>
+                <span className="admin-nav-badge" style={{ background: '#6366f1' }}>{categories.length}</span>
+              </a>
+            </div>
+
+            <div className="admin-nav-group">
+              <span className="admin-nav-section-title">Editorial &amp; Deals</span>
+              <a
+                href="/admin?tab=blog"
+                className={`admin-nav-item ${activeTab === 'blog' ? 'active' : ''}`}
+              >
+                <span>📰 Tech Guides CMS</span>
+                <span className="admin-nav-badge" style={{ background: '#f59e0b' }}>{articles.length}</span>
+              </a>
+              <a
+                href="/admin?tab=reviews"
+                className={`admin-nav-item ${activeTab === 'reviews' ? 'active' : ''}`}
+              >
+                <span>⭐ Review Moderation</span>
+                {pendingReviews.length > 0 && (
+                  <span className="admin-nav-badge">{pendingReviews.length} new</span>
+                )}
+              </a>
+              <a
+                href="/admin?tab=coupons"
+                className={`admin-nav-item ${activeTab === 'coupons' ? 'active' : ''}`}
+              >
+                <span>🏷️ Promo Vouchers</span>
+                <span className="admin-nav-badge" style={{ background: '#10b981' }}>{coupons.length}</span>
+              </a>
+            </div>
+
+            <div className="admin-nav-group">
+              <span className="admin-nav-section-title">Store &amp; System</span>
+              <a
+                href="/admin?tab=customizer"
+                className={`admin-nav-item ${activeTab === 'customizer' ? 'active' : ''}`}
+              >
+                <span>🎨 Store Customizer</span>
+                <span className="admin-nav-badge" style={{ background: '#f43f5e' }}>2026</span>
+              </a>
+              <a
+                href="/admin?tab=settings"
+                className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+              >
+                <span>⚙️ Store Settings</span>
+              </a>
+              <a
+                href="/admin?tab=users"
+                className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`}
+              >
+                <span>👥 User Access</span>
+                <span className="admin-nav-badge" style={{ background: '#64748b' }}>{users.length}</span>
+              </a>
+            </div>
           </nav>
 
-          <div style={{ padding: '20px', borderTop: '1px solid #1e293b', fontSize: '12px', color: '#64748b' }}>
+          <div style={{ padding: '20px', borderTop: '1px solid #1e293b', fontSize: '12px', color: '#64748b', background: 'rgba(15, 23, 42, 0.4)' }}>
             <span style={{ display: 'block', color: '#cbd5e1', fontWeight: 700 }}>
-              Logged in: {currentUser.username}
+              👤 {currentUser.username}
             </span>
-            <span style={{ display: 'block', marginTop: '2px' }}>Role: {currentUser.role}</span>
-            <div style={{ marginTop: '14px', display: 'flex', gap: '8px' }}>
+            <span style={{ display: 'block', marginTop: '2px', color: '#94a3b8' }}>Role: {currentUser.role}</span>
+            <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
               <a href="/" target="_blank" style={{ color: '#60a5fa', fontWeight: 600 }}>Live Store ↗</a>
               <span>•</span>
               <a href="/admin/logout" style={{ color: '#f87171', fontWeight: 600 }}>Sign Out</a>
@@ -185,24 +200,45 @@ export const AdminDashboardView: FC<{
         {/* Main Content Area */}
         <main className="admin-main">
           {/* Top Info Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '14px' }}>
+          <div className="admin-topbar-card">
             <div>
-              <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
+                <span>BuyerNepal Suite</span>
+                <span>/</span>
+                <span style={{ color: 'var(--accent)', fontWeight: 700 }}>
+                  {activeTab === 'overview' && 'Executive Overview'}
+                  {activeTab === 'products' && 'Curated Products Catalog'}
+                  {activeTab === 'categories' && 'Departments & Menu'}
+                  {activeTab === 'reviews' && 'Review Moderation'}
+                  {activeTab === 'coupons' && 'Promo Coupons'}
+                  {activeTab === 'blog' && 'Tech Guides CMS'}
+                  {activeTab === 'users' && 'Staff & Access'}
+                  {activeTab === 'customizer' && 'Store Customizer'}
+                  {activeTab === 'settings' && 'Global Settings'}
+                </span>
+              </div>
+              <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.8px', margin: 0 }}>
                 {activeTab === 'overview' && 'Executive Overview & Analytics'}
                 {activeTab === 'products' && 'Curated Products Catalog'}
                 {activeTab === 'categories' && 'Departments & Menu Hierarchy'}
                 {activeTab === 'reviews' && 'Customer Review Moderation'}
                 {activeTab === 'coupons' && 'Promo Coupons & Discount Codes'}
+                {activeTab === 'blog' && 'Tech Guides & Editorial CMS'}
                 {activeTab === 'users' && 'Staff & User Access Control'}
                 {activeTab === 'customizer' && 'Store Customizer & Feature Flags'}
                 {activeTab === 'settings' && 'Store Branding & Global Settings'}
               </h1>
-              <span style={{ fontSize: '13px', color: '#64748b' }}>
-                Cloudflare Workers Fullstack Edge SSR • Kathmandu, Nepal
-              </span>
             </div>
 
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                id="btnOpenAddProduct"
+                className="primary-action"
+                style={{ background: 'var(--accent)', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                + Add Curated Product
+              </button>
               <a href="/" target="_blank" className="primary-action" style={{ background: '#ffffff', color: '#0f172a', border: '1px solid var(--line)' }}>
                 View Storefront ↗
               </a>
@@ -210,25 +246,25 @@ export const AdminDashboardView: FC<{
                 <button
                   type="submit"
                   className="primary-action"
-                  title="Populate or refresh D1 database with 22+ curated Nepali products"
+                  title="Populate or refresh D1 database with curated Nepali products"
                   style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)' }}
                 >
-                  🌱 Seed Catalog in D1
+                  🌱 Seed D1
                 </button>
               </form>
               <form
                 method="post"
                 action="/admin/catalog/clear"
-                onsubmit="return confirm('⚠️ ARE YOU SURE? This will permanently wipe all products, categories, coupons, and reviews from D1. Admin user accounts will remain safe.');"
+                onsubmit="return confirm('⚠️ ARE YOU SURE? This will permanently wipe products, categories, coupons, and reviews from D1. Admin accounts stay safe.');"
                 style={{ display: 'inline' }}
               >
                 <button
                   type="submit"
                   className="primary-action"
-                  title="Wipe all products, categories, coupons, and reviews from D1"
+                  title="Wipe catalog from D1"
                   style={{ background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' }}
                 >
-                  🗑️ Clear Catalog in D1
+                  🗑️ Clear D1
                 </button>
               </form>
             </div>
@@ -243,41 +279,66 @@ export const AdminDashboardView: FC<{
           {/* TAB 1: EXECUTIVE OVERVIEW */}
           {activeTab === 'overview' && (
             <div>
-              {/* Stat Cards */}
+              {/* 2026 Executive Stat Cards with Mesh Gradients & Sparklines */}
               <div className="admin-stats-grid">
                 <div className="admin-stat-card">
-                  <span className="admin-stat-label">CURATED PRODUCTS</span>
+                  <div className="admin-stat-top">
+                    <span className="admin-stat-label">CURATED PRODUCTS</span>
+                    <span className="admin-stat-icon-wrap" style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#2563eb' }}>🛍️</span>
+                  </div>
                   <strong className="admin-stat-value">{stats.products}</strong>
-                  <span className="admin-stat-trend">↑ Active in 7 departments</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="admin-stat-trend">↑ Active in {categories.length} depts</span>
+                    <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+                      <path d="M2 18 L15 14 L28 16 L42 8 L58 4" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" />
+                    </svg>
+                  </div>
                 </div>
+
                 <div className="admin-stat-card">
-                  <span className="admin-stat-label">DEPARTMENTS</span>
+                  <div className="admin-stat-top">
+                    <span className="admin-stat-label">DEPARTMENTS &amp; MENU</span>
+                    <span className="admin-stat-icon-wrap" style={{ background: 'rgba(99, 102, 241, 0.12)', color: '#6366f1' }}>📂</span>
+                  </div>
                   <strong className="admin-stat-value">{stats.categories}</strong>
-                  <span className="admin-stat-trend">↑ Verified categories</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="admin-stat-trend">↑ Synced with Top Strip</span>
+                    <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+                      <path d="M2 20 L18 15 L32 17 L46 9 L58 5" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" />
+                    </svg>
+                  </div>
                 </div>
+
                 <div className="admin-stat-card">
-                  <span className="admin-stat-label">PENDING REVIEWS</span>
-                  <strong className="admin-stat-value" style={{ color: pendingReviews.length > 0 ? '#e11d48' : '#0f172a' }}>
+                  <div className="admin-stat-top">
+                    <span className="admin-stat-label">CUSTOMER REVIEWS</span>
+                    <span className="admin-stat-icon-wrap" style={{ background: pendingReviews.length > 0 ? 'rgba(225, 29, 72, 0.12)' : 'rgba(16, 185, 129, 0.12)', color: pendingReviews.length > 0 ? '#e11d48' : '#10b981' }}>⭐</span>
+                  </div>
+                  <strong className="admin-stat-value" style={{ color: pendingReviews.length > 0 ? '#e11d48' : 'inherit' }}>
                     {pendingReviews.length}
                   </strong>
-                  <span className="admin-stat-trend" style={{ color: pendingReviews.length > 0 ? '#e11d48' : '#64748b' }}>
-                    {pendingReviews.length > 0 ? 'Requires moderation' : 'All reviews moderated'}
-                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="admin-stat-trend" style={{ color: pendingReviews.length > 0 ? '#e11d48' : '#10b981' }}>
+                      {pendingReviews.length > 0 ? '⚠️ Moderation required' : `✓ ${reviews.length} approved`}
+                    </span>
+                    <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+                      <path d="M2 12 L16 12 L30 10 L44 14 L58 8" stroke={pendingReviews.length > 0 ? '#e11d48' : '#10b981'} strokeWidth="2.5" strokeLinecap="round" />
+                    </svg>
+                  </div>
                 </div>
+
                 <div className="admin-stat-card">
-                  <span className="admin-stat-label">ACTIVE PROMOS</span>
+                  <div className="admin-stat-top">
+                    <span className="admin-stat-label">ACTIVE PROMOS</span>
+                    <span className="admin-stat-icon-wrap" style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#10b981' }}>🏷️</span>
+                  </div>
                   <strong className="admin-stat-value">{stats.activeCoupons}</strong>
-                  <span className="admin-stat-trend">↑ Active vouchers</span>
-                </div>
-                <div className="admin-stat-card">
-                  <span className="admin-stat-label">TECH GUIDES &amp; BLOG</span>
-                  <strong className="admin-stat-value" style={{ color: '#d97706' }}>{stats.articles || articles.length}</strong>
-                  <span className="admin-stat-trend">↑ Editorial stories</span>
-                </div>
-                <div className="admin-stat-card">
-                  <span className="admin-stat-label">AUTHORIZED USERS</span>
-                  <strong className="admin-stat-value">{stats.users}</strong>
-                  <span className="admin-stat-trend">Staff access granted</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="admin-stat-trend">↑ Daraz &amp; Oliz vouchers</span>
+                    <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+                      <path d="M2 16 L15 14 L28 10 L42 12 L58 4" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" />
+                    </svg>
+                  </div>
                 </div>
               </div>
 
@@ -443,101 +504,66 @@ export const AdminDashboardView: FC<{
             </div>
           )}
 
-          {/* TAB 2: PRODUCTS CATALOG */}
+          {/* TAB 2: PRODUCTS CATALOG (2026 Full-Width Executive Suite) */}
           {activeTab === 'products' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '24px' }}>
-              {/* Add Product Form */}
-              <div className="admin-card">
-                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '16px' }}>Add Curated Product</h2>
-                <form method="post" action="/admin/products/new">
-                  <div className="form-group">
-                    <label>Product Title *</label>
-                    <input name="name" type="text" placeholder="e.g. Sony WH-1000XM5 Headphones" required />
-                  </div>
+            <div>
+              {/* 2026 Admin Toolbar */}
+              <div className="admin-toolbar">
+                <div className="admin-search-box">
+                  <span className="admin-search-icon">🔍</span>
+                  <input
+                    type="text"
+                    id="adminProductSearch"
+                    placeholder="Live search by gadget title, brand, or store..."
+                  />
+                </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div className="form-group">
-                      <label>Deal Price (NPR) *</label>
-                      <input name="price" type="number" placeholder="44999" required />
-                    </div>
-                    <div className="form-group">
-                      <label>Original MRP (NPR)</label>
-                      <input name="original_price" type="number" placeholder="49999" />
-                    </div>
-                  </div>
+                <div className="admin-toolbar-actions">
+                  <select id="adminCategoryFilter" className="admin-filter-select">
+                    <option value="">All Departments ({categories.length})</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.name.toLowerCase()}>{c.name}</option>
+                    ))}
+                  </select>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div className="form-group">
-                      <label>Department</label>
-                      <select name="category_id">
-                        <option value="">-- Select Category --</option>
-                        {categories.map((c) => (
-                          <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label>Verified Store Name</label>
-                      <input name="store_name" type="text" placeholder="e.g. Oliz Store Nepal" defaultValue="Daraz Mall" />
-                    </div>
-                  </div>
+                  <select id="adminStatusFilter" className="admin-filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="active">Active (Published)</option>
+                    <option value="draft">Draft Only</option>
+                    <option value="emi">0% EMI Available</option>
+                  </select>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div className="form-group">
-                      <label>Badge Tag</label>
-                      <input name="badge" type="text" placeholder="e.g. 🔥 Hot Deal" defaultValue="🔥 Hot Deal" />
-                    </div>
-                    <div className="form-group">
-                      <label>Brand</label>
-                      <input name="brand" type="text" placeholder="e.g. Sony" />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Store / Affiliate URL</label>
-                    <input name="affiliate_url" type="url" placeholder="https://www.daraz.com.np/..." />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Image URL</label>
-                    <input name="image_url" type="url" placeholder="https://images.unsplash.com/..." />
-                  </div>
-
-                  <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--card-subtle, #f8fafc)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--line, #e2e8f0)' }}>
-                    <input type="checkbox" id="addProdEmi" name="emi_available" value="1" style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
-                    <label htmlFor="addProdEmi" style={{ margin: 0, cursor: 'pointer', fontWeight: 700, fontSize: '13px', color: 'var(--ink)' }}>
-                      💳 0% Bank EMI Available in Nepal (Nabil, NIC Asia, Global IME, etc.)
-                    </label>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Editorial Verdict &amp; Nepal Buying Advice</label>
-                    <textarea name="verdict" rows={2} placeholder="Our bottom-line recommendation for Nepali shoppers…"></textarea>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Description &amp; Specs Highlights</label>
-                    <textarea name="description" rows={3} placeholder="Highlights, specs and warranty details…"></textarea>
-                  </div>
-
-                  <button type="submit" className="primary-action" style={{ width: '100%', justifyContent: 'center' }}>
-                    Publish Product to Nepal Catalog
+                  <button
+                    type="button"
+                    className="primary-action btn-trigger-add-product"
+                    style={{ background: 'var(--accent)', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    + Add Curated Product
                   </button>
-                </form>
+                </div>
               </div>
 
-              {/* Product Listing Table */}
-              <div className="admin-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Catalog Items ({products.length})</h2>
+              {/* Full-Width Product Catalog Table */}
+              <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--card-bg)' }}>
+                  <div>
+                    <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: 'var(--ink)' }}>Verified Product Catalog</h2>
+                    <span style={{ fontSize: '12px', color: '#64748b' }}>
+                      Showing curated Nepali tech and lifestyle products
+                    </span>
+                  </div>
+                  <span id="filteredCountBadge" className="badge badge-active" style={{ background: 'var(--line-subtle)', color: 'var(--ink)' }}>
+                    {products.length} Items
+                  </span>
                 </div>
-                <div style={{ overflowX: 'auto', maxHeight: '700px' }}>
-                  <table className="admin-table">
+
+                <div style={{ overflowX: 'auto', maxHeight: '800px' }}>
+                  <table className="admin-table" id="adminProductsTable">
                     <thead>
                       <tr>
-                        <th>Item</th>
-                        <th>Store</th>
-                        <th>Price</th>
+                        <th style={{ width: '42%' }}>Gadget Item &amp; Specs</th>
+                        <th>Store Source</th>
+                        <th>Verified Price</th>
                         <th>0% EMI</th>
                         <th>Status</th>
                         <th style={{ textAlign: 'right' }}>Actions</th>
@@ -545,34 +571,85 @@ export const AdminDashboardView: FC<{
                     </thead>
                     <tbody>
                       {products.map((p) => (
-                        <tr key={p.id}>
+                        <tr
+                          key={p.id}
+                          className="admin-product-row"
+                          data-name={p.name.toLowerCase()}
+                          data-brand={(p.brand || '').toLowerCase()}
+                          data-category={(p.category_name || '').toLowerCase()}
+                          data-store={(p.store_name || '').toLowerCase()}
+                          data-status={p.is_active ? 'active' : 'draft'}
+                          data-emi={p.emi_available === 1 ? 'emi' : ''}
+                        >
                           <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              {p.image_url ? (
-                                <img src={p.image_url} alt="" style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} />
-                              ) : (
-                                <span style={{ width: '36px', height: '36px', borderRadius: '6px', background: '#f1f5f9', display: 'grid', placeItems: 'center' }}>🛍️</span>
-                              )}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                              <div
+                                style={{
+                                  width: '48px',
+                                  height: '48px',
+                                  borderRadius: '10px',
+                                  background: 'radial-gradient(circle, #ffffff 0%, #f1f5f9 100%)',
+                                  border: '1px solid var(--line)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  padding: '4px',
+                                  flexShrink: 0
+                                }}
+                              >
+                                {p.image_url ? (
+                                  <img src={p.image_url} alt="" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                                ) : (
+                                  <span style={{ fontSize: '22px' }}>🛍️</span>
+                                )}
+                              </div>
                               <div>
-                                <span style={{ fontWeight: 700, display: 'block' }}>{p.name}</span>
-                                <span style={{ fontSize: '11px', color: '#64748b' }}>{p.category_name || 'General'}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                                  {p.brand && (
+                                    <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--muted)', background: 'var(--line-subtle)', padding: '1px 6px', borderRadius: '4px' }}>
+                                      {p.brand}
+                                    </span>
+                                  )}
+                                  <span style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 600 }}>
+                                    {p.category_name || 'General'}
+                                  </span>
+                                  {p.badge && (
+                                    <span style={{ fontSize: '10px', fontWeight: 700, color: '#e11d48' }}>
+                                      {p.badge}
+                                    </span>
+                                  )}
+                                </div>
+                                <span style={{ fontWeight: 800, color: 'var(--ink)', fontSize: '14px', display: 'block' }}>
+                                  {p.name}
+                                </span>
                               </div>
                             </div>
                           </td>
                           <td>
-                            <span style={{ fontSize: '11px', fontWeight: 600, background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ink-secondary)', background: 'var(--line-subtle)', padding: '3px 8px', borderRadius: '6px', border: '1px solid var(--line)' }}>
                               {p.store_name || 'Daraz Mall'}
                             </span>
                           </td>
-                          <td style={{ fontWeight: 800 }}>Rs. {Number(p.price).toLocaleString('en-NP')}</td>
+                          <td>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <strong style={{ fontWeight: 900, fontSize: '14px', color: 'var(--ink)' }}>
+                                Rs. {Number(p.price).toLocaleString('en-NP')}
+                              </strong>
+                              {p.original_price && Number(p.original_price) > Number(p.price) && (
+                                <span style={{ fontSize: '11px', color: 'var(--muted)', textDecoration: 'line-through' }}>
+                                  Rs. {Number(p.original_price).toLocaleString('en-NP')}
+                                </span>
+                              )}
+                            </div>
+                          </td>
                           <td>
                             {p.emi_available === 1 ? (
-                              <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', background: '#d1fae5', padding: '3px 8px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                                💳 Yes
+                              <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', background: '#d1fae5', padding: '3px 8px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                💳 0% EMI
                               </span>
                             ) : (
                               <span style={{ fontSize: '11px', color: '#94a3b8', background: '#f1f5f9', padding: '3px 8px', borderRadius: '12px' }}>
-                                No
+                                None
                               </span>
                             )}
                           </td>
@@ -583,20 +660,21 @@ export const AdminDashboardView: FC<{
                                 type="submit"
                                 className={`badge ${p.is_active ? 'badge-active' : 'badge-inactive'}`}
                                 style={{ border: 0, cursor: 'pointer' }}
+                                title="Click to toggle Active / Draft state"
                               >
-                                {p.is_active ? 'Active' : 'Draft'}
+                                {p.is_active ? '● Active' : '○ Draft'}
                               </button>
                             </form>
                           </td>
                           <td style={{ textAlign: 'right' }}>
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-                              <a href={`/product/${p.id}`} target="_blank" className="primary-action" style={{ padding: '4px 8px', fontSize: '11px', background: '#0f172a' }}>
+                              <a href={`/product/${p.id}`} target="_blank" className="primary-action" style={{ padding: '5px 10px', fontSize: '11px', background: '#0f172a' }}>
                                 View ↗
                               </a>
                               <button
                                 type="button"
                                 className="btn-scores-product primary-action"
-                                style={{ padding: '4px 8px', fontSize: '11px', background: '#d97706', border: 0, cursor: 'pointer' }}
+                                style={{ padding: '5px 10px', fontSize: '11px', background: '#d97706', border: 0, cursor: 'pointer' }}
                                 data-id={p.id}
                                 data-name={p.name}
                                 data-display={p.scores?.display_score ?? 8.5}
@@ -613,7 +691,7 @@ export const AdminDashboardView: FC<{
                               <button
                                 type="button"
                                 className="btn-edit-product primary-action"
-                                style={{ padding: '4px 8px', fontSize: '11px', background: '#2563eb', border: 0, cursor: 'pointer' }}
+                                style={{ padding: '5px 10px', fontSize: '11px', background: '#2563eb', border: 0, cursor: 'pointer' }}
                                 data-id={p.id}
                                 data-name={p.name}
                                 data-price={p.price}
@@ -631,8 +709,8 @@ export const AdminDashboardView: FC<{
                               >
                                 ✏️ Edit
                               </button>
-                              <form method="post" action={`/admin/products/${p.id}/delete`} onsubmit="return confirm('Delete this product?');" style={{ display: 'inline' }}>
-                                <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>
+                              <form method="post" action={`/admin/products/${p.id}/delete`} onsubmit="return confirm('Delete this product permanently from catalog?');" style={{ display: 'inline' }}>
+                                <button type="submit" style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '5px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>
                                   Delete
                                 </button>
                               </form>
@@ -1404,6 +1482,97 @@ export const AdminDashboardView: FC<{
         </main>
       </div>
 
+      {/* Modal: Add New Curated Product */}
+      <div id="addProductModal" className="admin-modal-backdrop">
+        <div className="admin-modal-content" style={{ maxWidth: '680px' }}>
+          <div className="admin-modal-header">
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)' }}>✨ Add Curated Product to Nepal Catalog</h3>
+            <button type="button" className="close-admin-modal" style={{ background: 'transparent', border: 0, fontSize: '24px', cursor: 'pointer', color: 'var(--muted)', lineHeight: 1 }}>×</button>
+          </div>
+          <form method="post" action="/admin/products/new">
+            <div className="admin-modal-body">
+              <div className="form-group">
+                <label>Product Title *</label>
+                <input name="name" type="text" placeholder="e.g. Sony WH-1000XM5 Noise Cancelling Headphones" required />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Deal Price (NPR) *</label>
+                  <input name="price" type="number" placeholder="44999" required />
+                </div>
+                <div className="form-group">
+                  <label>Original MRP (NPR)</label>
+                  <input name="original_price" type="number" placeholder="49999" />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Department / Category</label>
+                  <select name="category_id">
+                    <option value="">-- Select Category --</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Verified Store Name</label>
+                  <input name="store_name" type="text" placeholder="e.g. Oliz Store Nepal" defaultValue="Daraz Mall" />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Badge Tag</label>
+                  <input name="badge" type="text" placeholder="e.g. 🔥 Hot Deal" defaultValue="🔥 Hot Deal" />
+                </div>
+                <div className="form-group">
+                  <label>Brand</label>
+                  <input name="brand" type="text" placeholder="e.g. Sony" />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Store / Affiliate URL</label>
+                <input name="affiliate_url" type="url" placeholder="https://www.daraz.com.np/products/..." />
+              </div>
+
+              <div className="form-group">
+                <label>Image URL</label>
+                <input name="image_url" type="url" placeholder="https://images.unsplash.com/..." />
+              </div>
+
+              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--card-subtle, #f8fafc)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--line, #e2e8f0)' }}>
+                <input type="checkbox" id="modalAddProdEmi" name="emi_available" value="1" style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                <label htmlFor="modalAddProdEmi" style={{ margin: 0, cursor: 'pointer', fontWeight: 700, fontSize: '13px', color: 'var(--ink)' }}>
+                  💳 0% Bank EMI Available in Nepal (Nabil, NIC Asia, Global IME, etc.)
+                </label>
+              </div>
+
+              <div className="form-group">
+                <label>Editorial Verdict &amp; Nepal Buying Advice</label>
+                <textarea name="verdict" rows={2} placeholder="Our bottom-line recommendation for Nepali shoppers…"></textarea>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Description &amp; Specs Highlights</label>
+                <textarea name="description" rows={3} placeholder="Key specs, dimensions and warranty details…"></textarea>
+              </div>
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+                Cancel
+              </button>
+              <button type="submit" className="primary-action">
+                Publish Product to Nepal Catalog
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       {/* Modal: Edit Curated Product */}
       <div id="editProductModal" className="admin-modal-backdrop">
         <div className="admin-modal-content">
@@ -1766,6 +1935,57 @@ export const AdminDashboardView: FC<{
         dangerouslySetInnerHTML={{
           __html: `
             document.addEventListener('DOMContentLoaded', () => {
+              // 0. Add Product Modal Triggers
+              const addProdModal = document.getElementById('addProductModal');
+              document.querySelectorAll('#btnOpenAddProduct, .btn-trigger-add-product').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  if (addProdModal) addProdModal.classList.add('open');
+                });
+              });
+
+              // 0.1 Real-time Catalog Live Search & Filters
+              const searchInput = document.getElementById('adminProductSearch');
+              const catFilter = document.getElementById('adminCategoryFilter');
+              const statusFilter = document.getElementById('adminStatusFilter');
+              const countBadge = document.getElementById('filteredCountBadge');
+              const productRows = document.querySelectorAll('.admin-product-row');
+
+              function applyProductFilters() {
+                const q = (searchInput?.value || '').toLowerCase().trim();
+                const cat = (catFilter?.value || '').toLowerCase().trim();
+                const st = (statusFilter?.value || '').toLowerCase().trim();
+                let visibleCount = 0;
+
+                productRows.forEach(row => {
+                  const name = row.getAttribute('data-name') || '';
+                  const brand = row.getAttribute('data-brand') || '';
+                  const rowCat = row.getAttribute('data-category') || '';
+                  const rowStore = row.getAttribute('data-store') || '';
+                  const rowStatus = row.getAttribute('data-status') || '';
+                  const rowEmi = row.getAttribute('data-emi') || '';
+
+                  const matchQuery = !q || name.includes(q) || brand.includes(q) || rowStore.includes(q) || rowCat.includes(q);
+                  const matchCat = !cat || rowCat === cat;
+                  let matchStatus = true;
+                  if (st === 'active') matchStatus = rowStatus === 'active';
+                  else if (st === 'draft') matchStatus = rowStatus === 'draft';
+                  else if (st === 'emi') matchStatus = rowEmi === 'emi';
+
+                  if (matchQuery && matchCat && matchStatus) {
+                    row.style.display = '';
+                    visibleCount++;
+                  } else {
+                    row.style.display = 'none';
+                  }
+                });
+
+                if (countBadge) countBadge.textContent = visibleCount + ' Items';
+              }
+
+              if (searchInput) searchInput.addEventListener('input', applyProductFilters);
+              if (catFilter) catFilter.addEventListener('change', applyProductFilters);
+              if (statusFilter) statusFilter.addEventListener('change', applyProductFilters);
+
               // 1. Edit Product Modal Triggers
               const editProdModal = document.getElementById('editProductModal');
               const editProdForm = document.getElementById('editProductForm');

@@ -504,6 +504,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
   const reviewCount = product.review_count || 42;
   const emiAvailable = product.emi_available === 1;
   const emiPrice = product.emi_starting_price || Math.round(price / 18);
+  const brand = product.brand || '';
 
   return (
     <article
@@ -517,10 +518,10 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
       data-badge={badge.toLowerCase()}
       data-rating={rating}
       data-discount={discountPercent}
-      data-brand={(product.brand || '').toLowerCase()}
+      data-brand={(brand).toLowerCase()}
       data-emi={emiAvailable ? '1' : '0'}
     >
-      <div style={{ position: 'relative' }}>
+      <div className="product-card-top-stage">
         <a
           href={`/product/${product.id}`}
           className="product-image-link"
@@ -533,8 +534,12 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
               <span>BN</span>
             </div>
           )}
-          <span className="product-badge-overlay">{badge}</span>
-          <span className="product-store-badge">{storeName}</span>
+          {discountPercent > 0 ? (
+            <span className="product-badge-overlay deal-accent">🔥 -{discountPercent}% OFF</span>
+          ) : (
+            <span className="product-badge-overlay">{badge}</span>
+          )}
+          <span className="product-store-badge">✓ {storeName}</span>
         </a>
 
         {/* Quick Action Floating Circles: Wishlist Heart + Comparison Balance */}
@@ -548,6 +553,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
             data-image={product.image_url}
             data-url={`/product/${product.id}`}
             title="Add to Wishlist"
+            aria-label="Add to Wishlist"
           >
             ❤️
           </button>
@@ -561,6 +567,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
             data-store={storeName}
             data-warranty={product.specs?.['Official Warranty'] || '1 Year Official'}
             title="Add to Compare"
+            aria-label="Add to Compare"
           >
             ⚖️
           </button>
@@ -569,22 +576,32 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
 
       <div className="product-card-body">
         <div className="product-meta-row">
-          <span className="product-category-tag">{product.category_name || 'Featured'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <span className="product-category-tag">{product.category_name || 'Tech'}</span>
+            {brand && <span className="product-brand-chip">{brand}</span>}
+          </div>
           <span className="product-rating">
             ★ {rating.toFixed(1)} <small style={{ color: 'var(--muted)', fontWeight: 500 }}>({reviewCount})</small>
           </span>
         </div>
 
-        <a href={`/product/${product.id}`} className="product-name">
+        <a href={`/product/${product.id}`} className="product-name" title={product.name}>
           {product.name}
         </a>
 
+        {/* 2026 Micro-Tags: Nepal Trust & Regulatory Badges */}
+        <div className="product-spec-pills">
+          <span className="spec-pill-mini">🇳🇵 MDMS Whitelisted</span>
+          <span className="spec-pill-mini">🛡️ Official VAT Bill</span>
+          {emiAvailable && <span className="spec-pill-mini emi">💳 0% EMI</span>}
+        </div>
+
         <p className="product-description">{product.description || 'Explore verified specifications and Nepal store pricing.'}</p>
 
-        {/* 0% EMI Indicator Pill */}
+        {/* 0% EMI Monthly Installment Strip */}
         {emiAvailable && (
-          <div style={{ margin: '6px 0', fontSize: '11px', fontWeight: 700, color: 'var(--emerald)' }}>
-            💳 0% EMI from Rs. {emiPrice.toLocaleString()}/mo
+          <div className="product-card-emi-strip">
+            <span>💳 0% EMI from:</span> <strong>Rs. {emiPrice.toLocaleString()}/mo</strong>
           </div>
         )}
 
@@ -595,7 +612,7 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
                 <span className="original-price" data-base-npr={originalPrice}>
                   Rs. {formattedOriginal}
                 </span>
-                <span className="discount-pill">-{discountPercent}%</span>
+                <span className="discount-pill">Save Rs. {(originalPrice - price).toLocaleString()}</span>
               </div>
             )}
             <strong className="product-price" data-base-npr={price}>
@@ -603,21 +620,16 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
             </strong>
           </div>
 
-          {product.affiliate_url ? (
-            <a
-              className="product-buy"
-              href={product.affiliate_url}
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              title={`View verified deal on ${storeName} (Direct Store Link)`}
-            >
-              Deal <span>↗</span>
-            </a>
-          ) : (
-            <a className="product-buy" href={`/product/${product.id}`}>
-              Details <span>→</span>
-            </a>
-          )}
+          <a
+            className="product-buy"
+            href={product.affiliate_url || `/product/${product.id}`}
+            target={product.affiliate_url ? '_blank' : '_self'}
+            rel="noopener noreferrer nofollow"
+            title={`View deal on ${storeName}`}
+          >
+            <span>{product.affiliate_url ? 'View Deal' : 'Details'}</span>
+            <span className="buy-arrow">↗</span>
+          </a>
         </div>
       </div>
     </article>
