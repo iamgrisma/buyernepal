@@ -623,12 +623,74 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                 }
 
                 if (menuBtn) menuBtn.addEventListener('click', openDrawer);
+                const allDepartmentsBtn = document.getElementById('allDepartmentsBtn');
+                if (allDepartmentsBtn) allDepartmentsBtn.addEventListener('click', openDrawer);
+
                 if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
                 if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+                // Desktop Nav Strip Horizontal Scroll Controls & Wheel Support
+                const navScrollWrapper = document.getElementById('storeNavScrollWrapper');
+                const navScrollPrev = document.getElementById('navScrollPrevBtn');
+                const navScrollNext = document.getElementById('navScrollNextBtn');
+
+                function updateNavScrollIndicators() {
+                  if (!navScrollWrapper) return;
+                  const { scrollLeft, scrollWidth, clientWidth } = navScrollWrapper;
+                  if (navScrollPrev) {
+                    navScrollPrev.style.opacity = scrollLeft > 10 ? '1' : '0.35';
+                    navScrollPrev.style.pointerEvents = scrollLeft > 10 ? 'auto' : 'none';
+                  }
+                  if (navScrollNext) {
+                    const isEnd = scrollLeft >= scrollWidth - clientWidth - 10;
+                    navScrollNext.style.opacity = isEnd ? '0.35' : '1';
+                    navScrollNext.style.pointerEvents = isEnd ? 'none' : 'auto';
+                  }
+                }
+
+                if (navScrollWrapper) {
+                  navScrollWrapper.addEventListener('scroll', updateNavScrollIndicators);
+                  navScrollWrapper.addEventListener('wheel', (e) => {
+                    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                      e.preventDefault();
+                      navScrollWrapper.scrollLeft += e.deltaY;
+                    }
+                  }, { passive: false });
+                  window.addEventListener('resize', updateNavScrollIndicators);
+                  setTimeout(updateNavScrollIndicators, 150);
+                }
+
+                if (navScrollPrev) {
+                  navScrollPrev.addEventListener('click', () => {
+                    if (navScrollWrapper) navScrollWrapper.scrollBy({ left: -260, behavior: 'smooth' });
+                  });
+                }
+                if (navScrollNext) {
+                  navScrollNext.addEventListener('click', () => {
+                    if (navScrollWrapper) navScrollWrapper.scrollBy({ left: 260, behavior: 'smooth' });
+                  });
+                }
+
+                // Nav More Dropdown Click Toggle for touch/click
+                const navMoreBtn = document.getElementById('navMoreDropdownBtn');
+                const navMoreWrap = document.querySelector('.nav-more-dropdown-wrap');
+                if (navMoreBtn && navMoreWrap) {
+                  navMoreBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navMoreWrap.classList.toggle('open');
+                  });
+                  document.addEventListener('click', (e) => {
+                    if (!navMoreWrap.contains(e.target)) {
+                      navMoreWrap.classList.remove('open');
+                    }
+                  });
+                }
+
                 document.addEventListener('keydown', (e) => {
                   if (e.key === 'Escape') {
                     closeDrawer();
                     closeWishlist();
+                    if (navMoreWrap) navMoreWrap.classList.remove('open');
                     if (compareModalBackdrop) compareModalBackdrop.classList.remove('open');
                   }
                 });

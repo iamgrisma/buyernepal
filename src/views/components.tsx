@@ -121,7 +121,30 @@ export const Header: FC<{
         {/* Tier 2: Dedicated Category Navigation Strip */}
         <div className="store-nav-strip">
           <div className="store-shell store-nav-strip-inner">
-            <div className="store-nav-scroll-wrapper">
+            {/* All Departments Drawer Toggle */}
+            <button
+              id="allDepartmentsBtn"
+              type="button"
+              className="nav-all-departments-btn"
+              title="Browse all departments & categories"
+              aria-label="Browse all departments"
+            >
+              <span className="nav-all-icon">☰</span>
+              <span>All Categories</span>
+            </button>
+
+            {/* Desktop Left Scroll Arrow */}
+            <button
+              id="navScrollPrevBtn"
+              type="button"
+              className="nav-scroll-btn nav-scroll-prev"
+              aria-label="Scroll categories left"
+              title="Scroll left"
+            >
+              ‹
+            </button>
+
+            <div id="storeNavScrollWrapper" className="store-nav-scroll-wrapper">
               <nav className="store-nav-pills" aria-label="Department navigation">
                 {settings.menu_show_deals !== '0' && (
                   <a href="/" className={`nav-pill ${!activeSlug ? 'nav-pill-active' : ''}`}>
@@ -208,7 +231,58 @@ export const Header: FC<{
               </nav>
             </div>
 
-            {/* Trust badges moved to hero section — removed from nav to keep full menu visible */}
+            {/* Desktop Right Scroll Arrow */}
+            <button
+              id="navScrollNextBtn"
+              type="button"
+              className="nav-scroll-btn nav-scroll-next"
+              aria-label="Scroll categories right"
+              title="Scroll right"
+            >
+              ›
+            </button>
+
+            {/* Quick "More ▾" Dropdown for instantaneous category jump */}
+            <div className="nav-more-dropdown-wrap">
+              <button
+                id="navMoreDropdownBtn"
+                type="button"
+                className="nav-more-pill"
+                aria-label="More categories"
+                title="View more categories"
+              >
+                <span>More</span>
+                <span className="nav-more-arrow">▾</span>
+              </button>
+              <div id="navMoreDropdownMenu" className="nav-more-dropdown-menu">
+                <div className="nav-more-dropdown-header">ALL CATEGORIES &amp; HUBS</div>
+                <div className="nav-more-dropdown-grid">
+                  {categories.map((cat) => (
+                    <a
+                      key={cat.id}
+                      href={`/category/${cat.slug}`}
+                      className="nav-more-dropdown-item"
+                    >
+                      <span className="nav-more-item-icon">{cat.icon || '🛍️'}</span>
+                      <span className="nav-more-item-name">{cat.name}</span>
+                    </a>
+                  ))}
+                  <div className="nav-more-dropdown-divider" />
+                  <a href="/stores" className="nav-more-dropdown-item">
+                    <span>🏪</span>
+                    <span className="nav-more-item-name">Verified Stores Directory</span>
+                  </a>
+                  <a href="/brands" className="nav-more-dropdown-item">
+                    <span>🏷️</span>
+                    <span className="nav-more-item-name">Official Brand Centers</span>
+                  </a>
+                  <a href="/coupons" className="nav-more-dropdown-item">
+                    <span>🎟️</span>
+                    <span className="nav-more-item-name">Active Discount Coupons</span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -354,7 +428,9 @@ export const Hero: FC<{ settings: SiteSettings }> = ({ settings }) => {
 
           <div className="hero-search-wrapper">
             <div className="hero-search">
-              <span aria-hidden="true">🔍</span>
+              <span aria-hidden="true" className="hero-search-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              </span>
               <input
                 id="searchInput"
                 type="text"
@@ -380,7 +456,10 @@ export const Hero: FC<{ settings: SiteSettings }> = ({ settings }) => {
 
           <div className="hero-points">
             {trustPoints.map((pt, i) => (
-              <span key={i}>{pt}</span>
+              <span key={i}>
+                <svg className="hero-point-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>{pt.replace(/^[✓✔]\s*/, '')}</span>
+              </span>
             ))}
           </div>
         </div>
@@ -419,19 +498,15 @@ export const Hero: FC<{ settings: SiteSettings }> = ({ settings }) => {
 };
 
 export const TrustStrip: FC<{ settings?: SiteSettings }> = ({ settings }) => {
-  const item1Icon = settings?.trust_item1_icon || '🇳🇵';
   const item1Title = settings?.trust_item1_title || 'Curated for Nepal';
   const item1Desc = settings?.trust_item1_desc || 'Prices, models and distributor warranties verified for Nepali buyers.';
 
-  const item2Icon = settings?.trust_item2_icon || '🏷️';
   const item2Title = settings?.trust_item2_title || 'Zero Price Markups';
   const item2Desc = settings?.trust_item2_desc || 'Compare authentic prices across Daraz, Oliz Store, EvoStore & more.';
 
-  const item3Icon = settings?.trust_item3_icon || '🔍';
   const item3Title = settings?.trust_item3_title || 'Independent Testing';
   const item3Desc = settings?.trust_item3_desc || 'In-depth benchmarks, real-world testing, pros & cons from Nepal editors.';
 
-  const item4Icon = settings?.trust_item4_icon || '⚖️';
   const item4Title = settings?.trust_item4_title || 'Multi-Store Comparison';
   const item4Desc = settings?.trust_item4_desc || 'Live price tracking & stock verification across verified Nepal retailers.';
 
@@ -439,28 +514,36 @@ export const TrustStrip: FC<{ settings?: SiteSettings }> = ({ settings }) => {
     <section className="store-shell">
       <div className="trust-strip">
         <div className="trust-item">
-          <div className="trust-icon">{item1Icon}</div>
+          <div className="trust-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
           <div className="trust-text">
             <strong>{item1Title}</strong>
             <span>{item1Desc}</span>
           </div>
         </div>
         <div className="trust-item">
-          <div className="trust-icon">{item2Icon}</div>
+          <div className="trust-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          </div>
           <div className="trust-text">
             <strong>{item2Title}</strong>
             <span>{item2Desc}</span>
           </div>
         </div>
         <div className="trust-item">
-          <div className="trust-icon">{item3Icon}</div>
+          <div className="trust-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
           <div className="trust-text">
             <strong>{item3Title}</strong>
             <span>{item3Desc}</span>
           </div>
         </div>
         <div className="trust-item">
-          <div className="trust-icon">{item4Icon}</div>
+          <div className="trust-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+          </div>
           <div className="trust-text">
             <strong>{item4Title}</strong>
             <span>{item4Desc}</span>
@@ -1135,9 +1218,6 @@ export const Footer: FC<{ settings: SiteSettings; categories?: Category[] }> = (
           <h3>Administration</h3>
           <a href="/admin">Admin Management Portal</a>
           <a href="/admin/login">Staff Login</a>
-          <span style={{ display: 'block', fontSize: '12px', color: '#64748b', marginTop: '10px', lineHeight: '1.5' }}>
-            Built with pure Hono Edge SSR on Cloudflare Workers + D1 database in Kathmandu, Nepal.
-          </span>
         </div>
       </div>
 

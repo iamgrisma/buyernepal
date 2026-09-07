@@ -108,14 +108,14 @@ export const HomePage: FC<{
               <div className="filter-bar" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                   <div className="filter-chips-group">
-                    <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--muted)', marginRight: '4px' }}>FILTER:</span>
+                    <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--ink)', marginRight: '4px' }}>FILTER:</span>
                     <button type="button" className="filter-pill active" data-filter="all">All Items</button>
-                    <button type="button" className="filter-pill" data-filter="hot">🔥 Hot Deals</button>
-                    <button type="button" className="filter-pill" data-filter="editor">🏆 Editor's Pick</button>
-                    <button type="button" className="filter-pill" data-filter="emi">💳 0% EMI Ready</button>
-                    <button type="button" className="filter-pill" data-filter="under10k">💰 Under Rs. 10,000</button>
-                    <button type="button" className="filter-pill" data-filter="flagship">📱 Flagships</button>
-                    <button type="button" className="filter-pill" data-filter="local">🇳🇵 Nepal Classic</button>
+                    <button type="button" className="filter-pill" data-filter="hot">Hot Deals</button>
+                    <button type="button" className="filter-pill" data-filter="editor">Editor's Pick</button>
+                    <button type="button" className="filter-pill" data-filter="emi">0% EMI</button>
+                    <button type="button" className="filter-pill" data-filter="under10k">Under Rs. 10,000</button>
+                    <button type="button" className="filter-pill" data-filter="flagship">Flagships</button>
+                    <button type="button" className="filter-pill" data-filter="local">Nepal Classic</button>
                   </div>
 
                   <div className="sort-controls">
