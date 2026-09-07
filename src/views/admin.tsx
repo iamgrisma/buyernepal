@@ -34,12 +34,12 @@ export const AdminLoginView: FC<{ error?: string; success?: string }> = ({ error
           <form method="post" action="/admin/login">
             <div className="form-group">
               <label htmlFor="username">Administrator Username or Email</label>
-              <input id="username" name="username" type="text" defaultValue="admin" placeholder="e.g. admin" required autoFocus />
+              <input id="username" name="username" type="text" placeholder="Enter administrator username or email" required autoFocus />
             </div>
 
             <div className="form-group">
               <label htmlFor="password">Password</label>
-              <input id="password" name="password" type="password" defaultValue="admin123" placeholder="••••••••" required />
+              <input id="password" name="password" type="password" placeholder="Enter password" required />
             </div>
 
             <button
@@ -50,10 +50,6 @@ export const AdminLoginView: FC<{ error?: string; success?: string }> = ({ error
               Sign In to Management Portal
             </button>
           </form>
-
-          <div style={{ marginTop: '20px', padding: '12px', background: '#f8fafc', borderRadius: '8px', fontSize: '12px', color: '#64748b', textAlign: 'center' }}>
-            <span>Default Demo Credentials: <b>admin</b> / <b>admin123</b></span>
-          </div>
 
           <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '13px' }}>
             <a href="/" style={{ color: '#64748b', fontWeight: 600 }}>← Return to Public Storefront</a>

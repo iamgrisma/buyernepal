@@ -29,7 +29,8 @@ export const Header: FC<{
       )}
 
       <header className="store-header">
-        <div className="store-shell store-header-inner">
+        {/* Tier 1: Brand, Search & Actions */}
+        <div className="store-shell store-header-main">
           <a href="/" className="store-brand" aria-label={`${title} Home`}>
             <span className="store-logo-mark">B</span>
             <span>
@@ -38,47 +39,30 @@ export const Header: FC<{
             </span>
           </a>
 
-          {/* Desktop Navigation */}
-          <nav className="store-nav" aria-label="Primary navigation">
-            <a href="/" className={!activeSlug ? 'store-nav-active' : ''}>
-              🏠 All Deals
-            </a>
-            {primaryCategories.map((cat) => (
-              <a
-                key={cat.id}
-                href={`/category/${cat.slug}`}
-                className={activeSlug === cat.slug ? 'store-nav-active' : ''}
-              >
-                <span>{cat.icon || '📁'}</span>
-                <span>{cat.name}</span>
-              </a>
-            ))}
+          {/* Central Header Quick Search */}
+          <div className="store-header-search">
+            <form
+              action="/"
+              method="get"
+              className="header-search-form"
+              onsubmit="event.preventDefault(); const inp = this.querySelector('input'); const val = inp ? inp.value.trim() : ''; const mainInput = document.getElementById('searchInput'); if (mainInput) { mainInput.value = val; mainInput.dispatchEvent(new Event('input')); mainInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); } else { window.location.href = '/?q=' + encodeURIComponent(val); }"
+            >
+              <span className="search-icon">🔍</span>
+              <input
+                type="search"
+                placeholder="Search iPhone, MacBook, Goldstar, Pashmina..."
+                className="header-search-input"
+                aria-label="Search verified deals in Nepal"
+                oninput="const mainInput = document.getElementById('searchInput'); if (mainInput) { mainInput.value = this.value; mainInput.dispatchEvent(new Event('input')); }"
+              />
+              <button type="submit" className="header-search-submit">Search</button>
+            </form>
+          </div>
 
-            {extraCategories.length > 0 && (
-              <div className="nav-dropdown">
-                <button type="button" className="nav-dropdown-btn">
-                  More Categories ▾
-                </button>
-                <div className="nav-dropdown-menu">
-                  {extraCategories.map((cat) => (
-                    <a
-                      key={cat.id}
-                      href={`/category/${cat.slug}`}
-                      className={activeSlug === cat.slug ? 'active' : ''}
-                    >
-                      <span>{cat.icon || '📁'}</span>
-                      <span>{cat.name}</span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-          </nav>
-
-          {/* Header Action Utilities: Currency, Theme, Wishlist, Compare, Admin */}
-          <div className="store-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Header Action Utilities: Currency, Theme, Wishlist, Admin */}
+          <div className="store-header-actions">
             {/* Multi-Currency Switcher */}
-            <div className="currency-selector" title="Switch Currency">
+            <div className="currency-selector" title="Switch Display Currency">
               <button type="button" className="currency-btn active" data-currency="NPR">🇳🇵 NPR</button>
               <button type="button" className="currency-btn" data-currency="USD">🇺🇸 USD</button>
               <button type="button" className="currency-btn" data-currency="INR">🇮🇳 INR</button>
@@ -107,10 +91,12 @@ export const Header: FC<{
               <span id="wishlistCountBadge" className="wishlist-badge" style={{ display: 'none' }}>0</span>
             </button>
 
-            <a href="/admin" className="store-admin-link">
+            {/* Staff / Admin Access */}
+            <a href="/admin" className="store-admin-link" title="Store Management Portal">
               🔐 <span>Admin</span>
             </a>
 
+            {/* Mobile Hamburger */}
             <button
               id="mobileMenuBtn"
               className="store-menu"
@@ -121,6 +107,37 @@ export const Header: FC<{
               <span></span>
               <span></span>
             </button>
+          </div>
+        </div>
+
+        {/* Tier 2: Dedicated Category Navigation Strip */}
+        <div className="store-nav-strip">
+          <div className="store-shell store-nav-strip-inner">
+            <div className="store-nav-scroll-wrapper">
+              <nav className="store-nav-pills" aria-label="Department navigation">
+                <a href="/" className={`nav-pill ${!activeSlug ? 'nav-pill-active' : ''}`}>
+                  <span>🏠</span>
+                  <span>All Deals</span>
+                </a>
+                {categories.map((cat) => (
+                  <a
+                    key={cat.id}
+                    href={`/category/${cat.slug}`}
+                    className={`nav-pill ${activeSlug === cat.slug ? 'nav-pill-active' : ''}`}
+                  >
+                    <span className="nav-pill-icon">{cat.icon || '🛍️'}</span>
+                    <span>{cat.name}</span>
+                  </a>
+                ))}
+              </nav>
+            </div>
+
+            {/* Right Trust Badges */}
+            <div className="store-nav-highlights">
+              <span className="nav-highlight-item">⚡ 0% Bank EMI</span>
+              <span className="nav-highlight-item">🇳🇵 100% Verified</span>
+              <span className="nav-highlight-item">🚚 24h KTM Courier</span>
+            </div>
           </div>
         </div>
 
