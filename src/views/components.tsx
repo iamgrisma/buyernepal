@@ -9,7 +9,7 @@ export const Header: FC<{
   const title = settings.site_title || 'BuyerNepal';
   const announcement =
     settings.announcement_text ||
-    '⚡ Grand 2026 Festive Deals in Nepal • Verified NPR Prices • 0% Bank EMI • Same-Day Kathmandu Delivery';
+    '🇳🇵 Nepal\'s Independent Shopping Intelligence • Real-Time Multi-Store Price Comparison & Tech Reviews';
   const showAnnouncement = settings.announcement_active !== '0';
   const primaryCategories = categories.slice(0, 5);
   const extraCategories = categories.slice(5);
@@ -184,11 +184,11 @@ export const Header: FC<{
               </nav>
             </div>
 
-            {/* Right Trust Badges */}
+            {/* Right Review Authority & Trust Badges */}
             <div className="store-nav-highlights">
-              <span className="nav-highlight-item">⚡ 0% Bank EMI</span>
-              <span className="nav-highlight-item">🇳🇵 100% Verified</span>
-              <span className="nav-highlight-item">🚚 24h KTM Courier</span>
+              <span className="nav-highlight-item">🔍 Independent Reviews</span>
+              <span className="nav-highlight-item">⚖️ Multi-Store Compare</span>
+              <span className="nav-highlight-item">🇳🇵 Verified Nepal Pricing</span>
             </div>
           </div>
         </div>
@@ -334,15 +334,15 @@ export const Hero: FC<{ settings: SiteSettings }> = ({ settings }) => {
           <div className="hero-stat-row">
             <div className="hero-stat-box">
               <strong>500+</strong>
-              <span>Verified Deals</span>
+              <span>Curated Products</span>
             </div>
             <div className="hero-stat-box">
-              <strong>0% EMI</strong>
-              <span>Bank Partners</span>
+              <strong>15+</strong>
+              <span>Nepal Stores</span>
             </div>
             <div className="hero-stat-box">
-              <strong>24h</strong>
-              <span>KTM Delivery</span>
+              <strong>100%</strong>
+              <span>Unbiased Testing</span>
             </div>
           </div>
         </div>
@@ -369,17 +369,17 @@ export const TrustStrip: FC = () => (
         </div>
       </div>
       <div className="trust-item">
-        <div className="trust-icon">💳</div>
+        <div className="trust-icon">🔍</div>
         <div className="trust-text">
-          <strong>0% Bank EMI Ready</strong>
-          <span>Calculate monthly installments across Nabil, NIC Asia &amp; Global IME.</span>
+          <strong>Independent Testing</strong>
+          <span>In-depth benchmarks, real-world testing, pros &amp; cons from Nepal editors.</span>
         </div>
       </div>
       <div className="trust-item">
-        <div className="trust-icon">⚡</div>
+        <div className="trust-icon">⚖️</div>
         <div className="trust-text">
-          <strong>Fast Nepal Delivery</strong>
-          <span>Listed sellers offer 24h Kathmandu delivery and reliable nationwide courier.</span>
+          <strong>Multi-Store Comparison</strong>
+          <span>Live price tracking &amp; stock verification across verified Nepal retailers.</span>
         </div>
       </div>
     </div>
@@ -424,25 +424,27 @@ export const FlashSaleSection: FC<{ products: Product[] }> = ({ products }) => {
             const originalPrice = Number(p.original_price) || Math.round(price * 1.15);
             const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
             const claimed = p.claimed_percentage || 78;
+            const storeName = p.store_name || 'Daraz Mall';
 
             return (
-              <div
+              <article
                 key={p.id}
                 className="product-card"
-                style={{ background: 'var(--card-bg)', border: '1px solid rgba(244, 63, 94, 0.3)' }}
+                style={{ border: '1px solid rgba(220, 38, 38, 0.25)' }}
               >
                 <div className="product-card-top-stage">
                   <a href={`/product/${p.id}`} className="product-image-link" aria-label={`View deal for ${p.name}`}>
                     <img src={p.image_url} alt={p.name} loading="lazy" decoding="async" />
                   </a>
 
-                  {/* Floating Badges */}
-                  <div className="product-card-badges">
-                    <span className="product-badge-overlay deal-accent">🔥 -{discountPercent}%</span>
-                    <span className="product-store-badge">✓ {p.store_name || 'Daraz Mall'}</span>
-                  </div>
+                  {/* Discount Badge */}
+                  {discountPercent > 0 && (
+                    <div className="product-card-badges">
+                      <span className="product-badge-overlay deal-accent">-{discountPercent}%</span>
+                    </div>
+                  )}
 
-                  {/* Floating Action Circles */}
+                  {/* Quick Action Circles */}
                   <div className="card-actions-float">
                     <button
                       type="button"
@@ -455,7 +457,7 @@ export const FlashSaleSection: FC<{ products: Product[] }> = ({ products }) => {
                       title="Save to Wishlist"
                       aria-label="Save to Wishlist"
                     >
-                      ❤️
+                      ♡
                     </button>
                     <button
                       type="button"
@@ -464,38 +466,44 @@ export const FlashSaleSection: FC<{ products: Product[] }> = ({ products }) => {
                       data-name={p.name}
                       data-price={price}
                       data-image={p.image_url}
-                      data-store={p.store_name || 'Daraz Mall'}
+                      data-store={storeName}
                       data-warranty={p.specs?.['Official Warranty'] || '1 Year Official'}
                       title="Add to Comparison"
                       aria-label="Add to Comparison"
                     >
-                      ⚖️
+                      ⇌
                     </button>
                   </div>
                 </div>
 
-                <div className="product-card-body" style={{ padding: '16px' }}>
-                  <a href={`/product/${p.id}`} className="product-name" style={{ fontSize: '14px' }}>
+                <div className="product-card-body">
+                  <div className="pc-meta">
+                    <span className="pc-cat">{p.category_name || 'Flash Deal'}</span>
+                    <span className="pc-rating">★ {(p.rating || 4.8).toFixed(1)}</span>
+                  </div>
+
+                  <a href={`/product/${p.id}`} className="product-name" title={p.name}>
                     {p.name}
                   </a>
 
-                  <div className="flash-meter-box">
-                    <div className="flash-meter-label">
-                      <span>⚡ Claimed: <strong>{claimed}%</strong></span>
-                      <span style={{ color: '#f43f5e' }}>Only 3 left</span>
-                    </div>
-                    <div className="flash-meter-track">
-                      <div className="flash-meter-fill" style={{ width: `${claimed}%` }} />
+                  <div className="pc-store-row">
+                    <span className="pc-store-chip">✓ {storeName}</span>
+                    <span style={{ fontSize: '10px', color: '#dc2626', fontWeight: 700, marginLeft: 'auto' }}>
+                      🔥 {claimed}% Claimed
+                    </span>
+                  </div>
+
+                  <div className="flash-meter-box" style={{ margin: '0 0 10px 0' }}>
+                    <div className="flash-meter-track" style={{ height: '4px', background: 'var(--line)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div className="flash-meter-fill" style={{ width: `${claimed}%`, height: '100%', background: 'linear-gradient(90deg, #dc2626, #f97316)', borderRadius: '2px' }} />
                     </div>
                   </div>
 
-                  <div className="product-card-bottom" style={{ marginTop: '14px' }}>
+                  <div className="product-card-bottom">
                     <div className="price-block">
-                      <div className="original-price-row">
-                        <span className="original-price" data-base-npr={originalPrice}>
-                          Rs. {originalPrice.toLocaleString()}
-                        </span>
-                      </div>
+                      <span className="original-price" data-base-npr={originalPrice}>
+                        Rs. {originalPrice.toLocaleString()}
+                      </span>
                       <strong className="product-price" data-base-npr={price}>
                         Rs. {price.toLocaleString()}
                       </strong>
@@ -504,15 +512,15 @@ export const FlashSaleSection: FC<{ products: Product[] }> = ({ products }) => {
                     <a
                       className="product-buy"
                       href={p.affiliate_url || `/product/${p.id}`}
-                      target="_blank"
+                      target={p.affiliate_url ? '_blank' : '_self'}
                       rel="noopener noreferrer nofollow"
-                      style={{ background: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)' }}
+                      style={{ background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' }}
                     >
                       Grab Deal ⚡
                     </a>
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
@@ -809,8 +817,8 @@ export const NepalCityDeliveryEstimator: FC = () => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
       <span style={{ fontSize: '24px' }}>🚚</span>
       <div>
-        <strong style={{ fontSize: '14px', display: 'block' }}>Nepal Courier &amp; Delivery Coverage</strong>
-        <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Check delivery time and charges to your city</span>
+        <strong style={{ fontSize: '14px', display: 'block' }}>Nepal Merchant Shipping &amp; Transit Guide</strong>
+        <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Average seller dispatch speed and courier availability across Nepal</span>
       </div>
     </div>
 
@@ -826,7 +834,7 @@ export const NepalCityDeliveryEstimator: FC = () => (
       </select>
 
       <div id="deliveryOutput" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--emerald)' }}>
-        ⚡ Same-Day / 24h Free Delivery • Cash on Delivery Available
+        ⚡ 24h KTM Valley Delivery • 2-3 Days Nationwide Courier (COD supported by most stores)
       </div>
     </div>
   </div>

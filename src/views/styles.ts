@@ -7,6 +7,7 @@ export const storefrontCss = `
   --muted: #64748b;
   --line: #e2e8f0;
   --line-subtle: #f1f5f9;
+  --bg-alt: #f1f5f9;
   --surface: #ffffff;
   --accent: #dc2626;
   --accent-hover: #b91c1c;
@@ -39,6 +40,7 @@ export const storefrontCss = `
   --muted: #94a3b8;
   --line: #1e293b;
   --line-subtle: #0f172a;
+  --bg-alt: #0d1526;
   --surface: #111827;
   --accent: #ef4444;
   --accent-hover: #f87171;

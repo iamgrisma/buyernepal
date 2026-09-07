@@ -502,8 +502,8 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                               \${compareItems.map(i => \`<td style="text-align: center; color: var(--emerald); font-weight: 700;">\${i.price >= 12000 ? 'Available (From ' + formatCurrencyPrice(Math.round(i.price/18), currentCurrency) + '/mo)' : 'N/A'}</td>\`).join('')}
                             </tr>
                             <tr>
-                              <td><strong>Delivery Coverage</strong></td>
-                              \${compareItems.map(() => \`<td style="text-align: center;">Kathmandu 24h Express • Nationwide Courier</td>\`).join('')}
+                              <td><strong>Store Delivery</strong></td>
+                              \${compareItems.map(() => \`<td style="text-align: center;">Verified Stores (KTM &amp; Nationwide Courier)</td>\`).join('')}
                             </tr>
                             <tr>
                               <td><strong>Action</strong></td>

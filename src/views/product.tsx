@@ -617,8 +617,8 @@ export const ProductPage: FC<{
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                     <span style={{ fontSize: '20px' }}>🚚</span>
                     <div>
-                      <strong style={{ fontSize: '14px' }}>Nepal City Delivery &amp; Speed Estimator</strong>
-                      <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>Select your location to check transit time &amp; courier charges</div>
+                      <strong style={{ fontSize: '14px' }}>Nepal Seller Dispatch &amp; Transit Guide</strong>
+                      <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>Typical seller transit times &amp; rates across Nepal</div>
                     </div>
                   </div>
                   <div className="form-group" style={{ marginBottom: '10px' }}>
@@ -634,8 +634,8 @@ export const ProductPage: FC<{
                   </div>
                   <div id="detailCityResult" style={{ background: 'var(--card-subtle, #f8fafc)', padding: '12px 14px', borderRadius: '8px', fontSize: '12.5px', border: '1px solid var(--line)' }}>
                     <div>⏱️ <strong>Estimated Transit:</strong> <span id="detailTransitTime">Same-Day / 24 Hours Express</span></div>
-                    <div style={{ marginTop: '4px' }}>💰 <strong>Courier Fee:</strong> <span id="detailCourierFee" style={{ color: 'var(--emerald)', fontWeight: 700 }}>FREE (Kathmandu Valley Order)</span></div>
-                    <div style={{ marginTop: '4px' }}>💵 <strong>Payment:</strong> <span>Cash on Delivery (COD) &amp; Fonepay Accepted</span></div>
+                    <div style={{ marginTop: '4px' }}>💰 <strong>Store Shipping:</strong> <span id="detailCourierFee" style={{ color: 'var(--emerald)', fontWeight: 700 }}>FREE (Kathmandu Valley Order)</span></div>
+                    <div style={{ marginTop: '4px' }}>💵 <strong>Payment Options:</strong> <span>Cash on Delivery (COD) &amp; Fonepay Accepted by Stores</span></div>
                   </div>
                 </div>
               )}

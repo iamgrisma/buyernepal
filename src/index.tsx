@@ -775,7 +775,7 @@ app.get('/admin', async (c) => {
     ? { type: 'error' as const, message: err }
     : undefined;
 
-  const [settings, categories, products, stats, users, reviews, coupons, articles, orders, outboundClicks] = await Promise.all([
+  const [settings, categories, products, stats, users, reviews, coupons, articles, orders, outboundClicks, stores, brands] = await Promise.all([
     getSettings(c.env?.DB),
     getCategories(c.env?.DB, false),
     getAllProductsAdmin(c.env?.DB),
@@ -785,7 +785,9 @@ app.get('/admin', async (c) => {
     getCoupons(c.env?.DB),
     getAllArticlesAdmin(c.env?.DB),
     getOrdersAdmin(c.env?.DB),
-    getOutboundClicksAdmin(c.env?.DB)
+    getOutboundClicksAdmin(c.env?.DB),
+    getStores(c.env?.DB),
+    getBrands(c.env?.DB)
   ]);
 
   return c.html(
@@ -800,6 +802,8 @@ app.get('/admin', async (c) => {
       articles={articles}
       orders={orders}
       outboundClicks={outboundClicks}
+      stores={stores}
+      brands={brands}
       settings={settings}
       activeTab={tab}
       notice={notice}

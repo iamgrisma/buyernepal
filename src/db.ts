@@ -715,7 +715,7 @@ export async function getSettings(db?: D1Database): Promise<SiteSettings> {
   const defaults: SiteSettings = {
     site_title: 'BuyerNepal',
     site_description: 'Discover products worth buying in Nepal — curated recommendations, verified NPR prices, and direct store links.',
-    announcement_text: '⚡ Grand 2026 Festive Deals in Nepal • Verified NPR Prices • 0% Bank EMI • Same-Day Kathmandu Delivery',
+    announcement_text: '🇳🇵 Nepal\'s Independent Shopping Intelligence • Real-Time Multi-Store Price Comparison & Tech Reviews',
     announcement_active: '1',
     contact_email: 'contact@buyernepal.com',
     contact_phone: '+977-1-4521098',

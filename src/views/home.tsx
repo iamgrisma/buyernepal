@@ -183,10 +183,12 @@ export const HomePage: FC<{
           </div>
         </section>
 
-        {/* Nepal Courier & Delivery Fee Estimator */}
-        <section className="store-shell" style={{ marginTop: '36px' }}>
-          <NepalCityDeliveryEstimator />
-        </section>
+        {/* Nepal Store Shipping & Delivery Estimator */}
+        {settings.delivery_estimator_enabled !== '0' && (
+          <section className="store-shell" style={{ marginTop: '36px' }}>
+            <NepalCityDeliveryEstimator />
+          </section>
+        )}
 
         {/* Nepal Shopping FAQ Accordion */}
         <NepalShoppingFaq />
