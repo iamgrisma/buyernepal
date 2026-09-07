@@ -1,7 +1,31 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { Env } from './types';
-import { getSettings, getCategories, getCategoryBySlug, getProducts, getProductById, getReviews, getAdminStats } from './db';
+import {
+  getSettings,
+  updateSettings,
+  getCategories,
+  getCategoryBySlug,
+  createCategory,
+  deleteCategory,
+  getProducts,
+  getAllProductsAdmin,
+  getProductById,
+  createProduct,
+  deleteProduct,
+  getReviews,
+  getAllReviewsAdmin,
+  updateReviewStatus,
+  deleteReview,
+  getUsers,
+  createUser,
+  toggleUserStatus,
+  deleteUser,
+  getCoupons,
+  createCoupon,
+  deleteCoupon,
+  getAdminStats
+} from './db';
 import { getSession, createSession, clearSession, passwordHash, safeEqual } from './auth';
 import { HomePage } from './views/home';
 import { CategoryPage } from './views/category';
@@ -155,26 +179,266 @@ app.post('/admin/login', async (c) => {
 // SSR: Admin Dashboard
 app.get('/admin', async (c) => {
   const s = await getSession(c);
-  if (!s || s.role !== 'admin') {
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) {
     return c.redirect('/admin/login');
   }
 
-  const [settings, categories, products, stats] = await Promise.all([
+  const tab = c.req.query('tab') || 'overview';
+  const msg = c.req.query('msg');
+  const err = c.req.query('err');
+  const notice = msg
+    ? { type: 'success' as const, message: msg }
+    : err
+    ? { type: 'error' as const, message: err }
+    : undefined;
+
+  const [settings, categories, products, stats, users, reviews, coupons] = await Promise.all([
     getSettings(c.env?.DB),
-    getCategories(c.env?.DB),
-    getProducts(c.env?.DB),
-    getAdminStats(c.env?.DB)
+    getCategories(c.env?.DB, false),
+    getAllProductsAdmin(c.env?.DB),
+    getAdminStats(c.env?.DB),
+    getUsers(c.env?.DB),
+    getAllReviewsAdmin(c.env?.DB),
+    getCoupons(c.env?.DB)
   ]);
 
   return c.html(
     <AdminDashboardView
-      user={{ username: s.username, email: s.email }}
+      currentUser={{ id: s.user_id, username: s.username, email: s.email, role: s.role }}
       stats={stats}
       products={products}
       categories={categories}
+      users={users}
+      reviews={reviews}
+      coupons={coupons}
       settings={settings}
+      activeTab={tab}
+      notice={notice}
     />
   );
+});
+
+// Admin Logout
+app.get('/admin/logout', (c) => {
+  clearSession(c);
+  return c.redirect('/admin/login');
+});
+app.post('/admin/logout', (c) => {
+  clearSession(c);
+  return c.redirect('/admin/login');
+});
+
+// Admin Action: Add Product
+app.post('/admin/products/new', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  try {
+    const body = await c.req.parseBody();
+    const name = String(body['name'] || '').trim();
+    const price = Number(body['price']);
+    const categoryId = body['category_id'] ? Number(body['category_id']) : null;
+    const affiliateUrl = String(body['affiliate_url'] || '').trim();
+    const imageUrl = String(body['image_url'] || '').trim();
+    const description = String(body['description'] || '').trim();
+
+    if (!name || isNaN(price) || price < 0) {
+      return c.redirect('/admin?tab=products&err=Invalid+product+name+or+price');
+    }
+
+    const res = await createProduct(c.env?.DB, name, price, description, imageUrl, affiliateUrl, categoryId, 1);
+    if (!res.success) {
+      return c.redirect(`/admin?tab=products&err=${encodeURIComponent(res.error || 'Failed to create product')}`);
+    }
+    return c.redirect('/admin?tab=products&msg=Product+created+successfully');
+  } catch {
+    return c.redirect('/admin?tab=products&err=Failed+to+process+request');
+  }
+});
+
+// Admin Action: Delete Product
+app.post('/admin/products/:id/delete', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (id) {
+    await deleteProduct(c.env?.DB, id);
+  }
+  return c.redirect('/admin?tab=products&msg=Product+deleted');
+});
+
+// Admin Action: Add Category / Menu Item
+app.post('/admin/categories/new', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  try {
+    const body = await c.req.parseBody();
+    const name = String(body['name'] || '').trim();
+    let slug = String(body['slug'] || '').trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    const description = String(body['description'] || '').trim();
+
+    if (!name || !slug) {
+      return c.redirect('/admin?tab=categories&err=Category+name+and+slug+are+required');
+    }
+
+    const res = await createCategory(c.env?.DB, name, slug, description);
+    if (!res.success) {
+      return c.redirect(`/admin?tab=categories&err=${encodeURIComponent(res.error || 'Failed to create category')}`);
+    }
+    return c.redirect('/admin?tab=categories&msg=Category+added+to+navigation+menu');
+  } catch {
+    return c.redirect('/admin?tab=categories&err=Failed+to+process+request');
+  }
+});
+
+// Admin Action: Delete Category
+app.post('/admin/categories/:id/delete', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (id) {
+    await deleteCategory(c.env?.DB, id);
+  }
+  return c.redirect('/admin?tab=categories&msg=Category+deleted');
+});
+
+// Admin Action: Create User
+app.post('/admin/users/new', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  try {
+    const body = await c.req.parseBody();
+    const username = String(body['username'] || '').trim();
+    const email = String(body['email'] || '').trim().toLowerCase();
+    const password = String(body['password'] || '');
+    const role = (body['role'] as 'admin' | 'moderator' | 'user') || 'user';
+
+    if (!username || !email || password.length < 8) {
+      return c.redirect('/admin?tab=users&err=Password+must+be+at+least+8+characters');
+    }
+
+    const { hash, salt } = await passwordHash(password);
+    const res = await createUser(c.env?.DB, username, email, hash, salt, role);
+    if (!res.success) {
+      return c.redirect(`/admin?tab=users&err=${encodeURIComponent(res.error || 'User creation failed')}`);
+    }
+    return c.redirect('/admin?tab=users&msg=User+created+successfully');
+  } catch {
+    return c.redirect('/admin?tab=users&err=Failed+to+create+user');
+  }
+});
+
+// Admin Action: Toggle User Active Status (with self-modification guard)
+app.post('/admin/users/:id/toggle-status', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (id === s.user_id) {
+    return c.redirect('/admin?tab=users&err=Cannot+modify+your+own+account+status');
+  }
+
+  const body = await c.req.parseBody();
+  const isActive = Number(body['is_active']) === 1 ? 1 : 0;
+  await toggleUserStatus(c.env?.DB, id, isActive);
+  return c.redirect('/admin?tab=users&msg=User+status+updated');
+});
+
+// Admin Action: Delete User (with self-deletion guard)
+app.post('/admin/users/:id/delete', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (id === s.user_id) {
+    return c.redirect('/admin?tab=users&err=Cannot+delete+your+own+account');
+  }
+
+  await deleteUser(c.env?.DB, id);
+  return c.redirect('/admin?tab=users&msg=User+deleted');
+});
+
+// Admin Action: Approve Review
+app.post('/admin/reviews/:id/approve', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (id) {
+    await updateReviewStatus(c.env?.DB, id, 'approved');
+  }
+  return c.redirect('/admin?tab=reviews&msg=Review+approved');
+});
+
+// Admin Action: Delete Review
+app.post('/admin/reviews/:id/delete', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (id) {
+    await deleteReview(c.env?.DB, id);
+  }
+  return c.redirect('/admin?tab=reviews&msg=Review+deleted');
+});
+
+// Admin Action: Create Coupon
+app.post('/admin/coupons/new', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  try {
+    const body = await c.req.parseBody();
+    const code = String(body['code'] || '').trim().toUpperCase();
+    const discountType = (body['discount_type'] as 'fixed' | 'percentage') || 'percentage';
+    const discountValue = Number(body['discount_value']);
+    const minPurchase = Number(body['min_purchase'] || 0);
+
+    if (!code || isNaN(discountValue) || discountValue <= 0) {
+      return c.redirect('/admin?tab=coupons&err=Invalid+coupon+code+or+discount+value');
+    }
+
+    await createCoupon(c.env?.DB, code, discountType, discountValue, minPurchase);
+    return c.redirect('/admin?tab=coupons&msg=Coupon+code+created');
+  } catch {
+    return c.redirect('/admin?tab=coupons&err=Failed+to+create+coupon');
+  }
+});
+
+// Admin Action: Delete Coupon
+app.post('/admin/coupons/:id/delete', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (id) {
+    await deleteCoupon(c.env?.DB, id);
+  }
+  return c.redirect('/admin?tab=coupons&msg=Coupon+deleted');
+});
+
+// Admin Action: Update Settings
+app.post('/admin/settings', async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== 'admin') return c.redirect('/admin/login');
+
+  try {
+    const body = await c.req.parseBody();
+    await updateSettings(c.env?.DB, {
+      site_title: String(body['site_title'] || '').trim(),
+      site_description: String(body['site_description'] || '').trim(),
+      site_logo: String(body['site_logo'] || '').trim(),
+      contact_email: String(body['contact_email'] || '').trim(),
+      homepage_html: String(body['homepage_html'] || '').trim()
+    });
+    return c.redirect('/admin?tab=settings&msg=Settings+saved+successfully');
+  } catch {
+    return c.redirect('/admin?tab=settings&err=Failed+to+save+settings');
+  }
 });
 
 // Export Hono app for Cloudflare Workers / Pages

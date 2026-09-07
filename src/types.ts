@@ -7,9 +7,18 @@ export interface Session {
   user_id: number;
   username: string;
   email: string;
-  role: string;
+  role: 'admin' | 'moderator' | 'user';
   expires_at: string;
   is_active: number;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: 'admin' | 'moderator' | 'user';
+  is_active: number;
+  created_at?: string;
 }
 
 export interface Category {
@@ -19,6 +28,8 @@ export interface Category {
   description?: string;
   parent_id?: number | null;
   is_active?: number;
+  display_order?: number;
+  in_menu?: number;
 }
 
 export interface Product {

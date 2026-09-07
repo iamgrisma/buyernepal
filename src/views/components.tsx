@@ -8,18 +8,21 @@ export const Header: FC<{
 }> = ({ settings, categories, activeSlug }) => {
   const title = settings.site_title || 'BuyerNepal';
   const logo = settings.site_logo;
+  const primaryCategories = categories.slice(0, 5);
+  const extraCategories = categories.slice(5);
 
   return (
     <>
       <div className="store-topbar">
         <div className="store-shell store-topbar-inner">
-          <span>🇳🇵 Nepal's shopping discovery platform</span>
-          <span className="store-topbar-note">Compare • Discover • Shop smarter</span>
+          <span>🇳🇵 Nepal's Curated Shopping &amp; Price Comparison Platform</span>
+          <span className="store-topbar-note">Verified Prices • Local Deals • Smart Shopping</span>
         </div>
       </div>
+
       <header className="store-header">
         <div className="store-shell store-header-inner">
-          <a href="/" className="store-brand" aria-label={`${title} home`}>
+          <a href="/" className="store-brand" aria-label={`${title} Home`}>
             {logo ? (
               <img src={logo} alt={title} className="store-logo" />
             ) : (
@@ -31,11 +34,12 @@ export const Header: FC<{
             </span>
           </a>
 
+          {/* Desktop Navigation */}
           <nav className="store-nav" aria-label="Primary navigation">
             <a href="/" className={!activeSlug ? 'store-nav-active' : ''}>
               Home
             </a>
-            {categories.slice(0, 5).map((cat) => (
+            {primaryCategories.map((cat) => (
               <a
                 key={cat.id}
                 href={`/category/${cat.slug}`}
@@ -44,16 +48,35 @@ export const Header: FC<{
                 {cat.name}
               </a>
             ))}
+
+            {extraCategories.length > 0 && (
+              <div className="nav-dropdown">
+                <button type="button" className="nav-dropdown-btn">
+                  More Categories ▾
+                </button>
+                <div className="nav-dropdown-menu">
+                  {extraCategories.map((cat) => (
+                    <a
+                      key={cat.id}
+                      href={`/category/${cat.slug}`}
+                      className={activeSlug === cat.slug ? 'active' : ''}
+                    >
+                      {cat.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </nav>
 
           <div className="store-header-actions">
             <a href="/admin/login" className="store-admin-link">
-              Admin
+              Admin Portal
             </a>
             <button
               id="mobileMenuBtn"
               className="store-menu"
-              aria-label="Toggle menu"
+              aria-label="Open mobile navigation menu"
               type="button"
             >
               <span></span>
@@ -63,15 +86,47 @@ export const Header: FC<{
           </div>
         </div>
 
-        <nav id="mobileNav" className="store-mobile-nav store-shell" aria-label="Mobile navigation">
-          <a href="/">Home</a>
-          {categories.map((cat) => (
-            <a key={cat.id} href={`/category/${cat.slug}`}>
-              {cat.name}
-            </a>
-          ))}
-          <a href="/admin/login">Admin Login</a>
-        </nav>
+        {/* Mobile Navigation Drawer with Overlay Backdrop */}
+        <div id="mobileDrawerBackdrop" className="mobile-drawer-backdrop" />
+        <div id="mobileDrawer" className="mobile-drawer">
+          <div className="mobile-drawer-header">
+            <div className="store-brand">
+              <span className="store-logo-mark">B</span>
+              <span>
+                <strong>{title}</strong>
+                <small>SHOP SMARTER</small>
+              </span>
+            </div>
+            <button id="closeMobileMenuBtn" className="mobile-drawer-close" type="button" aria-label="Close menu">
+              ×
+            </button>
+          </div>
+
+          <div className="mobile-drawer-content">
+            <span className="mobile-drawer-label">CATEGORIES</span>
+            <nav className="mobile-nav-links">
+              <a href="/" className={!activeSlug ? 'active' : ''}>
+                🏠 All Products (Home)
+              </a>
+              {categories.map((cat) => (
+                <a
+                  key={cat.id}
+                  href={`/category/${cat.slug}`}
+                  className={activeSlug === cat.slug ? 'active' : ''}
+                >
+                  📁 {cat.name}
+                </a>
+              ))}
+            </nav>
+
+            <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
+              <span className="mobile-drawer-label">ADMINISTRATION</span>
+              <nav className="mobile-nav-links">
+                <a href="/admin/login">🔐 Admin Portal Login</a>
+              </nav>
+            </div>
+          </div>
+        </div>
       </header>
     </>
   );
@@ -106,8 +161,8 @@ export const Hero: FC<{ settings: SiteSettings }> = ({ settings }) => {
             </button>
           </div>
           <div className="hero-points">
-            <span>✓ Curated picks</span>
-            <span>✓ Local NPR prices</span>
+            <span>✓ Verified NPR pricing</span>
+            <span>✓ Curated recommendations</span>
             <span>✓ Direct store links</span>
           </div>
         </div>
@@ -155,7 +210,7 @@ export const TrustStrip: FC = () => (
     </div>
     <div>
       <strong>Shop on the source</strong>
-      <span>Direct links send you straight to the trusted seller or store.</span>
+      <span>Direct links send you straight to the verified seller or store.</span>
     </div>
   </section>
 );
@@ -266,9 +321,9 @@ export const Footer: FC<{ settings: SiteSettings; categories: Category[] }> = ({
         </div>
 
         <div>
-          <h3>Categories</h3>
+          <h3>Menu &amp; Categories</h3>
           <a href="/">All Products</a>
-          {categories.slice(0, 5).map((cat) => (
+          {categories.map((cat) => (
             <a key={cat.id} href={`/category/${cat.slug}`}>
               {cat.name}
             </a>
@@ -277,7 +332,7 @@ export const Footer: FC<{ settings: SiteSettings; categories: Category[] }> = ({
 
         <div>
           <h3>Administration</h3>
-          <a href="/admin/login">Admin Login</a>
+          <a href="/admin/login">Admin Portal Login</a>
           <span className="footer-note">
             Manage products, categories, reviews, coupons and site configurations.
           </span>

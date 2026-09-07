@@ -67,19 +67,34 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
       <body>
         {children}
 
-        {/* Lightweight Vanilla JS for instant client-side search & mobile menu */}
+        {/* Lightweight Production Vanilla JS for Search, Drawer, & Admin Tabs */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               document.addEventListener('DOMContentLoaded', () => {
-                // Mobile menu toggle
+                // Mobile Drawer Menu Control
                 const menuBtn = document.getElementById('mobileMenuBtn');
-                const mobileNav = document.getElementById('mobileNav');
-                if (menuBtn && mobileNav) {
-                  menuBtn.addEventListener('click', () => {
-                    mobileNav.classList.toggle('open');
-                  });
+                const closeBtn = document.getElementById('closeMobileMenuBtn');
+                const drawer = document.getElementById('mobileDrawer');
+                const backdrop = document.getElementById('mobileDrawerBackdrop');
+
+                function openDrawer() {
+                  if (drawer) drawer.classList.add('open');
+                  if (backdrop) backdrop.classList.add('open');
+                  document.body.style.overflow = 'hidden';
                 }
+                function closeDrawer() {
+                  if (drawer) drawer.classList.remove('open');
+                  if (backdrop) backdrop.classList.remove('open');
+                  document.body.style.overflow = '';
+                }
+
+                if (menuBtn) menuBtn.addEventListener('click', openDrawer);
+                if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+                if (backdrop) backdrop.addEventListener('click', closeDrawer);
+                document.addEventListener('keydown', (e) => {
+                  if (e.key === 'Escape') closeDrawer();
+                });
 
                 // Client-side real-time search
                 const searchInput = document.getElementById('searchInput');
@@ -112,6 +127,20 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                     });
                   }
                 }
+
+                // Admin Dashboard Tab Switching
+                const tabBtns = document.querySelectorAll('.admin-tab-btn');
+                const tabPanes = document.querySelectorAll('.admin-tab-pane');
+                tabBtns.forEach((btn) => {
+                  btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab');
+                    tabBtns.forEach((b) => b.classList.remove('active'));
+                    tabPanes.forEach((p) => p.style.display = 'none');
+                    btn.classList.add('active');
+                    const activePane = document.getElementById('tab-' + targetTab);
+                    if (activePane) activePane.style.display = 'block';
+                  });
+                });
               });
             `
           }}

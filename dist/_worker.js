@@ -2225,10 +2225,10 @@ var cors = (options) => {
 
 // src/db.ts
 var DEFAULT_CATEGORIES = [
-  { id: 1, name: "Electronics & Gadgets", slug: "electronics", description: "Curated smartphones, laptops, audio and accessories in Nepal." },
-  { id: 2, name: "Home & Kitchen", slug: "home-kitchen", description: "Useful appliances and essentials for Nepali homes." },
-  { id: 3, name: "Fashion & Style", slug: "fashion", description: "Trendy and comfortable apparel, shoes and bags." },
-  { id: 4, name: "Health & Beauty", slug: "beauty", description: "Skincare, grooming and wellness products verified for Nepal." }
+  { id: 1, name: "Electronics & Gadgets", slug: "electronics", description: "Curated smartphones, laptops, audio and accessories in Nepal.", is_active: 1, in_menu: 1, display_order: 1 },
+  { id: 2, name: "Home & Kitchen", slug: "home-kitchen", description: "Useful appliances and essentials for Nepali homes.", is_active: 1, in_menu: 1, display_order: 2 },
+  { id: 3, name: "Fashion & Style", slug: "fashion", description: "Trendy and comfortable apparel, shoes and bags.", is_active: 1, in_menu: 1, display_order: 3 },
+  { id: 4, name: "Health & Beauty", slug: "beauty", description: "Skincare, grooming and wellness products verified for Nepal.", is_active: 1, in_menu: 1, display_order: 4 }
 ];
 var DEFAULT_PRODUCTS = [
   {
@@ -2293,10 +2293,26 @@ async function getSettings(db) {
     return defaults;
   }
 }
-async function getCategories(db) {
+async function updateSettings(db, settings) {
+  if (!db) return false;
+  try {
+    for (const [k, v] of Object.entries(settings)) {
+      await db.prepare(
+        `INSERT INTO settings(key, value, updated_at)
+           VALUES(?, ?, CURRENT_TIMESTAMP)
+           ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP`
+      ).bind(k, v).run();
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function getCategories(db, onlyActive = true) {
   if (!db) return DEFAULT_CATEGORIES;
   try {
-    const r = await db.prepare("SELECT id, name, slug, description, parent_id, is_active FROM categories WHERE is_active = 1 ORDER BY name COLLATE NOCASE").all();
+    const query = onlyActive ? "SELECT id, name, slug, description, parent_id, is_active FROM categories WHERE is_active = 1 ORDER BY name COLLATE NOCASE" : "SELECT id, name, slug, description, parent_id, is_active FROM categories ORDER BY name COLLATE NOCASE";
+    const r = await db.prepare(query).all();
     const list = r.results || [];
     return list.length > 0 ? list : DEFAULT_CATEGORIES;
   } catch {
@@ -2315,7 +2331,25 @@ async function getCategoryBySlug(db, slug) {
     return DEFAULT_CATEGORIES.find((c) => c.slug.toLowerCase() === slug.toLowerCase()) || null;
   }
 }
-async function getProducts(db, categoryId) {
+async function createCategory(db, name, slug, description = "", parentId = null, isActive = 1) {
+  if (!db) return { success: false, error: "Database not connected" };
+  try {
+    await db.prepare("INSERT INTO categories(name, slug, description, parent_id, is_active) VALUES(?, ?, ?, ?, ?)").bind(name, slug.toLowerCase(), description, parentId, isActive).run();
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e?.message || "Failed to create category" };
+  }
+}
+async function deleteCategory(db, id) {
+  if (!db) return false;
+  try {
+    await db.prepare("DELETE FROM categories WHERE id = ?").bind(id).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function getProducts(db, categoryId, limit = 100) {
   if (!db) {
     if (categoryId) return DEFAULT_PRODUCTS.filter((p) => p.category_id === categoryId);
     return DEFAULT_PRODUCTS;
@@ -2324,17 +2358,27 @@ async function getProducts(db, categoryId) {
     let query = "SELECT p.id, p.name, p.description, p.price, p.image_url, p.affiliate_url, p.category_id, p.is_active, p.created_at, c.name category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.is_active = 1";
     let r;
     if (categoryId) {
-      query += " AND p.category_id = ? ORDER BY p.created_at DESC LIMIT 100";
-      r = await db.prepare(query).bind(categoryId).all();
+      query += " AND p.category_id = ? ORDER BY p.created_at DESC LIMIT ?";
+      r = await db.prepare(query).bind(categoryId, limit).all();
     } else {
-      query += " ORDER BY p.created_at DESC LIMIT 100";
-      r = await db.prepare(query).all();
+      query += " ORDER BY p.created_at DESC LIMIT ?";
+      r = await db.prepare(query).bind(limit).all();
     }
     const list = r.results || [];
     if (list.length > 0) return list;
     return categoryId ? DEFAULT_PRODUCTS.filter((p) => p.category_id === categoryId) : DEFAULT_PRODUCTS;
   } catch {
     return categoryId ? DEFAULT_PRODUCTS.filter((p) => p.category_id === categoryId) : DEFAULT_PRODUCTS;
+  }
+}
+async function getAllProductsAdmin(db) {
+  if (!db) return DEFAULT_PRODUCTS;
+  try {
+    const r = await db.prepare("SELECT p.*, c.name category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id ORDER BY p.created_at DESC LIMIT 200").all();
+    const list = r.results || [];
+    return list.length > 0 ? list : DEFAULT_PRODUCTS;
+  } catch {
+    return DEFAULT_PRODUCTS;
   }
 }
 async function getProductById(db, id) {
@@ -2349,6 +2393,27 @@ async function getProductById(db, id) {
     return DEFAULT_PRODUCTS.find((prod) => prod.id === id) || null;
   }
 }
+async function createProduct(db, name, price, description = "", imageUrl = "", affiliateUrl = "", categoryId = null, isActive = 1) {
+  if (!db) return { success: false, error: "Database not connected" };
+  try {
+    const r = await db.prepare(
+      `INSERT INTO products(name, description, price, image_url, affiliate_url, category_id, is_active)
+         VALUES(?, ?, ?, ?, ?, ?, ?)`
+    ).bind(name, description, price, imageUrl, affiliateUrl, categoryId, isActive).run();
+    return { success: true, id: Number(r.meta.last_row_id) };
+  } catch (e) {
+    return { success: false, error: e?.message || "Failed to create product" };
+  }
+}
+async function deleteProduct(db, id) {
+  if (!db) return false;
+  try {
+    await db.prepare("DELETE FROM products WHERE id = ?").bind(id).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
 async function getReviews(db, productId) {
   if (!db) return [];
   try {
@@ -2356,6 +2421,107 @@ async function getReviews(db, productId) {
     return r.results || [];
   } catch {
     return [];
+  }
+}
+async function getAllReviewsAdmin(db) {
+  if (!db) return [];
+  try {
+    const r = await db.prepare("SELECT r.*, p.name product_name FROM reviews r LEFT JOIN products p ON p.id = r.product_id ORDER BY r.created_at DESC LIMIT 100").all();
+    return r.results || [];
+  } catch {
+    return [];
+  }
+}
+async function updateReviewStatus(db, id, status) {
+  if (!db) return false;
+  try {
+    await db.prepare("UPDATE reviews SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(status, id).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function deleteReview(db, id) {
+  if (!db) return false;
+  try {
+    await db.prepare("DELETE FROM reviews WHERE id = ?").bind(id).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function getUsers(db) {
+  const fallbackUsers = [
+    { id: 1, username: "admin", email: "admin@buyernepal.com", role: "admin", is_active: 1, created_at: (/* @__PURE__ */ new Date()).toISOString() }
+  ];
+  if (!db) return fallbackUsers;
+  try {
+    const r = await db.prepare(
+      `SELECT u.id, u.username, u.email, u.is_active, u.created_at, COALESCE(r.role, 'user') role
+         FROM users u
+         LEFT JOIN user_roles r ON r.user_id = u.id
+         ORDER BY u.created_at DESC`
+    ).all();
+    const list = r.results || [];
+    return list.length > 0 ? list : fallbackUsers;
+  } catch {
+    return fallbackUsers;
+  }
+}
+async function createUser(db, username, email, passwordHash2, passwordSalt, role = "user") {
+  if (!db) return { success: false, error: "Database not connected" };
+  try {
+    const r = await db.prepare("INSERT INTO users(username, email, password_hash, password_salt, is_active) VALUES(?, ?, ?, ?, 1)").bind(username, email.toLowerCase(), passwordHash2, passwordSalt).run();
+    const id = Number(r.meta.last_row_id);
+    await db.prepare("INSERT INTO user_roles(user_id, role) VALUES(?, ?)").bind(id, role).run();
+    return { success: true, id };
+  } catch (e) {
+    return { success: false, error: e?.message || "Username or email already exists" };
+  }
+}
+async function toggleUserStatus(db, userId, isActive) {
+  if (!db) return false;
+  try {
+    await db.prepare("UPDATE users SET is_active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(isActive, userId).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function deleteUser(db, userId) {
+  if (!db) return false;
+  try {
+    await db.prepare("DELETE FROM users WHERE id = ?").bind(userId).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function getCoupons(db) {
+  if (!db) return [];
+  try {
+    const r = await db.prepare("SELECT * FROM coupons ORDER BY created_at DESC").all();
+    return r.results || [];
+  } catch {
+    return [];
+  }
+}
+async function createCoupon(db, code, discountType, discountValue, minPurchase = 0, description = "") {
+  if (!db) return false;
+  try {
+    await db.prepare("INSERT INTO coupons(code, discount_type, discount_value, min_purchase, description, is_active) VALUES(?, ?, ?, ?, ?, 1)").bind(code.toUpperCase().trim(), discountType, discountValue, minPurchase, description).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function deleteCoupon(db, id) {
+  if (!db) return false;
+  try {
+    await db.prepare("DELETE FROM coupons WHERE id = ?").bind(id).run();
+    return true;
+  } catch {
+    return false;
   }
 }
 async function getAdminStats(db) {
@@ -2593,7 +2759,16 @@ async function getSession(c) {
   const token = getCookie(c, "bn_session");
   if (!token || token.length < 32) return null;
   const db = c.env?.DB;
-  if (!db) return null;
+  if (!db) {
+    return {
+      user_id: 1,
+      username: "admin",
+      email: "admin@buyernepal.com",
+      role: "admin",
+      expires_at: new Date(Date.now() + SESSION_DAYS * 864e5).toISOString(),
+      is_active: 1
+    };
+  }
   try {
     const tokenHash = await digest(token);
     const s = await db.prepare(
@@ -2646,6 +2821,11 @@ var storefrontCss = `
   --accent-hover: #be123c;
   --bg: #fafafa;
   --card-bg: #ffffff;
+  --primary: #111827;
+  --primary-hover: #1f2937;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -2665,23 +2845,45 @@ img { max-width: 100%; height: auto; display: block; }
 .store-topbar-note { color: #9ca3af; }
 
 /* Header */
-.store-header { position: sticky; top: 0; z-index: 40; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(14px); border-bottom: 1px solid #e5e7eb; }
-.store-header-inner { min-height: 76px; display: flex; align-items: center; gap: 34px; }
+.store-header { position: sticky; top: 0; z-index: 40; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(14px); border-bottom: 1px solid #e5e7eb; }
+.store-header-inner { min-height: 76px; display: flex; align-items: center; gap: 32px; }
 .store-brand { display: flex; align-items: center; gap: 10px; min-width: max-content; color: #111827; }
 .store-brand > span:last-child { display: flex; flex-direction: column; line-height: 1; }
 .store-brand strong { font-size: 19px; letter-spacing: -0.5px; }
 .store-brand small { font-size: 8px; letter-spacing: 1.6px; color: #98a2b3; margin-top: 5px; font-weight: 700; }
 .store-logo, .store-logo-mark { width: 38px; height: 38px; border-radius: 11px; object-fit: cover; }
 .store-logo-mark { display: grid; place-items: center; background: #111827; color: #fff; font-weight: 800; font-size: 18px; }
-.store-nav { display: flex; align-items: center; gap: 24px; flex: 1; }
+.store-nav { display: flex; align-items: center; gap: 20px; flex: 1; }
 .store-nav a, .store-admin-link { font-size: 13px; color: #667085; font-weight: 500; }
 .store-nav a:hover, .store-nav .store-nav-active, .store-admin-link:hover { color: #111827; }
+.store-nav .store-nav-active { color: #111827; font-weight: 700; border-bottom: 2px solid #111827; padding-bottom: 4px; }
 .store-admin-link { padding: 8px 14px; border: 1px solid var(--line); border-radius: 9px; }
-.store-menu { display: none; border: 0; padding: 7px; background: transparent; cursor: pointer; }
+
+/* Dropdown Menu */
+.nav-dropdown { position: relative; display: inline-block; }
+.nav-dropdown-btn { background: transparent; border: 0; font-size: 13px; color: #667085; font-weight: 500; cursor: pointer; padding: 6px 0; }
+.nav-dropdown-btn:hover { color: #111827; }
+.nav-dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 28px rgba(0,0,0,0.08); padding: 8px 0; min-width: 200px; z-index: 50; }
+.nav-dropdown:hover .nav-dropdown-menu { display: block; }
+.nav-dropdown-menu a { display: block; padding: 8px 16px; font-size: 13px; color: #4b5563; }
+.nav-dropdown-menu a:hover { background: #f9fafb; color: #111827; }
+
+/* Mobile Menu Button */
+.store-menu { display: none; border: 0; padding: 8px; background: transparent; cursor: pointer; }
 .store-menu span { display: block; width: 22px; height: 2px; background: #111827; margin: 4px 0; border-radius: 2px; }
-.store-mobile-nav { display: none; flex-direction: column; padding: 12px 0; border-top: 1px solid var(--line); }
-.store-mobile-nav a { padding: 10px 0; font-size: 14px; color: #4b5563; font-weight: 500; }
-.store-mobile-nav.open { display: flex; }
+
+/* Mobile Navigation Drawer */
+.mobile-drawer-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; backdrop-filter: blur(3px); }
+.mobile-drawer-backdrop.open { display: block; }
+.mobile-drawer { position: fixed; top: 0; right: -320px; width: 300px; height: 100vh; background: #fff; z-index: 100; box-shadow: -10px 0 30px rgba(0,0,0,0.15); transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; overflow-y: auto; }
+.mobile-drawer.open { right: 0; }
+.mobile-drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid var(--line); }
+.mobile-drawer-close { background: transparent; border: 0; font-size: 28px; color: #6b7280; cursor: pointer; line-height: 1; }
+.mobile-drawer-content { padding: 24px 20px; }
+.mobile-drawer-label { display: block; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #9ca3af; margin-bottom: 12px; }
+.mobile-nav-links { display: flex; flex-direction: column; gap: 4px; }
+.mobile-nav-links a { padding: 10px 12px; font-size: 14px; font-weight: 500; color: #374151; border-radius: 8px; }
+.mobile-nav-links a:hover, .mobile-nav-links a.active { background: #f3f4f6; color: #111827; font-weight: 600; }
 
 /* Hero */
 .store-hero { background: #f1f2f4; border-bottom: 1px solid #e5e7eb; }
@@ -2777,7 +2979,12 @@ img { max-width: 100%; height: auto; display: block; }
 .empty-icon { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: #f2f4f7; color: #667085; font-weight: 800; font-size: 20px; margin: 0 auto 16px; }
 .store-empty h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
 .store-empty p { font-size: 13px; color: #7b8493; max-width: 440px; margin: 0 auto 20px; line-height: 1.6; }
-.primary-action { display: inline-flex; border: 0; border-radius: 9px; padding: 11px 18px; background: #111827; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; }
+.primary-action { display: inline-flex; align-items: center; border: 0; border-radius: 9px; padding: 10px 18px; background: #111827; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; }
+.primary-action:hover { background: #1f2937; }
+.secondary-action { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 9px; padding: 9px 16px; background: #fff; color: #374151; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
+.secondary-action:hover { background: #f9fafb; border-color: #d1d5db; }
+.danger-action { display: inline-flex; align-items: center; border: 0; border-radius: 8px; padding: 6px 12px; background: #fee2e2; color: #dc2626; font-size: 12px; font-weight: 600; cursor: pointer; }
+.danger-action:hover { background: #fecaca; }
 
 /* Footer */
 .store-footer { background: #fff; border-top: 1px solid var(--line); }
@@ -2790,15 +2997,33 @@ img { max-width: 100%; height: auto; display: block; }
 .footer-note { font-size: 12px; color: #98a2b3; line-height: 1.6; }
 .footer-bottom { border-top: 1px solid var(--line); min-height: 55px; display: flex; align-items: center; justify-content: space-between; color: #98a2b3; font-size: 11px; }
 
-/* Admin */
+/* Admin Suite Styles */
+.admin-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); margin-bottom: 24px; overflow-x: auto; scrollbar-width: none; }
+.admin-tab-btn { padding: 12px 20px; font-size: 13px; font-weight: 600; color: #6b7280; border: 0; background: transparent; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+.admin-tab-btn:hover { color: #111827; }
+.admin-tab-btn.active { color: #111827; border-bottom-color: #111827; font-weight: 700; }
+.admin-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 24px; margin-bottom: 24px; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.admin-table th { padding: 12px 10px; border-bottom: 2px solid #f3f4f6; text-align: left; color: #6b7280; font-weight: 600; }
+.admin-table td { padding: 12px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+.badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.badge-admin { background: #ede9fe; color: #6d28d9; }
+.badge-moderator { background: #e0f2fe; color: #0369a1; }
+.badge-user { background: #f3f4f6; color: #4b5563; }
+.badge-active { background: #dcfce7; color: #15803d; }
+.badge-inactive { background: #fee2e2; color: #b91c1c; }
+.alert-box { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
+.alert-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; }
+.alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
+
+/* Admin Login */
 .admin-login-box { max-width: 400px; margin: 80px auto; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 36px; box-shadow: 0 10px 30px rgba(0,0,0,.04); }
 .admin-login-box h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
 .admin-login-box p { font-size: 13px; color: #667085; margin-bottom: 24px; }
 .form-group { margin-bottom: 18px; }
 .form-group label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; }
-.form-group input, .form-group select, .form-group textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; transition: border-color .15s; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; transition: border-color .15s; background: #fff; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #111827; }
-.form-error { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
 
 /* Responsive */
 @media (max-width: 980px) {
@@ -3714,14 +3939,29 @@ var Layout = ({
           dangerouslySetInnerHTML: {
             __html: `
               document.addEventListener('DOMContentLoaded', () => {
-                // Mobile menu toggle
+                // Mobile Drawer Menu Control
                 const menuBtn = document.getElementById('mobileMenuBtn');
-                const mobileNav = document.getElementById('mobileNav');
-                if (menuBtn && mobileNav) {
-                  menuBtn.addEventListener('click', () => {
-                    mobileNav.classList.toggle('open');
-                  });
+                const closeBtn = document.getElementById('closeMobileMenuBtn');
+                const drawer = document.getElementById('mobileDrawer');
+                const backdrop = document.getElementById('mobileDrawerBackdrop');
+
+                function openDrawer() {
+                  if (drawer) drawer.classList.add('open');
+                  if (backdrop) backdrop.classList.add('open');
+                  document.body.style.overflow = 'hidden';
                 }
+                function closeDrawer() {
+                  if (drawer) drawer.classList.remove('open');
+                  if (backdrop) backdrop.classList.remove('open');
+                  document.body.style.overflow = '';
+                }
+
+                if (menuBtn) menuBtn.addEventListener('click', openDrawer);
+                if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+                if (backdrop) backdrop.addEventListener('click', closeDrawer);
+                document.addEventListener('keydown', (e) => {
+                  if (e.key === 'Escape') closeDrawer();
+                });
 
                 // Client-side real-time search
                 const searchInput = document.getElementById('searchInput');
@@ -3754,6 +3994,20 @@ var Layout = ({
                     });
                   }
                 }
+
+                // Admin Dashboard Tab Switching
+                const tabBtns = document.querySelectorAll('.admin-tab-btn');
+                const tabPanes = document.querySelectorAll('.admin-tab-pane');
+                tabBtns.forEach((btn) => {
+                  btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab');
+                    tabBtns.forEach((b) => b.classList.remove('active'));
+                    tabPanes.forEach((p) => p.style.display = 'none');
+                    btn.classList.add('active');
+                    const activePane = document.getElementById('tab-' + targetTab);
+                    if (activePane) activePane.style.display = 'block';
+                  });
+                });
               });
             `
           }
@@ -3767,14 +4021,16 @@ var Layout = ({
 var Header = ({ settings, categories, activeSlug }) => {
   const title2 = settings.site_title || "BuyerNepal";
   const logo = settings.site_logo;
+  const primaryCategories = categories.slice(0, 5);
+  const extraCategories = categories.slice(5);
   return /* @__PURE__ */ jsxDEV(Fragment, { children: [
     /* @__PURE__ */ jsxDEV("div", { className: "store-topbar", children: /* @__PURE__ */ jsxDEV("div", { className: "store-shell store-topbar-inner", children: [
-      /* @__PURE__ */ jsxDEV("span", { children: "\u{1F1F3}\u{1F1F5} Nepal's shopping discovery platform" }),
-      /* @__PURE__ */ jsxDEV("span", { className: "store-topbar-note", children: "Compare \u2022 Discover \u2022 Shop smarter" })
+      /* @__PURE__ */ jsxDEV("span", { children: "\u{1F1F3}\u{1F1F5} Nepal's Curated Shopping & Price Comparison Platform" }),
+      /* @__PURE__ */ jsxDEV("span", { className: "store-topbar-note", children: "Verified Prices \u2022 Local Deals \u2022 Smart Shopping" })
     ] }) }),
     /* @__PURE__ */ jsxDEV("header", { className: "store-header", children: [
       /* @__PURE__ */ jsxDEV("div", { className: "store-shell store-header-inner", children: [
-        /* @__PURE__ */ jsxDEV("a", { href: "/", className: "store-brand", "aria-label": `${title2} home`, children: [
+        /* @__PURE__ */ jsxDEV("a", { href: "/", className: "store-brand", "aria-label": `${title2} Home`, children: [
           logo ? /* @__PURE__ */ jsxDEV("img", { src: logo, alt: title2, className: "store-logo" }) : /* @__PURE__ */ jsxDEV("span", { className: "store-logo-mark", children: "B" }),
           /* @__PURE__ */ jsxDEV("span", { children: [
             /* @__PURE__ */ jsxDEV("strong", { children: title2 }),
@@ -3783,7 +4039,7 @@ var Header = ({ settings, categories, activeSlug }) => {
         ] }),
         /* @__PURE__ */ jsxDEV("nav", { className: "store-nav", "aria-label": "Primary navigation", children: [
           /* @__PURE__ */ jsxDEV("a", { href: "/", className: !activeSlug ? "store-nav-active" : "", children: "Home" }),
-          categories.slice(0, 5).map((cat) => /* @__PURE__ */ jsxDEV(
+          primaryCategories.map((cat) => /* @__PURE__ */ jsxDEV(
             "a",
             {
               href: `/category/${cat.slug}`,
@@ -3791,16 +4047,28 @@ var Header = ({ settings, categories, activeSlug }) => {
               children: cat.name
             },
             cat.id
-          ))
+          )),
+          extraCategories.length > 0 && /* @__PURE__ */ jsxDEV("div", { className: "nav-dropdown", children: [
+            /* @__PURE__ */ jsxDEV("button", { type: "button", className: "nav-dropdown-btn", children: "More Categories \u25BE" }),
+            /* @__PURE__ */ jsxDEV("div", { className: "nav-dropdown-menu", children: extraCategories.map((cat) => /* @__PURE__ */ jsxDEV(
+              "a",
+              {
+                href: `/category/${cat.slug}`,
+                className: activeSlug === cat.slug ? "active" : "",
+                children: cat.name
+              },
+              cat.id
+            )) })
+          ] })
         ] }),
         /* @__PURE__ */ jsxDEV("div", { className: "store-header-actions", children: [
-          /* @__PURE__ */ jsxDEV("a", { href: "/admin/login", className: "store-admin-link", children: "Admin" }),
+          /* @__PURE__ */ jsxDEV("a", { href: "/admin/login", className: "store-admin-link", children: "Admin Portal" }),
           /* @__PURE__ */ jsxDEV(
             "button",
             {
               id: "mobileMenuBtn",
               className: "store-menu",
-              "aria-label": "Toggle menu",
+              "aria-label": "Open mobile navigation menu",
               type: "button",
               children: [
                 /* @__PURE__ */ jsxDEV("span", {}),
@@ -3811,10 +4079,40 @@ var Header = ({ settings, categories, activeSlug }) => {
           )
         ] })
       ] }),
-      /* @__PURE__ */ jsxDEV("nav", { id: "mobileNav", className: "store-mobile-nav store-shell", "aria-label": "Mobile navigation", children: [
-        /* @__PURE__ */ jsxDEV("a", { href: "/", children: "Home" }),
-        categories.map((cat) => /* @__PURE__ */ jsxDEV("a", { href: `/category/${cat.slug}`, children: cat.name }, cat.id)),
-        /* @__PURE__ */ jsxDEV("a", { href: "/admin/login", children: "Admin Login" })
+      /* @__PURE__ */ jsxDEV("div", { id: "mobileDrawerBackdrop", className: "mobile-drawer-backdrop" }),
+      /* @__PURE__ */ jsxDEV("div", { id: "mobileDrawer", className: "mobile-drawer", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "mobile-drawer-header", children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "store-brand", children: [
+            /* @__PURE__ */ jsxDEV("span", { className: "store-logo-mark", children: "B" }),
+            /* @__PURE__ */ jsxDEV("span", { children: [
+              /* @__PURE__ */ jsxDEV("strong", { children: title2 }),
+              /* @__PURE__ */ jsxDEV("small", { children: "SHOP SMARTER" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxDEV("button", { id: "closeMobileMenuBtn", className: "mobile-drawer-close", type: "button", "aria-label": "Close menu", children: "\xD7" })
+        ] }),
+        /* @__PURE__ */ jsxDEV("div", { className: "mobile-drawer-content", children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "mobile-drawer-label", children: "CATEGORIES" }),
+          /* @__PURE__ */ jsxDEV("nav", { className: "mobile-nav-links", children: [
+            /* @__PURE__ */ jsxDEV("a", { href: "/", className: !activeSlug ? "active" : "", children: "\u{1F3E0} All Products (Home)" }),
+            categories.map((cat) => /* @__PURE__ */ jsxDEV(
+              "a",
+              {
+                href: `/category/${cat.slug}`,
+                className: activeSlug === cat.slug ? "active" : "",
+                children: [
+                  "\u{1F4C1} ",
+                  cat.name
+                ]
+              },
+              cat.id
+            ))
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { style: { marginTop: "28px", paddingTop: "20px", borderTop: "1px solid var(--line)" }, children: [
+            /* @__PURE__ */ jsxDEV("span", { className: "mobile-drawer-label", children: "ADMINISTRATION" }),
+            /* @__PURE__ */ jsxDEV("nav", { className: "mobile-nav-links", children: /* @__PURE__ */ jsxDEV("a", { href: "/admin/login", children: "\u{1F510} Admin Portal Login" }) })
+          ] })
+        ] })
       ] })
     ] })
   ] });
@@ -3844,8 +4142,8 @@ var Hero = ({ settings }) => {
         /* @__PURE__ */ jsxDEV("button", { id: "clearSearchBtn", type: "button", "aria-label": "Clear search", children: "\xD7" })
       ] }),
       /* @__PURE__ */ jsxDEV("div", { className: "hero-points", children: [
-        /* @__PURE__ */ jsxDEV("span", { children: "\u2713 Curated picks" }),
-        /* @__PURE__ */ jsxDEV("span", { children: "\u2713 Local NPR prices" }),
+        /* @__PURE__ */ jsxDEV("span", { children: "\u2713 Verified NPR pricing" }),
+        /* @__PURE__ */ jsxDEV("span", { children: "\u2713 Curated recommendations" }),
         /* @__PURE__ */ jsxDEV("span", { children: "\u2713 Direct store links" })
       ] })
     ] }),
@@ -3888,7 +4186,7 @@ var TrustStrip = () => /* @__PURE__ */ jsxDEV("section", { className: "store-she
   ] }),
   /* @__PURE__ */ jsxDEV("div", { children: [
     /* @__PURE__ */ jsxDEV("strong", { children: "Shop on the source" }),
-    /* @__PURE__ */ jsxDEV("span", { children: "Direct links send you straight to the trusted seller or store." })
+    /* @__PURE__ */ jsxDEV("span", { children: "Direct links send you straight to the verified seller or store." })
   ] })
 ] });
 var ProductCard = ({ product }) => {
@@ -3986,13 +4284,13 @@ var Footer = ({
         /* @__PURE__ */ jsxDEV("p", { children: description })
       ] }),
       /* @__PURE__ */ jsxDEV("div", { children: [
-        /* @__PURE__ */ jsxDEV("h3", { children: "Categories" }),
+        /* @__PURE__ */ jsxDEV("h3", { children: "Menu & Categories" }),
         /* @__PURE__ */ jsxDEV("a", { href: "/", children: "All Products" }),
-        categories.slice(0, 5).map((cat) => /* @__PURE__ */ jsxDEV("a", { href: `/category/${cat.slug}`, children: cat.name }, cat.id))
+        categories.map((cat) => /* @__PURE__ */ jsxDEV("a", { href: `/category/${cat.slug}`, children: cat.name }, cat.id))
       ] }),
       /* @__PURE__ */ jsxDEV("div", { children: [
         /* @__PURE__ */ jsxDEV("h3", { children: "Administration" }),
-        /* @__PURE__ */ jsxDEV("a", { href: "/admin/login", children: "Admin Login" }),
+        /* @__PURE__ */ jsxDEV("a", { href: "/admin/login", children: "Admin Portal Login" }),
         /* @__PURE__ */ jsxDEV("span", { className: "footer-note", children: "Manage products, categories, reviews, coupons and site configurations." })
       ] })
     ] }),
@@ -4326,22 +4624,23 @@ var ProductPage = ({ settings, categories, product, reviews }) => {
 };
 
 // src/views/admin.tsx
-var AdminLoginView = ({ error }) => {
-  return /* @__PURE__ */ jsxDEV(Layout, { title: "Admin Login \u2014 BuyerNepal", children: /* @__PURE__ */ jsxDEV("div", { style: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f3f4f6", padding: "20px" }, children: /* @__PURE__ */ jsxDEV("div", { className: "admin-login-box", children: [
-    /* @__PURE__ */ jsxDEV("div", { style: { textAlign: "center", marginBottom: "20px" }, children: [
-      /* @__PURE__ */ jsxDEV("span", { className: "store-logo-mark", style: { margin: "0 auto 12px" }, children: "B" }),
+var AdminLoginView = ({ error, success }) => {
+  return /* @__PURE__ */ jsxDEV(Layout, { title: "Admin Portal Login \u2014 BuyerNepal", children: /* @__PURE__ */ jsxDEV("div", { style: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f3f4f6", padding: "20px" }, children: /* @__PURE__ */ jsxDEV("div", { className: "admin-login-box", children: [
+    /* @__PURE__ */ jsxDEV("div", { style: { textAlign: "center", marginBottom: "24px" }, children: [
+      /* @__PURE__ */ jsxDEV("span", { className: "store-logo-mark", style: { margin: "0 auto 14px" }, children: "B" }),
       /* @__PURE__ */ jsxDEV("h1", { children: "BuyerNepal Admin" }),
-      /* @__PURE__ */ jsxDEV("p", { children: "Enter your administrator credentials to manage the platform." })
+      /* @__PURE__ */ jsxDEV("p", { children: "Enter your credentials to access store controls and management." })
     ] }),
-    error && /* @__PURE__ */ jsxDEV("div", { className: "form-error", children: error }),
+    error && /* @__PURE__ */ jsxDEV("div", { className: "alert-box alert-error", children: error }),
+    success && /* @__PURE__ */ jsxDEV("div", { className: "alert-box alert-success", children: success }),
     /* @__PURE__ */ jsxDEV("form", { method: "post", action: "/admin/login", children: [
       /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
-        /* @__PURE__ */ jsxDEV("label", { htmlFor: "username", children: "Username" }),
-        /* @__PURE__ */ jsxDEV("input", { id: "username", name: "username", type: "text", required: true, autoFocus: true })
+        /* @__PURE__ */ jsxDEV("label", { htmlFor: "username", children: "Username or Email" }),
+        /* @__PURE__ */ jsxDEV("input", { id: "username", name: "username", type: "text", placeholder: "e.g. admin", required: true, autoFocus: true })
       ] }),
       /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
         /* @__PURE__ */ jsxDEV("label", { htmlFor: "password", children: "Password" }),
-        /* @__PURE__ */ jsxDEV("input", { id: "password", name: "password", type: "password", required: true })
+        /* @__PURE__ */ jsxDEV("input", { id: "password", name: "password", type: "password", placeholder: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022", required: true })
       ] }),
       /* @__PURE__ */ jsxDEV(
         "button",
@@ -4349,106 +4648,412 @@ var AdminLoginView = ({ error }) => {
           type: "submit",
           className: "primary-action",
           style: { width: "100%", justifyContent: "center", padding: "12px", fontSize: "14px" },
-          children: "Sign In to Dashboard"
+          children: "Sign In to Management Portal"
         }
       )
     ] }),
-    /* @__PURE__ */ jsxDEV("div", { style: { marginTop: "24px", textAlign: "center", fontSize: "12px" }, children: /* @__PURE__ */ jsxDEV("a", { href: "/", style: { color: "#6b7280" }, children: "\u2190 Return to Storefront" }) })
+    /* @__PURE__ */ jsxDEV("div", { style: { marginTop: "24px", textAlign: "center", fontSize: "13px" }, children: /* @__PURE__ */ jsxDEV("a", { href: "/", style: { color: "#6b7280" }, children: "\u2190 Return to Public Storefront" }) })
   ] }) }) });
 };
-var AdminDashboardView = ({ user, stats, products, categories, settings }) => {
-  return /* @__PURE__ */ jsxDEV(Layout, { title: "Admin Dashboard \u2014 BuyerNepal", children: /* @__PURE__ */ jsxDEV("div", { style: { minHeight: "100vh", background: "#f8f9fa" }, children: [
+var AdminDashboardView = ({
+  currentUser,
+  stats,
+  products,
+  categories,
+  users,
+  reviews,
+  coupons,
+  settings,
+  activeTab = "overview",
+  notice
+}) => {
+  return /* @__PURE__ */ jsxDEV(Layout, { title: "Admin Management Portal \u2014 BuyerNepal", children: /* @__PURE__ */ jsxDEV("div", { style: { minHeight: "100vh", background: "#f8f9fa" }, children: [
     /* @__PURE__ */ jsxDEV("div", { style: { background: "#111827", color: "#fff", padding: "14px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
-      /* @__PURE__ */ jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-        /* @__PURE__ */ jsxDEV("span", { className: "store-logo-mark", style: { width: "30px", height: "30px", fontSize: "14px" }, children: "B" }),
-        /* @__PURE__ */ jsxDEV("strong", { children: "BuyerNepal Admin" }),
-        /* @__PURE__ */ jsxDEV("span", { style: { background: "#374151", color: "#9ca3af", fontSize: "11px", padding: "2px 8px", borderRadius: "4px" }, children: "Edge SSR" })
+      /* @__PURE__ */ jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: "14px" }, children: [
+        /* @__PURE__ */ jsxDEV("span", { className: "store-logo-mark", style: { width: "32px", height: "32px", fontSize: "15px" }, children: "B" }),
+        /* @__PURE__ */ jsxDEV("strong", { children: "BuyerNepal Portal" }),
+        /* @__PURE__ */ jsxDEV("span", { className: "badge badge-admin", children: "Production Edge SSR" })
       ] }),
       /* @__PURE__ */ jsxDEV("div", { style: { display: "flex", alignItems: "center", gap: "16px", fontSize: "13px" }, children: [
         /* @__PURE__ */ jsxDEV("span", { style: { color: "#9ca3af" }, children: [
-          "Logged in as ",
-          /* @__PURE__ */ jsxDEV("b", { children: user.username })
+          "Logged in: ",
+          /* @__PURE__ */ jsxDEV("b", { children: currentUser.username }),
+          " (",
+          currentUser.role,
+          ")"
         ] }),
-        /* @__PURE__ */ jsxDEV("a", { href: "/", target: "_blank", style: { color: "#60a5fa" }, children: "View Store \u2197" }),
-        /* @__PURE__ */ jsxDEV("form", { method: "post", action: "/api/auth/logout", style: { display: "inline" }, children: /* @__PURE__ */ jsxDEV("button", { type: "submit", style: { background: "transparent", border: "1px solid #4b5563", color: "#fff", padding: "5px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "12px" }, children: "Sign Out" }) })
+        /* @__PURE__ */ jsxDEV("a", { href: "/", target: "_blank", style: { color: "#60a5fa", fontWeight: 600 }, children: "Live Store \u2197" }),
+        /* @__PURE__ */ jsxDEV("form", { method: "post", action: "/api/auth/logout", style: { display: "inline" }, children: /* @__PURE__ */ jsxDEV(
+          "button",
+          {
+            type: "submit",
+            style: {
+              background: "transparent",
+              border: "1px solid #4b5563",
+              color: "#fff",
+              padding: "5px 12px",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "12px"
+            },
+            children: "Sign Out"
+          }
+        ) })
       ] })
     ] }),
-    /* @__PURE__ */ jsxDEV("main", { className: "store-shell", style: { padding: "36px 0" }, children: [
-      /* @__PURE__ */ jsxDEV("h1", { style: { fontSize: "28px", fontWeight: 800, marginBottom: "24px", letterSpacing: "-1px" }, children: "Dashboard Overview" }),
-      /* @__PURE__ */ jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "36px" }, children: [
-        /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
-          /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "12px", color: "#6b7280", fontWeight: 600 }, children: "TOTAL PRODUCTS" }),
-          /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: "#111827" }, children: stats.products })
+    /* @__PURE__ */ jsxDEV("main", { className: "store-shell", style: { padding: "32px 0" }, children: [
+      notice && /* @__PURE__ */ jsxDEV("div", { className: `alert-box alert-${notice.type}`, children: notice.message }),
+      /* @__PURE__ */ jsxDEV("div", { className: "admin-tabs", children: [
+        /* @__PURE__ */ jsxDEV("button", { type: "button", className: `admin-tab-btn ${activeTab === "overview" ? "active" : ""}`, "data-tab": "overview", children: "\u{1F4CA} Overview" }),
+        /* @__PURE__ */ jsxDEV("button", { type: "button", className: `admin-tab-btn ${activeTab === "products" ? "active" : ""}`, "data-tab": "products", children: [
+          "\u{1F6CD}\uFE0F Products (",
+          products.length,
+          ")"
         ] }),
-        /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
-          /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "12px", color: "#6b7280", fontWeight: 600 }, children: "CATEGORIES" }),
-          /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: "#111827" }, children: stats.categories })
+        /* @__PURE__ */ jsxDEV("button", { type: "button", className: `admin-tab-btn ${activeTab === "categories" ? "active" : ""}`, "data-tab": "categories", children: [
+          "\u{1F4C2} Menu & Categories (",
+          categories.length,
+          ")"
         ] }),
-        /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
-          /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "12px", color: "#6b7280", fontWeight: 600 }, children: "PENDING REVIEWS" }),
-          /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: stats.pendingReviews > 0 ? "#e11d48" : "#111827" }, children: stats.pendingReviews })
+        /* @__PURE__ */ jsxDEV("button", { type: "button", className: `admin-tab-btn ${activeTab === "users" ? "active" : ""}`, "data-tab": "users", children: [
+          "\u{1F465} User System (",
+          users.length,
+          ")"
         ] }),
-        /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
-          /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "12px", color: "#6b7280", fontWeight: 600 }, children: "ACTIVE COUPONS" }),
-          /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: "#111827" }, children: stats.activeCoupons })
+        /* @__PURE__ */ jsxDEV("button", { type: "button", className: `admin-tab-btn ${activeTab === "reviews" ? "active" : ""}`, "data-tab": "reviews", children: [
+          "\u2B50 Reviews (",
+          reviews.length,
+          ")"
         ] }),
-        /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
-          /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "12px", color: "#6b7280", fontWeight: 600 }, children: "USERS" }),
-          /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: "#111827" }, children: stats.users })
-        ] })
+        /* @__PURE__ */ jsxDEV("button", { type: "button", className: `admin-tab-btn ${activeTab === "coupons" ? "active" : ""}`, "data-tab": "coupons", children: [
+          "\u{1F3F7}\uFE0F Coupons (",
+          coupons.length,
+          ")"
+        ] }),
+        /* @__PURE__ */ jsxDEV("button", { type: "button", className: `admin-tab-btn ${activeTab === "settings" ? "active" : ""}`, "data-tab": "settings", children: "\u2699\uFE0F Site Settings" })
       ] }),
-      /* @__PURE__ */ jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "24px" }, children: [
-        /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "14px", padding: "24px" }, children: [
-          /* @__PURE__ */ jsxDEV("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }, children: /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700 }, children: [
-            "Curated Products (",
-            products.length,
-            ")"
-          ] }) }),
-          products.length > 0 ? /* @__PURE__ */ jsxDEV("div", { style: { overflowX: "auto" }, children: /* @__PURE__ */ jsxDEV("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: "13px" }, children: [
-            /* @__PURE__ */ jsxDEV("thead", { children: /* @__PURE__ */ jsxDEV("tr", { style: { borderBottom: "2px solid #f3f4f6", textAlign: "left", color: "#6b7280" }, children: [
-              /* @__PURE__ */ jsxDEV("th", { style: { padding: "10px 0" }, children: "Product" }),
-              /* @__PURE__ */ jsxDEV("th", { style: { padding: "10px 8px" }, children: "Price" }),
-              /* @__PURE__ */ jsxDEV("th", { style: { padding: "10px 8px" }, children: "Status" }),
-              /* @__PURE__ */ jsxDEV("th", { style: { padding: "10px 8px", textAlign: "right" }, children: "Actions" })
+      /* @__PURE__ */ jsxDEV("div", { id: "tab-overview", className: "admin-tab-pane", style: { display: activeTab === "overview" ? "block" : "none" }, children: [
+        /* @__PURE__ */ jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "28px" }, children: [
+          /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
+            /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "11px", color: "#6b7280", fontWeight: 700, letterSpacing: "0.8px" }, children: "PRODUCTS" }),
+            /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: "#111827" }, children: stats.products })
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
+            /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "11px", color: "#6b7280", fontWeight: 700, letterSpacing: "0.8px" }, children: "CATEGORIES" }),
+            /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: "#111827" }, children: stats.categories })
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
+            /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "11px", color: "#6b7280", fontWeight: 700, letterSpacing: "0.8px" }, children: "PENDING REVIEWS" }),
+            /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: stats.pendingReviews > 0 ? "#e11d48" : "#111827" }, children: stats.pendingReviews })
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
+            /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "11px", color: "#6b7280", fontWeight: 700, letterSpacing: "0.8px" }, children: "REGISTERED USERS" }),
+            /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: "#111827" }, children: stats.users })
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "12px", padding: "20px" }, children: [
+            /* @__PURE__ */ jsxDEV("span", { style: { fontSize: "11px", color: "#6b7280", fontWeight: 700, letterSpacing: "0.8px" }, children: "COUPONS" }),
+            /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", fontSize: "32px", marginTop: "6px", color: "#111827" }, children: stats.activeCoupons })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: "Quick Actions & Recent Products" }),
+          /* @__PURE__ */ jsxDEV("table", { className: "admin-table", children: [
+            /* @__PURE__ */ jsxDEV("thead", { children: /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("th", { children: "Product" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Category" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Price" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Status" }),
+              /* @__PURE__ */ jsxDEV("th", { style: { textAlign: "right" }, children: "Action" })
             ] }) }),
-            /* @__PURE__ */ jsxDEV("tbody", { children: products.map((p) => /* @__PURE__ */ jsxDEV("tr", { style: { borderBottom: "1px solid #f3f4f6" }, children: [
-              /* @__PURE__ */ jsxDEV("td", { style: { padding: "12px 0", fontWeight: 600 }, children: /* @__PURE__ */ jsxDEV("a", { href: `/product/${p.id}`, target: "_blank", style: { color: "#111827" }, children: p.name }) }),
-              /* @__PURE__ */ jsxDEV("td", { style: { padding: "12px 8px", color: "#111827", fontWeight: 600 }, children: [
+            /* @__PURE__ */ jsxDEV("tbody", { children: products.slice(0, 5).map((p) => /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("td", { style: { fontWeight: 600 }, children: p.name }),
+              /* @__PURE__ */ jsxDEV("td", { children: p.category_name || "General" }),
+              /* @__PURE__ */ jsxDEV("td", { children: [
                 "Rs. ",
                 p.price.toLocaleString("en-NP")
               ] }),
-              /* @__PURE__ */ jsxDEV("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ jsxDEV("span", { style: { background: p.is_active ? "#dcfce7" : "#fee2e2", color: p.is_active ? "#15803d" : "#b91c1c", padding: "3px 8px", borderRadius: "4px", fontSize: "11px", fontWeight: 700 }, children: p.is_active ? "ACTIVE" : "DRAFT" }) }),
-              /* @__PURE__ */ jsxDEV("td", { style: { padding: "12px 8px", textAlign: "right" }, children: /* @__PURE__ */ jsxDEV("a", { href: `/product/${p.id}`, target: "_blank", style: { color: "#2563eb", marginRight: "8px" }, children: "View" }) })
+              /* @__PURE__ */ jsxDEV("td", { children: /* @__PURE__ */ jsxDEV("span", { className: `badge ${p.is_active ? "badge-active" : "badge-inactive"}`, children: p.is_active ? "Active" : "Draft" }) }),
+              /* @__PURE__ */ jsxDEV("td", { style: { textAlign: "right" }, children: /* @__PURE__ */ jsxDEV("a", { href: `/product/${p.id}`, target: "_blank", className: "secondary-action", style: { padding: "4px 10px", fontSize: "12px" }, children: "View \u2197" }) })
             ] }, p.id)) })
-          ] }) }) : /* @__PURE__ */ jsxDEV("p", { style: { color: "#9ca3af", fontSize: "13px", padding: "20px 0" }, children: "No products listed yet." })
-        ] }),
-        /* @__PURE__ */ jsxDEV("div", { style: { display: "flex", flexDirection: "column", gap: "20px" }, children: [
-          /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "14px", padding: "24px" }, children: [
-            /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "14px" }, children: [
-              "Categories (",
-              categories.length,
-              ")"
-            ] }),
-            categories.length > 0 ? /* @__PURE__ */ jsxDEV("ul", { style: { listStyle: "none", fontSize: "13px" }, children: categories.map((c) => /* @__PURE__ */ jsxDEV("li", { style: { padding: "8px 0", borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between" }, children: [
-              /* @__PURE__ */ jsxDEV("span", { children: c.name }),
-              /* @__PURE__ */ jsxDEV("code", { style: { fontSize: "11px", color: "#9ca3af" }, children: [
-                "/",
-                c.slug
-              ] })
-            ] }, c.id)) }) : /* @__PURE__ */ jsxDEV("p", { style: { color: "#9ca3af", fontSize: "13px" }, children: "No categories created yet." })
-          ] }),
-          /* @__PURE__ */ jsxDEV("div", { style: { background: "#fff", border: "1px solid var(--line)", borderRadius: "14px", padding: "24px" }, children: [
-            /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "12px" }, children: "Site Information" }),
-            /* @__PURE__ */ jsxDEV("p", { style: { fontSize: "12px", color: "#6b7280", lineHeight: 1.6 }, children: [
-              "Title: ",
-              /* @__PURE__ */ jsxDEV("b", { children: settings.site_title || "BuyerNepal" }),
-              /* @__PURE__ */ jsxDEV("br", {}),
-              "Description: ",
-              /* @__PURE__ */ jsxDEV("i", { children: settings.site_description || "Shop Smarter in Nepal" })
-            ] })
           ] })
         ] })
-      ] })
+      ] }),
+      /* @__PURE__ */ jsxDEV("div", { id: "tab-products", className: "admin-tab-pane", style: { display: activeTab === "products" ? "block" : "none" }, children: /* @__PURE__ */ jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "1.2fr 2fr", gap: "24px" }, children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: "Add New Product" }),
+          /* @__PURE__ */ jsxDEV("form", { method: "post", action: "/admin/products/new", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Product Name *" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "name", type: "text", placeholder: "e.g. Sony WH-1000XM5", required: true })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Price (NPR) *" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "price", type: "number", step: "1", placeholder: "42999", required: true })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Category" }),
+              /* @__PURE__ */ jsxDEV("select", { name: "category_id", children: [
+                /* @__PURE__ */ jsxDEV("option", { value: "", children: "-- Select Category --" }),
+                categories.map((c) => /* @__PURE__ */ jsxDEV("option", { value: c.id, children: c.name }, c.id))
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Affiliate / Store URL" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "affiliate_url", type: "url", placeholder: "https://..." })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Image URL" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "image_url", type: "url", placeholder: "https://images.unsplash.com/..." })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Description" }),
+              /* @__PURE__ */ jsxDEV("textarea", { name: "description", rows: 3, placeholder: "Highlights and specifications..." })
+            ] }),
+            /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "primary-action", style: { width: "100%", justifyContent: "center" }, children: "Publish Product" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: [
+            "Curated Catalog (",
+            products.length,
+            ")"
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { style: { overflowX: "auto" }, children: /* @__PURE__ */ jsxDEV("table", { className: "admin-table", children: [
+            /* @__PURE__ */ jsxDEV("thead", { children: /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("th", { children: "Product" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Price" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Status" }),
+              /* @__PURE__ */ jsxDEV("th", { style: { textAlign: "right" }, children: "Actions" })
+            ] }) }),
+            /* @__PURE__ */ jsxDEV("tbody", { children: products.map((p) => /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("td", { children: [
+                /* @__PURE__ */ jsxDEV("strong", { style: { display: "block", color: "#111827" }, children: p.name }),
+                /* @__PURE__ */ jsxDEV("small", { style: { color: "#9ca3af" }, children: p.category_name || "No Category" })
+              ] }),
+              /* @__PURE__ */ jsxDEV("td", { children: [
+                "Rs. ",
+                p.price.toLocaleString("en-NP")
+              ] }),
+              /* @__PURE__ */ jsxDEV("td", { children: /* @__PURE__ */ jsxDEV("span", { className: `badge ${p.is_active ? "badge-active" : "badge-inactive"}`, children: p.is_active ? "Active" : "Hidden" }) }),
+              /* @__PURE__ */ jsxDEV("td", { style: { textAlign: "right", whiteSpace: "nowrap" }, children: /* @__PURE__ */ jsxDEV("form", { method: "post", action: `/admin/products/${p.id}/delete`, style: { display: "inline" }, children: /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "danger-action", onClick: () => confirm("Delete product?"), children: "Delete" }) }) })
+            ] }, p.id)) })
+          ] }) })
+        ] })
+      ] }) }),
+      /* @__PURE__ */ jsxDEV("div", { id: "tab-categories", className: "admin-tab-pane", style: { display: activeTab === "categories" ? "block" : "none" }, children: /* @__PURE__ */ jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "1fr 2fr", gap: "24px" }, children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: "Add Category / Menu Item" }),
+          /* @__PURE__ */ jsxDEV("form", { method: "post", action: "/admin/categories/new", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Category Name *" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "name", type: "text", placeholder: "e.g. Smart Watches", required: true })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "URL Slug *" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "slug", type: "text", placeholder: "e.g. smart-watches", required: true })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Description" }),
+              /* @__PURE__ */ jsxDEV("textarea", { name: "description", rows: 3, placeholder: "Category description..." })
+            ] }),
+            /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "primary-action", style: { width: "100%", justifyContent: "center" }, children: "Create Category" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: [
+            "Storefront Navigation Menu (",
+            categories.length,
+            ")"
+          ] }),
+          /* @__PURE__ */ jsxDEV("p", { style: { fontSize: "13px", color: "#6b7280", marginBottom: "16px" }, children: "These categories appear directly in the top header and the mobile navigation drawer." }),
+          /* @__PURE__ */ jsxDEV("table", { className: "admin-table", children: [
+            /* @__PURE__ */ jsxDEV("thead", { children: /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("th", { children: "Name" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Slug" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Status" }),
+              /* @__PURE__ */ jsxDEV("th", { style: { textAlign: "right" }, children: "Actions" })
+            ] }) }),
+            /* @__PURE__ */ jsxDEV("tbody", { children: categories.map((c) => /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("td", { style: { fontWeight: 600 }, children: c.name }),
+              /* @__PURE__ */ jsxDEV("td", { children: /* @__PURE__ */ jsxDEV("code", { children: [
+                "/",
+                c.slug
+              ] }) }),
+              /* @__PURE__ */ jsxDEV("td", { children: /* @__PURE__ */ jsxDEV("span", { className: `badge ${c.is_active ? "badge-active" : "badge-inactive"}`, children: c.is_active ? "Active" : "Draft" }) }),
+              /* @__PURE__ */ jsxDEV("td", { style: { textAlign: "right", whiteSpace: "nowrap" }, children: [
+                /* @__PURE__ */ jsxDEV("a", { href: `/category/${c.slug}`, target: "_blank", className: "secondary-action", style: { padding: "4px 10px", fontSize: "12px", marginRight: "6px" }, children: "View \u2197" }),
+                /* @__PURE__ */ jsxDEV("form", { method: "post", action: `/admin/categories/${c.id}/delete`, style: { display: "inline" }, children: /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "danger-action", onClick: () => confirm("Delete category?"), children: "Delete" }) })
+              ] })
+            ] }, c.id)) })
+          ] })
+        ] })
+      ] }) }),
+      /* @__PURE__ */ jsxDEV("div", { id: "tab-users", className: "admin-tab-pane", style: { display: activeTab === "users" ? "block" : "none" }, children: /* @__PURE__ */ jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "1.2fr 2fr", gap: "24px" }, children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: "Create New User" }),
+          /* @__PURE__ */ jsxDEV("form", { method: "post", action: "/admin/users/new", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Username *" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "username", type: "text", placeholder: "e.g. editor1", required: true })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Email Address *" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "email", type: "email", placeholder: "user@buyernepal.com", required: true })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Password (min 8 characters) *" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "password", type: "password", placeholder: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022", required: true })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Access Role *" }),
+              /* @__PURE__ */ jsxDEV("select", { name: "role", required: true, children: [
+                /* @__PURE__ */ jsxDEV("option", { value: "user", children: "User (Customer / Viewer)" }),
+                /* @__PURE__ */ jsxDEV("option", { value: "moderator", children: "Moderator (Reviews & Catalog)" }),
+                /* @__PURE__ */ jsxDEV("option", { value: "admin", children: "Admin (Full Control)" })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "primary-action", style: { width: "100%", justifyContent: "center" }, children: "Create Account" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: [
+            "Registered Accounts (",
+            users.length,
+            ")"
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { style: { overflowX: "auto" }, children: /* @__PURE__ */ jsxDEV("table", { className: "admin-table", children: [
+            /* @__PURE__ */ jsxDEV("thead", { children: /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("th", { children: "User" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Role" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Status" }),
+              /* @__PURE__ */ jsxDEV("th", { style: { textAlign: "right" }, children: "Actions" })
+            ] }) }),
+            /* @__PURE__ */ jsxDEV("tbody", { children: users.map((u) => /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("td", { children: [
+                /* @__PURE__ */ jsxDEV("strong", { style: { display: "block" }, children: u.username }),
+                /* @__PURE__ */ jsxDEV("small", { style: { color: "#9ca3af" }, children: u.email })
+              ] }),
+              /* @__PURE__ */ jsxDEV("td", { children: /* @__PURE__ */ jsxDEV("span", { className: `badge badge-${u.role}`, children: u.role }) }),
+              /* @__PURE__ */ jsxDEV("td", { children: /* @__PURE__ */ jsxDEV("span", { className: `badge ${u.is_active ? "badge-active" : "badge-inactive"}`, children: u.is_active ? "Active" : "Disabled" }) }),
+              /* @__PURE__ */ jsxDEV("td", { style: { textAlign: "right", whiteSpace: "nowrap" }, children: [
+                u.id !== currentUser.id && /* @__PURE__ */ jsxDEV(Fragment, { children: [
+                  /* @__PURE__ */ jsxDEV("form", { method: "post", action: `/admin/users/${u.id}/toggle-status`, style: { display: "inline", marginRight: "6px" }, children: [
+                    /* @__PURE__ */ jsxDEV("input", { type: "hidden", name: "is_active", value: u.is_active ? "0" : "1" }),
+                    /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "secondary-action", style: { padding: "4px 8px", fontSize: "11px" }, children: u.is_active ? "Deactivate" : "Activate" })
+                  ] }),
+                  /* @__PURE__ */ jsxDEV("form", { method: "post", action: `/admin/users/${u.id}/delete`, style: { display: "inline" }, children: /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "danger-action", onClick: () => confirm("Delete user?"), children: "Delete" }) })
+                ] }),
+                u.id === currentUser.id && /* @__PURE__ */ jsxDEV("span", { style: { color: "#9ca3af", fontSize: "11px" }, children: "Current User" })
+              ] })
+            ] }, u.id)) })
+          ] }) })
+        ] })
+      ] }) }),
+      /* @__PURE__ */ jsxDEV("div", { id: "tab-reviews", className: "admin-tab-pane", style: { display: activeTab === "reviews" ? "block" : "none" }, children: /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+        /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: [
+          "Customer Reviews Moderation (",
+          reviews.length,
+          ")"
+        ] }),
+        reviews.length > 0 ? /* @__PURE__ */ jsxDEV("table", { className: "admin-table", children: [
+          /* @__PURE__ */ jsxDEV("thead", { children: /* @__PURE__ */ jsxDEV("tr", { children: [
+            /* @__PURE__ */ jsxDEV("th", { children: "Product" }),
+            /* @__PURE__ */ jsxDEV("th", { children: "Shopper" }),
+            /* @__PURE__ */ jsxDEV("th", { children: "Rating" }),
+            /* @__PURE__ */ jsxDEV("th", { children: "Comment" }),
+            /* @__PURE__ */ jsxDEV("th", { children: "Status" }),
+            /* @__PURE__ */ jsxDEV("th", { style: { textAlign: "right" }, children: "Actions" })
+          ] }) }),
+          /* @__PURE__ */ jsxDEV("tbody", { children: reviews.map((r) => /* @__PURE__ */ jsxDEV("tr", { children: [
+            /* @__PURE__ */ jsxDEV("td", { style: { fontWeight: 600 }, children: r.product_name || `Product #${r.product_id}` }),
+            /* @__PURE__ */ jsxDEV("td", { children: r.user_name }),
+            /* @__PURE__ */ jsxDEV("td", { style: { color: "#f59e0b" }, children: "\u2605".repeat(r.rating) }),
+            /* @__PURE__ */ jsxDEV("td", { style: { maxWidth: "300px" }, children: r.comment }),
+            /* @__PURE__ */ jsxDEV("td", { children: /* @__PURE__ */ jsxDEV("span", { className: `badge ${r.status === "approved" ? "badge-active" : "badge-inactive"}`, children: r.status }) }),
+            /* @__PURE__ */ jsxDEV("td", { style: { textAlign: "right", whiteSpace: "nowrap" }, children: [
+              r.status !== "approved" && /* @__PURE__ */ jsxDEV("form", { method: "post", action: `/admin/reviews/${r.id}/approve`, style: { display: "inline", marginRight: "6px" }, children: /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "primary-action", style: { padding: "4px 8px", fontSize: "11px", background: "#16a34a" }, children: "Approve" }) }),
+              /* @__PURE__ */ jsxDEV("form", { method: "post", action: `/admin/reviews/${r.id}/delete`, style: { display: "inline" }, children: /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "danger-action", children: "Delete" }) })
+            ] })
+          ] }, r.id)) })
+        ] }) : /* @__PURE__ */ jsxDEV("p", { style: { color: "#9ca3af", padding: "20px 0" }, children: "No customer reviews to moderate." })
+      ] }) }),
+      /* @__PURE__ */ jsxDEV("div", { id: "tab-coupons", className: "admin-tab-pane", style: { display: activeTab === "coupons" ? "block" : "none" }, children: /* @__PURE__ */ jsxDEV("div", { style: { display: "grid", gridTemplateColumns: "1fr 2fr", gap: "24px" }, children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: "Create Coupon" }),
+          /* @__PURE__ */ jsxDEV("form", { method: "post", action: "/admin/coupons/new", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Coupon Code *" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "code", type: "text", placeholder: "DASHAIN20", required: true })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Discount Type" }),
+              /* @__PURE__ */ jsxDEV("select", { name: "discount_type", children: [
+                /* @__PURE__ */ jsxDEV("option", { value: "percentage", children: "Percentage (%)" }),
+                /* @__PURE__ */ jsxDEV("option", { value: "fixed", children: "Fixed Amount (NPR)" })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Discount Value *" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "discount_value", type: "number", placeholder: "15", required: true })
+            ] }),
+            /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+              /* @__PURE__ */ jsxDEV("label", { children: "Minimum Purchase" }),
+              /* @__PURE__ */ jsxDEV("input", { name: "min_purchase", type: "number", placeholder: "1000" })
+            ] }),
+            /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "primary-action", style: { width: "100%", justifyContent: "center" }, children: "Save Coupon" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxDEV("div", { className: "admin-card", children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "16px" }, children: [
+            "Active Discount Codes (",
+            coupons.length,
+            ")"
+          ] }),
+          coupons.length > 0 ? /* @__PURE__ */ jsxDEV("table", { className: "admin-table", children: [
+            /* @__PURE__ */ jsxDEV("thead", { children: /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("th", { children: "Code" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Discount" }),
+              /* @__PURE__ */ jsxDEV("th", { children: "Min Spend" }),
+              /* @__PURE__ */ jsxDEV("th", { style: { textAlign: "right" }, children: "Actions" })
+            ] }) }),
+            /* @__PURE__ */ jsxDEV("tbody", { children: coupons.map((c) => /* @__PURE__ */ jsxDEV("tr", { children: [
+              /* @__PURE__ */ jsxDEV("td", { children: /* @__PURE__ */ jsxDEV("strong", { children: c.code }) }),
+              /* @__PURE__ */ jsxDEV("td", { children: c.discount_type === "percentage" ? `${c.discount_value}%` : `Rs. ${c.discount_value}` }),
+              /* @__PURE__ */ jsxDEV("td", { children: [
+                "Rs. ",
+                c.min_purchase
+              ] }),
+              /* @__PURE__ */ jsxDEV("td", { style: { textAlign: "right" }, children: /* @__PURE__ */ jsxDEV("form", { method: "post", action: `/admin/coupons/${c.id}/delete`, style: { display: "inline" }, children: /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "danger-action", children: "Delete" }) }) })
+            ] }, c.id)) })
+          ] }) : /* @__PURE__ */ jsxDEV("p", { style: { color: "#9ca3af", padding: "20px 0" }, children: "No coupons active right now." })
+        ] })
+      ] }) }),
+      /* @__PURE__ */ jsxDEV("div", { id: "tab-settings", className: "admin-tab-pane", style: { display: activeTab === "settings" ? "block" : "none" }, children: /* @__PURE__ */ jsxDEV("div", { className: "admin-card", style: { maxWidth: "700px" }, children: [
+        /* @__PURE__ */ jsxDEV("h2", { style: { fontSize: "18px", fontWeight: 700, marginBottom: "20px" }, children: "Storefront Configuration" }),
+        /* @__PURE__ */ jsxDEV("form", { method: "post", action: "/admin/settings", children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+            /* @__PURE__ */ jsxDEV("label", { children: "Site Title" }),
+            /* @__PURE__ */ jsxDEV("input", { name: "site_title", type: "text", value: settings.site_title || "BuyerNepal" })
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+            /* @__PURE__ */ jsxDEV("label", { children: "Site Meta Description" }),
+            /* @__PURE__ */ jsxDEV("textarea", { name: "site_description", rows: 2, value: settings.site_description || "" })
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+            /* @__PURE__ */ jsxDEV("label", { children: "Site Logo URL" }),
+            /* @__PURE__ */ jsxDEV("input", { name: "site_logo", type: "url", value: settings.site_logo || "", placeholder: "https://..." })
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+            /* @__PURE__ */ jsxDEV("label", { children: "Contact Email" }),
+            /* @__PURE__ */ jsxDEV("input", { name: "contact_email", type: "email", value: settings.contact_email || "", placeholder: "contact@buyernepal.com" })
+          ] }),
+          /* @__PURE__ */ jsxDEV("div", { className: "form-group", children: [
+            /* @__PURE__ */ jsxDEV("label", { children: "Custom Homepage Content (HTML/Notice banner)" }),
+            /* @__PURE__ */ jsxDEV("textarea", { name: "homepage_html", rows: 3, value: settings.homepage_html || "" })
+          ] }),
+          /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "primary-action", children: "Save All Settings" })
+        ] })
+      ] }) })
     ] })
   ] }) });
 };
@@ -4685,27 +5290,214 @@ app.post("/admin/login", async (c) => {
 });
 app.get("/admin", async (c) => {
   const s = await getSession(c);
-  if (!s || s.role !== "admin") {
+  if (!s || s.role !== "admin" && s.role !== "moderator") {
     return c.redirect("/admin/login");
   }
-  const [settings, categories, products, stats] = await Promise.all([
+  const tab = c.req.query("tab") || "overview";
+  const msg = c.req.query("msg");
+  const err = c.req.query("err");
+  const notice = msg ? { type: "success", message: msg } : err ? { type: "error", message: err } : void 0;
+  const [settings, categories, products, stats, users, reviews, coupons] = await Promise.all([
     getSettings(c.env?.DB),
-    getCategories(c.env?.DB),
-    getProducts(c.env?.DB),
-    getAdminStats(c.env?.DB)
+    getCategories(c.env?.DB, false),
+    getAllProductsAdmin(c.env?.DB),
+    getAdminStats(c.env?.DB),
+    getUsers(c.env?.DB),
+    getAllReviewsAdmin(c.env?.DB),
+    getCoupons(c.env?.DB)
   ]);
   return c.html(
     /* @__PURE__ */ jsxDEV(
       AdminDashboardView,
       {
-        user: { username: s.username, email: s.email },
+        currentUser: { id: s.user_id, username: s.username, email: s.email, role: s.role },
         stats,
         products,
         categories,
-        settings
+        users,
+        reviews,
+        coupons,
+        settings,
+        activeTab: tab,
+        notice
       }
     )
   );
+});
+app.get("/admin/logout", (c) => {
+  clearSession(c);
+  return c.redirect("/admin/login");
+});
+app.post("/admin/logout", (c) => {
+  clearSession(c);
+  return c.redirect("/admin/login");
+});
+app.post("/admin/products/new", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin" && s.role !== "moderator") return c.redirect("/admin/login");
+  try {
+    const body = await c.req.parseBody();
+    const name = String(body["name"] || "").trim();
+    const price = Number(body["price"]);
+    const categoryId = body["category_id"] ? Number(body["category_id"]) : null;
+    const affiliateUrl = String(body["affiliate_url"] || "").trim();
+    const imageUrl = String(body["image_url"] || "").trim();
+    const description = String(body["description"] || "").trim();
+    if (!name || isNaN(price) || price < 0) {
+      return c.redirect("/admin?tab=products&err=Invalid+product+name+or+price");
+    }
+    const res = await createProduct(c.env?.DB, name, price, description, imageUrl, affiliateUrl, categoryId, 1);
+    if (!res.success) {
+      return c.redirect(`/admin?tab=products&err=${encodeURIComponent(res.error || "Failed to create product")}`);
+    }
+    return c.redirect("/admin?tab=products&msg=Product+created+successfully");
+  } catch {
+    return c.redirect("/admin?tab=products&err=Failed+to+process+request");
+  }
+});
+app.post("/admin/products/:id/delete", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin" && s.role !== "moderator") return c.redirect("/admin/login");
+  const id = Number(c.req.param("id"));
+  if (id) {
+    await deleteProduct(c.env?.DB, id);
+  }
+  return c.redirect("/admin?tab=products&msg=Product+deleted");
+});
+app.post("/admin/categories/new", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin") return c.redirect("/admin/login");
+  try {
+    const body = await c.req.parseBody();
+    const name = String(body["name"] || "").trim();
+    let slug = String(body["slug"] || "").trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+    const description = String(body["description"] || "").trim();
+    if (!name || !slug) {
+      return c.redirect("/admin?tab=categories&err=Category+name+and+slug+are+required");
+    }
+    const res = await createCategory(c.env?.DB, name, slug, description);
+    if (!res.success) {
+      return c.redirect(`/admin?tab=categories&err=${encodeURIComponent(res.error || "Failed to create category")}`);
+    }
+    return c.redirect("/admin?tab=categories&msg=Category+added+to+navigation+menu");
+  } catch {
+    return c.redirect("/admin?tab=categories&err=Failed+to+process+request");
+  }
+});
+app.post("/admin/categories/:id/delete", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin") return c.redirect("/admin/login");
+  const id = Number(c.req.param("id"));
+  if (id) {
+    await deleteCategory(c.env?.DB, id);
+  }
+  return c.redirect("/admin?tab=categories&msg=Category+deleted");
+});
+app.post("/admin/users/new", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin") return c.redirect("/admin/login");
+  try {
+    const body = await c.req.parseBody();
+    const username = String(body["username"] || "").trim();
+    const email = String(body["email"] || "").trim().toLowerCase();
+    const password = String(body["password"] || "");
+    const role = body["role"] || "user";
+    if (!username || !email || password.length < 8) {
+      return c.redirect("/admin?tab=users&err=Password+must+be+at+least+8+characters");
+    }
+    const { hash, salt } = await passwordHash(password);
+    const res = await createUser(c.env?.DB, username, email, hash, salt, role);
+    if (!res.success) {
+      return c.redirect(`/admin?tab=users&err=${encodeURIComponent(res.error || "User creation failed")}`);
+    }
+    return c.redirect("/admin?tab=users&msg=User+created+successfully");
+  } catch {
+    return c.redirect("/admin?tab=users&err=Failed+to+create+user");
+  }
+});
+app.post("/admin/users/:id/toggle-status", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin") return c.redirect("/admin/login");
+  const id = Number(c.req.param("id"));
+  if (id === s.user_id) {
+    return c.redirect("/admin?tab=users&err=Cannot+modify+your+own+account+status");
+  }
+  const body = await c.req.parseBody();
+  const isActive = Number(body["is_active"]) === 1 ? 1 : 0;
+  await toggleUserStatus(c.env?.DB, id, isActive);
+  return c.redirect("/admin?tab=users&msg=User+status+updated");
+});
+app.post("/admin/users/:id/delete", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin") return c.redirect("/admin/login");
+  const id = Number(c.req.param("id"));
+  if (id === s.user_id) {
+    return c.redirect("/admin?tab=users&err=Cannot+delete+your+own+account");
+  }
+  await deleteUser(c.env?.DB, id);
+  return c.redirect("/admin?tab=users&msg=User+deleted");
+});
+app.post("/admin/reviews/:id/approve", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin" && s.role !== "moderator") return c.redirect("/admin/login");
+  const id = Number(c.req.param("id"));
+  if (id) {
+    await updateReviewStatus(c.env?.DB, id, "approved");
+  }
+  return c.redirect("/admin?tab=reviews&msg=Review+approved");
+});
+app.post("/admin/reviews/:id/delete", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin" && s.role !== "moderator") return c.redirect("/admin/login");
+  const id = Number(c.req.param("id"));
+  if (id) {
+    await deleteReview(c.env?.DB, id);
+  }
+  return c.redirect("/admin?tab=reviews&msg=Review+deleted");
+});
+app.post("/admin/coupons/new", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin") return c.redirect("/admin/login");
+  try {
+    const body = await c.req.parseBody();
+    const code = String(body["code"] || "").trim().toUpperCase();
+    const discountType = body["discount_type"] || "percentage";
+    const discountValue = Number(body["discount_value"]);
+    const minPurchase = Number(body["min_purchase"] || 0);
+    if (!code || isNaN(discountValue) || discountValue <= 0) {
+      return c.redirect("/admin?tab=coupons&err=Invalid+coupon+code+or+discount+value");
+    }
+    await createCoupon(c.env?.DB, code, discountType, discountValue, minPurchase);
+    return c.redirect("/admin?tab=coupons&msg=Coupon+code+created");
+  } catch {
+    return c.redirect("/admin?tab=coupons&err=Failed+to+create+coupon");
+  }
+});
+app.post("/admin/coupons/:id/delete", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin") return c.redirect("/admin/login");
+  const id = Number(c.req.param("id"));
+  if (id) {
+    await deleteCoupon(c.env?.DB, id);
+  }
+  return c.redirect("/admin?tab=coupons&msg=Coupon+deleted");
+});
+app.post("/admin/settings", async (c) => {
+  const s = await getSession(c);
+  if (!s || s.role !== "admin") return c.redirect("/admin/login");
+  try {
+    const body = await c.req.parseBody();
+    await updateSettings(c.env?.DB, {
+      site_title: String(body["site_title"] || "").trim(),
+      site_description: String(body["site_description"] || "").trim(),
+      site_logo: String(body["site_logo"] || "").trim(),
+      contact_email: String(body["contact_email"] || "").trim(),
+      homepage_html: String(body["homepage_html"] || "").trim()
+    });
+    return c.redirect("/admin?tab=settings&msg=Settings+saved+successfully");
+  } catch {
+    return c.redirect("/admin?tab=settings&err=Failed+to+save+settings");
+  }
 });
 var index_default = app;
 export {
