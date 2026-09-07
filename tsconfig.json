@@ -4,7 +4,7 @@
     "lib": ["esnext", "dom", "dom.iterable"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "types": ["@cloudflare/workers-types", "./worker-configuration.d.ts"],
+    "types": ["./worker-configuration.d.ts"],
     "noEmit": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
@@ -13,5 +13,5 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
   },
-  "include": ["src"]
+  "include": ["src", "server.ts"]
 }

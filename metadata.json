@@ -1,0 +1,8 @@
+{
+  "name": "BuyerNepal",
+  "description": "Nepal shopping discovery platform — discover products, compare prices, and track deals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

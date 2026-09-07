@@ -1780,6 +1780,9 @@ export async function createArticle(
     isFeatured?: number;
     isPublished?: number;
     featuredProductIds?: string;
+    seoTitle?: string;
+    seoDescription?: string;
+    focusKeyword?: string;
   }
 ): Promise<{ success: boolean; id?: number; error?: string }> {
   if (!db) return { success: false, error: 'Database not connected' };
@@ -1827,6 +1830,9 @@ export async function updateArticle(
     isFeatured?: number;
     isPublished?: number;
     featuredProductIds?: string;
+    seoTitle?: string;
+    seoDescription?: string;
+    focusKeyword?: string;
   }
 ): Promise<{ success: boolean; error?: string }> {
   if (!db) return { success: true };
