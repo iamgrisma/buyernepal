@@ -150,6 +150,13 @@ export const AdminDashboardView: FC<{
               <span className="admin-nav-badge" style={{ background: '#64748b' }}>{users.length}</span>
             </a>
             <a
+              href="/admin?tab=customizer"
+              className={`admin-nav-item ${activeTab === 'customizer' ? 'active' : ''}`}
+            >
+              <span>🎨 Store Customizer</span>
+              <span className="admin-nav-badge" style={{ background: '#f43f5e' }}>2026</span>
+            </a>
+            <a
               href="/admin?tab=settings"
               className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
             >
@@ -182,6 +189,7 @@ export const AdminDashboardView: FC<{
                 {activeTab === 'reviews' && 'Customer Review Moderation'}
                 {activeTab === 'coupons' && 'Promo Coupons & Discount Codes'}
                 {activeTab === 'users' && 'Staff & User Access Control'}
+                {activeTab === 'customizer' && 'Store Customizer & Feature Flags'}
                 {activeTab === 'settings' && 'Store Branding & Global Settings'}
               </h1>
               <span style={{ fontSize: '13px', color: '#64748b' }}>
@@ -813,6 +821,218 @@ export const AdminDashboardView: FC<{
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* TAB: STORE CUSTOMIZER & FEATURE FLAGS */}
+          {activeTab === 'customizer' && (
+            <div>
+              <div className="admin-card">
+                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '6px' }}>
+                  🎨 2026 Store Customizer &amp; Feature Flags
+                </h2>
+                <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '24px' }}>
+                  Toggle cutting-edge discovery features on the public storefront with real-time effect.
+                </p>
+
+                <form method="post" action="/admin/settings">
+                  <input type="hidden" name="_return_tab" value="customizer" />
+
+                  <div className="admin-flags-grid">
+                    {/* Feature 1: Flash Sale */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>⚡ Live Flash Sale with Ticking Timer</strong>
+                        <small>Display countdown banner &amp; claimed progress meter</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="flash_sale_enabled"
+                          value="1"
+                          defaultChecked={settings.flash_sale_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Feature 2: Bank 0% EMI Calculator */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>💳 Nepal Bank 0% EMI Calculator</strong>
+                        <small>Interactive installment estimator on products &gt; Rs. 10,000</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="emi_enabled"
+                          value="1"
+                          defaultChecked={settings.emi_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Feature 3: Multi-Currency Switcher */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>💱 Multi-Currency Converter</strong>
+                        <small>Allow shoppers to convert prices between NPR, USD, INR</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="currency_converter_enabled"
+                          value="1"
+                          defaultChecked={settings.currency_converter_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Feature 4: Nepal City Delivery Fee Estimator */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>🚚 Nepal City Delivery Estimator</strong>
+                        <small>Show shipping charges &amp; times across Kathmandu &amp; 77 districts</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="delivery_estimator_enabled"
+                          value="1"
+                          defaultChecked={settings.delivery_estimator_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Feature 5: Comparison Floating Dock */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>⚖️ Product Comparison Dock</strong>
+                        <small>Enable side-by-side spec &amp; price comparisons (up to 3 items)</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="comparison_enabled"
+                          value="1"
+                          defaultChecked={settings.comparison_enabled !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    {/* Feature 6: Top Announcement Banner */}
+                    <div className="admin-flag-item">
+                      <div className="admin-flag-info">
+                        <strong>📢 Top Notification Banner</strong>
+                        <small>Display top urgent deal strip across the site</small>
+                      </div>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          name="announcement_active"
+                          value="1"
+                          defaultChecked={settings.announcement_active !== '0'}
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+                    <div className="form-group">
+                      <label>Flash Sale Banner Title</label>
+                      <input
+                        name="flash_sale_title"
+                        type="text"
+                        defaultValue={settings.flash_sale_title || '⚡ 2026 Mega Flash Sale • Limited Nepal Inventory'}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Top Announcement Banner Text</label>
+                      <input
+                        name="announcement_text"
+                        type="text"
+                        defaultValue={settings.announcement_text || '⚡ Grand 2026 Festive Deals in Nepal • Verified NPR Prices • 0% Bank EMI • Same-Day Kathmandu Delivery'}
+                      />
+                    </div>
+                  </div>
+
+                  <button type="submit" className="primary-action" style={{ marginTop: '8px' }}>
+                    Save Customizer Settings 🚀
+                  </button>
+                </form>
+              </div>
+
+              {/* Regional Traffic Analytics Visualizer */}
+              <div className="admin-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h2 style={{ fontSize: '18px', fontWeight: 800 }}>
+                      🇳🇵 Nepal Regional Shopper Distribution
+                    </h2>
+                    <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                      Estimated weekly click &amp; referral traffic volume across Nepal provinces
+                    </span>
+                  </div>
+                  <span className="badge badge-active">Live Geo Analytics</span>
+                </div>
+
+                <div className="geo-distribution-wrap">
+                  <div className="geo-row">
+                    <div className="geo-label-bar">
+                      <span>Kathmandu Valley (Kathmandu, Lalitpur, Bhaktapur)</span>
+                      <strong>62% (14,880 visits)</strong>
+                    </div>
+                    <div className="geo-track">
+                      <div className="geo-fill" style={{ width: '62%', background: 'linear-gradient(90deg, #e11d48 0%, #f43f5e 100%)' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="geo-row">
+                    <div className="geo-label-bar">
+                      <span>Pokhara Valley (Gandaki Province)</span>
+                      <strong>18% (4,320 visits)</strong>
+                    </div>
+                    <div className="geo-track">
+                      <div className="geo-fill" style={{ width: '18%', background: 'linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="geo-row">
+                    <div className="geo-label-bar">
+                      <span>Chitwan Valley &amp; Central Terai</span>
+                      <strong>9% (2,160 visits)</strong>
+                    </div>
+                    <div className="geo-track">
+                      <div className="geo-fill" style={{ width: '9%', background: 'linear-gradient(90deg, #059669 0%, #10b981 100%)' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="geo-row">
+                    <div className="geo-label-bar">
+                      <span>Butwal / Bhairahawa / Lumbini</span>
+                      <strong>6% (1,440 visits)</strong>
+                    </div>
+                    <div className="geo-track">
+                      <div className="geo-fill" style={{ width: '6%', background: 'linear-gradient(90deg, #d97706 0%, #f59e0b 100%)' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="geo-row">
+                    <div className="geo-label-bar">
+                      <span>Eastern Nepal (Biratnagar, Dharan, Itahari) &amp; Others</span>
+                      <strong>5% (1,200 visits)</strong>
+                    </div>
+                    <div className="geo-track">
+                      <div className="geo-fill" style={{ width: '5%', background: '#64748b' }}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

@@ -51,6 +51,15 @@ export interface Product {
   review_count?: number;
   brand?: string;
   is_featured?: number;
+  emi_available?: number;
+  emi_starting_price?: number;
+  flash_deal?: number;
+  claimed_percentage?: number;
+  price_history?: { month: string; price: number }[];
+  specs?: Record<string, string>;
+  pros?: string[];
+  cons?: string[];
+  delivery_info?: string;
 }
 
 export interface Review {
@@ -76,6 +85,16 @@ export interface Coupon {
   is_active: number;
 }
 
+export interface PriceAlert {
+  id?: number;
+  product_id: number;
+  product_name?: string;
+  email: string;
+  target_price: number;
+  current_price: number;
+  created_at?: string;
+}
+
 export interface SiteSettings {
   site_title?: string;
   site_description?: string;
@@ -93,4 +112,12 @@ export interface SiteSettings {
   footer_html?: string;
   meta_keywords?: string;
   google_analytics_id?: string;
+  flash_sale_enabled?: string;
+  flash_sale_title?: string;
+  flash_sale_ends?: string;
+  emi_enabled?: string;
+  currency_converter_enabled?: string;
+  delivery_estimator_enabled?: string;
+  comparison_enabled?: string;
+  dark_mode_default?: string;
 }

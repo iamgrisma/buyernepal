@@ -27,7 +27,8 @@ import {
   createCoupon,
   deleteCoupon,
   getAdminStats,
-  seedCatalog
+  seedCatalog,
+  savePriceAlert
 } from './db';
 import { getSession, createSession, clearSession, passwordHash, safeEqual, digest } from './auth';
 import { HomePage } from './views/home';
@@ -153,6 +154,34 @@ app.post('/api/reviews', async (c) => {
     return c.json(res);
   } catch (err: any) {
     return c.json({ success: false, error: err?.message || 'Failed to submit review' }, 500);
+  }
+});
+
+// API: Register Price Drop Alert
+app.post('/api/price-alert', async (c) => {
+  try {
+    const body = await c.req.parseBody();
+    const productId = Number(body['product_id']);
+    const productName = String(body['product_name'] || '').trim();
+    const email = String(body['email'] || '').trim();
+    const targetPrice = Number(body['target_price']);
+    const currentPrice = Number(body['current_price']);
+
+    if (!productId || !email || !targetPrice) {
+      return c.json({ success: false, error: 'Product, email, and target price are required.' }, 400);
+    }
+
+    await savePriceAlert(c.env?.DB, {
+      productId,
+      productName,
+      email,
+      targetPrice,
+      currentPrice
+    });
+
+    return c.json({ success: true, message: 'Price alert registered successfully!' });
+  } catch (err: any) {
+    return c.json({ success: false, error: err?.message || 'Failed to register price alert' }, 500);
   }
 });
 
@@ -493,23 +522,38 @@ app.post('/admin/users/:id/delete', async (c) => {
   return c.redirect('/admin?tab=users&msg=User+access+revoked');
 });
 
-// Admin Action: Update Site Settings
+// Admin Action: Update Site Settings & Feature Flags
 app.post('/admin/settings', async (c) => {
   const s = await getSession(c);
   if (!s || s.role !== 'admin') return c.redirect('/admin/login');
 
   try {
     const body = await c.req.parseBody();
-    await updateSettings(c.env?.DB, {
-      site_title: String(body['site_title'] || '').trim(),
-      site_description: String(body['site_description'] || '').trim(),
-      announcement_text: String(body['announcement_text'] || '').trim(),
-      contact_phone: String(body['contact_phone'] || '').trim(),
-      whatsapp_number: String(body['whatsapp_number'] || '').trim(),
-      social_facebook: String(body['social_facebook'] || '').trim(),
-      social_instagram: String(body['social_instagram'] || '').trim()
-    });
-    return c.redirect('/admin?tab=settings&msg=Settings+saved+successfully');
+    const returnTab = String(body['_return_tab'] || 'settings');
+
+    const updatePayload: Record<string, string> = {};
+
+    if (body['site_title'] !== undefined) updatePayload.site_title = String(body['site_title']).trim();
+    if (body['site_description'] !== undefined) updatePayload.site_description = String(body['site_description']).trim();
+    if (body['announcement_text'] !== undefined) updatePayload.announcement_text = String(body['announcement_text']).trim();
+    if (body['contact_phone'] !== undefined) updatePayload.contact_phone = String(body['contact_phone']).trim();
+    if (body['whatsapp_number'] !== undefined) updatePayload.whatsapp_number = String(body['whatsapp_number']).trim();
+    if (body['social_facebook'] !== undefined) updatePayload.social_facebook = String(body['social_facebook']).trim();
+    if (body['social_instagram'] !== undefined) updatePayload.social_instagram = String(body['social_instagram']).trim();
+
+    // Feature Flags Toggles
+    if (returnTab === 'customizer') {
+      updatePayload.flash_sale_enabled = body['flash_sale_enabled'] ? '1' : '0';
+      updatePayload.emi_enabled = body['emi_enabled'] ? '1' : '0';
+      updatePayload.currency_converter_enabled = body['currency_converter_enabled'] ? '1' : '0';
+      updatePayload.delivery_estimator_enabled = body['delivery_estimator_enabled'] ? '1' : '0';
+      updatePayload.comparison_enabled = body['comparison_enabled'] ? '1' : '0';
+      updatePayload.announcement_active = body['announcement_active'] ? '1' : '0';
+      if (body['flash_sale_title'] !== undefined) updatePayload.flash_sale_title = String(body['flash_sale_title']).trim();
+    }
+
+    await updateSettings(c.env?.DB, updatePayload);
+    return c.redirect(`/admin?tab=${returnTab}&msg=Customizer+settings+saved+successfully`);
   } catch {
     return c.redirect('/admin?tab=settings&err=Failed+to+save+settings');
   }
