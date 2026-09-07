@@ -96,7 +96,7 @@ export const ComparePage: FC<{
                   {isComparing ? `${productNames.join(' vs ')} Comparison` : 'Compare Gadgets, Prices & Hardware in Nepal'}
                 </h1>
                 <p style={{ color: 'var(--muted)', fontSize: '13.5px', marginTop: '6px', maxWidth: '680px', lineHeight: '1.5' }}>
-                  Side-by-side evaluation of technical specifications, verified Nepal prices across stores, NTA MDMS clearance, bank EMI installments, and lab performance scores.
+                  Side-by-side evaluation of technical specifications, verified Nepal prices across stores, 0% bank EMI installments, and lab performance scores.
                 </p>
               </div>
 
@@ -248,11 +248,11 @@ export const ComparePage: FC<{
                     </tr>
 
                     <tr className="compare-row" data-feature="warranty">
-                      <td className="compare-feature-label">Nepal Warranty &amp; VAT Bill</td>
+                      <td className="compare-feature-label">Official Importer Warranty</td>
                       {products.map((p) => (
                         <td key={p.id} className="compare-feature-val" style={{ textAlign: 'center' }}>
                           <span style={{ color: 'var(--emerald)', fontWeight: 700, fontSize: '12px' }}>
-                            ✓ 100% Tax-Paid Official Warranty
+                            ✓ Official Brand / Importer Warranty
                           </span>
                         </td>
                       ))}

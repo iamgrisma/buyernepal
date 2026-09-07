@@ -423,14 +423,14 @@ export const BlogIndexPage: FC<{
         {/* Nepal Tech Intelligence Banner */}
         <div className="nepal-tech-banner">
           <div className="banner-content">
-            <div className="banner-badge">🇳🇵 OFFICIAL REGULATORY ADVISORY</div>
-            <h3>Looking for Verified NTA / MDMS Registration?</h3>
+            <div className="banner-badge">🇳🇵 SMARTPHONE BUYER ADVISORY</div>
+            <h3>Buying a Smartphone in Nepal? Verify NTA MDMS First</h3>
             <p>
-              BuyerNepal guarantees that all smartphone stores and curated links listed on our platform sell 100% tax-paid, MDMS-registered handsets with authentic VAT bills and official Nepal brand warranties.
+              To protect yourself against gray market imports and network blacklisting, always verify the 15-digit IMEI on the official NTA MDMS portal and request a genuine VAT bill from the retailer.
             </p>
           </div>
           <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer" className="banner-btn">
-            Verify IMEI on NTA Portal ↗
+            Check IMEI on NTA Portal ↗
           </a>
         </div>
         </main>

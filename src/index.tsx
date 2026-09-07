@@ -434,6 +434,20 @@ app.get('/track-order', async (c) => {
   );
 });
 
+// Friendly Route Aliases (Prevent 404s on singular/plural)
+app.get('/coupon', (c) => c.redirect('/coupons'));
+app.get('/deal', (c) => c.redirect('/coupons'));
+app.get('/deals', (c) => c.redirect('/coupons'));
+app.get('/trackorder', (c) => c.redirect('/track-order'));
+app.get('/track', (c) => c.redirect('/track-order'));
+app.get('/order-track', (c) => c.redirect('/track-order'));
+app.get('/chart', (c) => c.redirect('/charts'));
+app.get('/top-charts', (c) => c.redirect('/charts'));
+app.get('/leaderboard', (c) => c.redirect('/charts'));
+app.get('/comparison', (c) => c.redirect('/compare'));
+app.get('/store', (c) => c.redirect('/stores'));
+app.get('/brand', (c) => c.redirect('/brands'));
+
 // Outbound Cloaked Affiliate Engine (/go/:type/:id)
 app.get('/go/:type/:id', async (c) => {
   const type = c.req.param('type');

@@ -14,7 +14,7 @@ export const StoresListPage: FC<{
   return (
     <Layout
       title="Verified Stores & Authorized Retailers in Nepal | BuyerNepal"
-      description="Directory of authentic, VAT-compliant retailers and official distributor showrooms across Nepal. Daraz Mall, Oliz Store, EvoStore, Samsung Plaza, and more."
+      description="Directory of verified electronics retailers and official distributor showrooms across Nepal. Daraz Mall, Oliz Store, EvoStore, Samsung Plaza, and more."
       url="https://buyernepal.com/stores"
     >
       <div className="store-page directory-page">
@@ -24,9 +24,9 @@ export const StoresListPage: FC<{
           {/* Header */}
           <div className="directory-header-hero">
             <div className="coupons-hero-badge">🏪 VERIFIED NEPAL RETAILERS</div>
-            <h1 className="directory-hero-title">Authorized Electronics, Tech & Lifestyle Retailers</h1>
+            <h1 className="directory-hero-title">Authorized Electronics, Tech &amp; Lifestyle Retailers</h1>
             <p className="directory-hero-subtitle">
-              Every retailer listed on BuyerNepal is audited for genuine VAT billing, official Nepal distributor warranty, and NTA MDMS phone compliance.
+              Discover trusted retailers, authorized distributor showrooms, and top marketplace sellers across Nepal.
             </p>
           </div>
 
@@ -260,7 +260,7 @@ export const BrandDetailPage: FC<{
             </div>
             <div className="brand-hub-content">
               <div className="brand-hub-meta-pills">
-                <span className="store-verified-pill">✓ NTA MDMS Verified in Nepal</span>
+                <span className="store-verified-pill">✓ Official Nepal Distributor / Brand</span>
                 <span className="hub-tag">Country of Origin: {brand.origin_country}</span>
               </div>
               <h1 className="brand-hub-title">{brand.name} Official Nepal Price &amp; Catalog</h1>

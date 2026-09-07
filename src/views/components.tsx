@@ -66,11 +66,13 @@ export const Header: FC<{
           {/* Header Action Utilities: Currency, Theme, Wishlist, Admin */}
           <div className="store-header-actions">
             {/* Multi-Currency Switcher */}
-            <div className="currency-selector" title="Switch Display Currency">
-              <button type="button" className="currency-btn active" data-currency="NPR">🇳🇵 NPR</button>
-              <button type="button" className="currency-btn" data-currency="USD">🇺🇸 USD</button>
-              <button type="button" className="currency-btn" data-currency="INR">🇮🇳 INR</button>
-            </div>
+            {settings.currency_converter_enabled !== '0' && (
+              <div className="currency-selector" title="Switch Display Currency">
+                <button type="button" className="currency-btn active" data-currency="NPR">🇳🇵 NPR</button>
+                <button type="button" className="currency-btn" data-currency="USD">🇺🇸 USD</button>
+                <button type="button" className="currency-btn" data-currency="INR">🇮🇳 INR</button>
+              </div>
+            )}
 
             {/* Dark Mode Toggle */}
             <button
@@ -168,13 +170,6 @@ export const Header: FC<{
                 >
                   <span>🏷️</span>
                   <span>Brands</span>
-                </a>
-                <a
-                  href="/track-order"
-                  className={`nav-pill ${activeSlug === 'orders' ? 'nav-pill-active' : ''}`}
-                >
-                  <span>📦</span>
-                  <span>Track Order</span>
                 </a>
                 {categories.map((cat) => (
                   <a
@@ -1025,7 +1020,7 @@ export const Footer: FC<{ settings: SiteSettings; categories?: Category[] }> = (
       <WishlistDrawer />
 
       {/* Global Comparison Floating Dock */}
-      <ComparisonDock />
+      {settings.comparison_enabled !== '0' && <ComparisonDock />}
 
       {/* Global Toast Alert */}
       <div id="toastMessage" className="toast-msg">

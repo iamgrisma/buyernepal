@@ -28,6 +28,7 @@ export const ProductPage: FC<{
   const brand = product.brand || 'Official';
   const emiAvailable = Number(product.emi_available) === 1;
   const baseMonthlyEmi = Math.round(price / 18);
+  const isPhoneOrCellular = product.category_id === 1 || (product.name && /iphone|galaxy|phone|pixel|redmi|realme|oneplus|poco|xiaomi/i.test(product.name));
 
   const priceHistory = product.price_history || [
     { month: 'Apr 2026', price: Math.round(price * 1.18) },
@@ -157,28 +158,37 @@ export const ProductPage: FC<{
                 </button>
               </div>
 
-              {/* Nepal Regulatory & Trust Guarantees */}
+              {/* Nepal Shopping Advice & Transparency Card */}
               <div className="product-trust-card">
-                <div className="trust-card-title">🇳🇵 BUYERNEPAL VERIFIED PURCHASE GUARANTEES</div>
+                <div className="trust-card-title">🇳🇵 BUYERNEPAL SHOPPING CHECKLIST</div>
                 <div className="trust-item">
-                  <span className="trust-icon">🛡️</span>
+                  <span className="trust-icon">🔍</span>
                   <div>
-                    <strong>100% NTA MDMS Registered</strong>
-                    <p>Officially cleared IMEI on Nepal Telecommunications Authority database.</p>
+                    <strong>Independent Price Comparison</strong>
+                    <p>We research and aggregate verified rates across top Nepal retailers so you don't overpay.</p>
                   </div>
                 </div>
+                {isPhoneOrCellular && (
+                  <div className="trust-item">
+                    <span className="trust-icon">📱</span>
+                    <div>
+                      <strong>Consumer Tip: Check MDMS for Phones</strong>
+                      <p>Always verify IMEI registration on <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: 700 }}>mdms.nta.gov.np</a> before finalizing phone purchases.</p>
+                    </div>
+                  </div>
+                )}
                 <div className="trust-item">
                   <span className="trust-icon">🧾</span>
                   <div>
-                    <strong>Authentic 13% VAT Bill Included</strong>
-                    <p>Authorized Nepal tax invoice eligible for official brand service center claims.</p>
+                    <strong>Request Official Tax Bill from Retailer</strong>
+                    <p>Ensure the selling store provides a genuine VAT/PAN bill to validate official brand warranty claims.</p>
                   </div>
                 </div>
                 <div className="trust-item">
-                  <span className="trust-icon">🚚</span>
+                  <span className="trust-icon">🤝</span>
                   <div>
-                    <strong>Fast Express Delivery Across Nepal</strong>
-                    <p>Same-day / 24h inside Kathmandu Valley; 2-3 business days across 77 districts.</p>
+                    <strong>Affiliate Transparency</strong>
+                    <p>BuyerNepal earns referral commissions from verified partner links at zero additional cost to you.</p>
                   </div>
                 </div>
               </div>
@@ -215,7 +225,7 @@ export const ProductPage: FC<{
                 <div className="product-variants-box">
                   <div className="variant-label-row">
                     <span className="variant-heading">Select Model / Storage Variant:</span>
-                    <span className="variant-mdms-tag">🛡️ NTA MDMS Registered</span>
+                    <span className="variant-mdms-tag">✓ Verified Nepal Stock</span>
                   </div>
                   <div className="variant-pills-row">
                     {product.variants.map((v, i) => (
@@ -286,7 +296,7 @@ export const ProductPage: FC<{
 
                 <div className="affiliate-redirect-notice" style={{ marginTop: '10px' }}>
                   <span>🔒</span>
-                  <span>100% Tax-Paid Official Nepal Stock with full warranty support &amp; genuine VAT bill.</span>
+                  <span>Comparing real-time rates from verified sellers. Always ask the merchant for a valid tax invoice.</span>
                 </div>
               </div>
 
@@ -346,7 +356,7 @@ export const ProductPage: FC<{
                   </div>
                 </div>
               </div>
-              <span className="price-match-guarantee">🛡️ VAT Bills &amp; MDMS Verified</span>
+              <span className="price-match-guarantee">🔍 Real-Time Price Comparison</span>
             </div>
 
             <div className="stores-matrix-table">
@@ -551,7 +561,7 @@ export const ProductPage: FC<{
             {/* Right Column: 0% EMI Calculator & Delivery City Estimator */}
             <div>
               {/* Interactive Nepal Bank 0% EMI Calculator Widget */}
-              {emiAvailable && (
+              {emiAvailable && settings.emi_enabled !== '0' && (
                 <div className="emi-calculator-card">
                   <div className="emi-calculator-header">
                     <div>
@@ -602,31 +612,33 @@ export const ProductPage: FC<{
               )}
 
               {/* Nepal City Delivery Estimator */}
-              <div className="delivery-estimator-card" style={{ marginTop: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '20px' }}>🚚</span>
-                  <div>
-                    <strong style={{ fontSize: '14px' }}>Nepal City Delivery &amp; Speed Estimator</strong>
-                    <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>Select your location to check transit time &amp; courier charges</div>
+              {settings.delivery_estimator_enabled !== '0' && (
+                <div className="delivery-estimator-card" style={{ marginTop: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>🚚</span>
+                    <div>
+                      <strong style={{ fontSize: '14px' }}>Nepal City Delivery &amp; Speed Estimator</strong>
+                      <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>Select your location to check transit time &amp; courier charges</div>
+                    </div>
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '10px' }}>
+                    <select id="detailCitySelect" style={{ padding: '9px 12px', borderRadius: '8px', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)', width: '100%', fontSize: '13px' }}>
+                      <option value="ktm">Kathmandu Valley (Kathmandu, Lalitpur, Bhaktapur)</option>
+                      <option value="pkr">Pokhara (Kaski District)</option>
+                      <option value="ctw">Chitwan (Bharatpur &amp; Narayangarh)</option>
+                      <option value="brt">Biratnagar (Morang District)</option>
+                      <option value="btl">Butwal &amp; Bhairahawa</option>
+                      <option value="dhr">Dharan &amp; Itahari</option>
+                      <option value="all">All Other 71 Districts (Courier Door Delivery)</option>
+                    </select>
+                  </div>
+                  <div id="detailCityResult" style={{ background: 'var(--card-subtle, #f8fafc)', padding: '12px 14px', borderRadius: '8px', fontSize: '12.5px', border: '1px solid var(--line)' }}>
+                    <div>⏱️ <strong>Estimated Transit:</strong> <span id="detailTransitTime">Same-Day / 24 Hours Express</span></div>
+                    <div style={{ marginTop: '4px' }}>💰 <strong>Courier Fee:</strong> <span id="detailCourierFee" style={{ color: 'var(--emerald)', fontWeight: 700 }}>FREE (Kathmandu Valley Order)</span></div>
+                    <div style={{ marginTop: '4px' }}>💵 <strong>Payment:</strong> <span>Cash on Delivery (COD) &amp; Fonepay Accepted</span></div>
                   </div>
                 </div>
-                <div className="form-group" style={{ marginBottom: '10px' }}>
-                  <select id="detailCitySelect" style={{ padding: '9px 12px', borderRadius: '8px', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)', width: '100%', fontSize: '13px' }}>
-                    <option value="ktm">Kathmandu Valley (Kathmandu, Lalitpur, Bhaktapur)</option>
-                    <option value="pkr">Pokhara (Kaski District)</option>
-                    <option value="ctw">Chitwan (Bharatpur &amp; Narayangarh)</option>
-                    <option value="brt">Biratnagar (Morang District)</option>
-                    <option value="btl">Butwal &amp; Bhairahawa</option>
-                    <option value="dhr">Dharan &amp; Itahari</option>
-                    <option value="all">All Other 71 Districts (Courier Door Delivery)</option>
-                  </select>
-                </div>
-                <div id="detailCityResult" style={{ background: 'var(--card-subtle, #f8fafc)', padding: '12px 14px', borderRadius: '8px', fontSize: '12.5px', border: '1px solid var(--line)' }}>
-                  <div>⏱️ <strong>Estimated Transit:</strong> <span id="detailTransitTime">Same-Day / 24 Hours Express</span></div>
-                  <div style={{ marginTop: '4px' }}>💰 <strong>Courier Fee:</strong> <span id="detailCourierFee" style={{ color: 'var(--emerald)', fontWeight: 700 }}>FREE (Kathmandu Valley Order)</span></div>
-                  <div style={{ marginTop: '4px' }}>💵 <strong>Payment:</strong> <span>Cash on Delivery (COD) &amp; Fonepay Accepted</span></div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -655,12 +667,14 @@ export const ProductPage: FC<{
                     </tr>
                     <tr>
                       <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Official Nepal Warranty</td>
-                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>1 Year Authorized Importer Warranty with VAT Bill</td>
+                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Manufacturer Warranty via Authorized Importer</td>
                     </tr>
-                    <tr>
-                      <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>NTA MDMS Status</td>
-                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>100% Registered &amp; Whitelisted on mdms.nta.gov.np</td>
-                    </tr>
+                    {isPhoneOrCellular && (
+                      <tr>
+                        <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>NTA MDMS Buyer Tip</td>
+                        <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Check IMEI status on <a href="https://mdms.nta.gov.np" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: 700 }}>mdms.nta.gov.np</a> before purchase</td>
+                      </tr>
+                    )}
                     <tr>
                       <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Delivery Window</td>
                       <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Kathmandu Valley: 24h Express • Nationwide: 2-3 Days</td>

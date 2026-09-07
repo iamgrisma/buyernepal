@@ -50,11 +50,11 @@ export const TopChartsPage: FC<{
 
             {/* Quick Metrics Strip */}
             <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '18px', fontSize: '12.5px', color: 'var(--muted)', fontWeight: 600 }}>
-              <span>✓ 100% Tax-Paid Official Nepal Stock</span>
+              <span>✓ Verified Importer Pricing</span>
               <span>•</span>
-              <span>🛡️ NTA MDMS Verified</span>
+              <span>⭐ Independent Lab Scores</span>
               <span>•</span>
-              <span>💳 0% Bank EMI Filterable</span>
+              <span>💳 0% Bank EMI Comparison</span>
               <span>•</span>
               <span>🔄 Updated Weekly</span>
             </div>
