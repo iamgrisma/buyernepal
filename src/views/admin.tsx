@@ -103,7 +103,7 @@ export const AdminDashboardView: FC<{
         {/* Left Sidebar */}
         <aside className="admin-sidebar">
           <div className="admin-sidebar-header">
-            <a href="/" className="store-brand" style={{ color: '#ffffff' }}>
+            <a href="/" className="store-brand" style={{ color: 'var(--ink)' }}>
               <span className="store-logo-mark">B</span>
               <span>
                 <strong>BuyerNepal</strong>
@@ -3652,6 +3652,8 @@ export const AdminDashboardView: FC<{
           `
         }}
       />
+      </main>
+    </div>
     </Layout>
   );
 };

@@ -71,6 +71,7 @@ import { TrackOrderPage, OrderSuccessPage } from './views/orders';
 import { ComparePage } from './views/compare';
 import { TopChartsPage } from './views/charts';
 import { AdminLoginView, AdminDashboardView } from './views/admin';
+import { ArticleEditorPage } from './views/article-editor';
 import { api } from './api';
 
 const app = new Hono<{ Bindings: Env }>();
@@ -835,6 +836,86 @@ app.get('/admin', async (c) => {
       notice={notice}
     />
   );
+});
+
+// SSR: Full-Page Article Editor (New)
+app.get('/admin/articles/editor', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const settings = await getSettings(c.env?.DB);
+  return c.html(
+    <ArticleEditorPage settings={settings} />
+  );
+});
+
+// SSR: Full-Page Article Editor (Edit existing)
+app.get('/admin/articles/editor/:id', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  const [settings, article] = await Promise.all([
+    getSettings(c.env?.DB),
+    getArticleById(c.env?.DB, id)
+  ]);
+
+  if (!article) return c.redirect('/admin?tab=blog&err=Article+not+found');
+
+  return c.html(
+    <ArticleEditorPage settings={settings} article={article} isEdit={true} />
+  );
+});
+
+// POST: Unified Article Save (create or update) with SEO fields
+app.post('/admin/articles/save', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  try {
+    const body = await c.req.parseBody();
+    const id = Number(body['id'] || 0);
+    const title = String(body['title'] || '').trim();
+    const slug = String(body['slug'] || '').trim();
+    const category = String(body['category'] || 'Buying Guides').trim();
+    const authorName = String(body['author_name'] || 'BuyerNepal Editorial Team').trim();
+    const coverImage = String(body['cover_image'] || '').trim();
+    const excerpt = String(body['excerpt'] || '').trim();
+    const content = String(body['content'] || '').trim();
+    const tags = String(body['tags'] || '').trim();
+    const readTimeMinutes = Number(body['read_time_minutes']) || 5;
+    const isFeatured = body['is_featured'] ? 1 : 0;
+    const isPublished = body['is_published'] ? 1 : 0;
+    const seoTitle = String(body['seo_title'] || '').trim();
+    const seoDescription = String(body['seo_description'] || '').trim();
+    const focusKeyword = String(body['focus_keyword'] || '').trim();
+
+    if (!title || !excerpt || !content) {
+      return c.redirect('/admin?tab=blog&err=Title,+excerpt,+and+content+are+required');
+    }
+
+    let res;
+    if (id > 0) {
+      res = await updateArticle(c.env?.DB, id, {
+        title, slug, category, authorName, coverImage, excerpt, content,
+        tags, readTimeMinutes, isFeatured, isPublished,
+        seoTitle, seoDescription, focusKeyword
+      });
+    } else {
+      res = await createArticle(c.env?.DB, {
+        title, category, authorName, coverImage, excerpt, content,
+        tags, readTimeMinutes, isFeatured, isPublished,
+        seoTitle, seoDescription, focusKeyword
+      });
+    }
+
+    if (!res.success) {
+      return c.redirect(`/admin?tab=blog&err=${encodeURIComponent(res.error || 'Failed to save article')}`);
+    }
+    return c.redirect(`/admin?tab=blog&msg=${id > 0 ? 'Article+updated' : 'Article+published'}+successfully`);
+  } catch (err: any) {
+    return c.redirect(`/admin?tab=blog&err=${encodeURIComponent(err?.message || 'Failed to save article')}`);
+  }
 });
 
 // Admin Action: Update Order Status

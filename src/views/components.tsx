@@ -65,12 +65,14 @@ export const Header: FC<{
 
           {/* Header Action Utilities: Currency, Theme, Wishlist, Admin */}
           <div className="store-header-actions">
-            {/* Multi-Currency Switcher */}
+            {/* Multi-Currency Switcher — compact dropdown, NPR default */}
             {settings.currency_converter_enabled !== '0' && (
-              <div className="currency-selector" title="Switch Display Currency">
-                <button type="button" className="currency-btn active" data-currency="NPR">🇳🇵 NPR</button>
-                <button type="button" className="currency-btn" data-currency="USD">🇺🇸 USD</button>
-                <button type="button" className="currency-btn" data-currency="INR">🇮🇳 INR</button>
+              <div className="currency-dropdown-wrap" title="Switch Display Currency">
+                <select id="currencyDropdown" className="currency-dropdown" aria-label="Currency">
+                  <option value="NPR">🇳🇵 NPR</option>
+                  <option value="USD">🇺🇸 USD</option>
+                  <option value="INR">🇮🇳 INR</option>
+                </select>
               </div>
             )}
 
@@ -210,14 +212,7 @@ export const Header: FC<{
               </nav>
             </div>
 
-            {/* Right Review Authority & Trust Badges */}
-            {settings.header_badges_enabled !== '0' && (
-              <div className="store-nav-highlights">
-                <span className="nav-highlight-item">{settings.nav_highlight_1 || '🔍 Independent Reviews'}</span>
-                <span className="nav-highlight-item">{settings.nav_highlight_2 || '⚖️ Multi-Store Compare'}</span>
-                <span className="nav-highlight-item">{settings.nav_highlight_3 || '🇳🇵 Verified Nepal Pricing'}</span>
-              </div>
-            )}
+            {/* Trust badges moved to hero section — removed from nav to keep full menu visible */}
           </div>
         </div>
 
@@ -920,52 +915,74 @@ export const NepalShoppingFaq: FC<{ settings?: SiteSettings }> = ({ settings }) 
   const title = settings?.faq_title || 'Frequently Asked Questions in Nepal';
 
   return (
-    <section className="store-shell faq-container">
-      <div className="section-heading" style={{ marginBottom: '24px' }}>
+    <section className="store-shell faq-section-wrap">
+      {/* Section Header */}
+      <div className="section-heading" style={{ marginBottom: '28px' }}>
         <div>
           <span className="section-kicker">{kicker}</span>
           <h2>{title}</h2>
         </div>
       </div>
 
-      <div className="faq-item">
-        <div className="faq-question">
-          <span>Are all featured products 100% genuine with official Nepal warranty?</span>
-          <span className="faq-icon">▾</span>
-        </div>
-        <div className="faq-answer">
-          Yes, 100%. All products featured on BuyerNepal are sourced exclusively through authorized national distributors and verified retailers, complete with official brand warranty and genuine VAT invoices.
-        </div>
-      </div>
+      {/* 2-column: FAQ accordion left, trust summary right */}
+      <div className="faq-layout">
+        <div className="faq-col-main">
+          <div className="faq-item">
+            <div className="faq-question">
+              <span>Are all featured products 100% genuine with official Nepal warranty?</span>
+              <span className="faq-icon">▾</span>
+            </div>
+            <div className="faq-answer">
+              Yes, 100%. All products featured on BuyerNepal are sourced exclusively through authorized national distributors and verified retailers, complete with official brand warranty and genuine VAT invoices.
+            </div>
+          </div>
 
-      <div className="faq-item">
-        <div className="faq-question">
-          <span>How does 0% Bank Credit Card EMI work in Nepal?</span>
-          <span className="faq-icon">▾</span>
-        </div>
-        <div className="faq-answer">
-          Cardholders of partner Nepali commercial banks (including Nabil Bank, NIC Asia, Global IME, Himalayan Bank, and Sanima Bank) can convert purchases of Rs. 10,000 or above into 6, 12, or 18 equal monthly installments at 0% markup without any hidden processing charges.
-        </div>
-      </div>
+          <div className="faq-item">
+            <div className="faq-question">
+              <span>How does 0% Bank Credit Card EMI work in Nepal?</span>
+              <span className="faq-icon">▾</span>
+            </div>
+            <div className="faq-answer">
+              Cardholders of partner Nepali commercial banks (including Nabil Bank, NIC Asia, Global IME, Himalayan Bank, and Sanima Bank) can convert purchases of Rs. 10,000 or above into 6, 12, or 18 equal monthly installments at 0% markup without any hidden processing charges.
+            </div>
+          </div>
 
-      <div className="faq-item">
-        <div className="faq-question">
-          <span>Is Cash on Delivery (COD) available outside Kathmandu Valley?</span>
-          <span className="faq-icon">▾</span>
-        </div>
-        <div className="faq-answer">
-          Yes! Most verified sellers and courier partners (Nepal Can Move, Sundar Courier, Daraz Express) support Cash on Delivery across major cities including Pokhara, Chitwan, Biratnagar, Butwal, and Dharan. You can inspect the sealed package upon courier handover.
-        </div>
-      </div>
+          <div className="faq-item">
+            <div className="faq-question">
+              <span>Is Cash on Delivery (COD) available outside Kathmandu Valley?</span>
+              <span className="faq-icon">▾</span>
+            </div>
+            <div className="faq-answer">
+              Yes! Most verified sellers and courier partners (Nepal Can Move, Sundar Courier, Daraz Express) support Cash on Delivery across major cities including Pokhara, Chitwan, Biratnagar, Butwal, and Dharan.
+            </div>
+          </div>
 
-      <div className="faq-item">
-        <div className="faq-question">
-          <span>How do I claim authorized warranty on products bought through BuyerNepal links?</span>
-          <span className="faq-icon">▾</span>
+          <div className="faq-item">
+            <div className="faq-question">
+              <span>How do I claim authorized warranty on products bought through BuyerNepal links?</span>
+              <span className="faq-icon">▾</span>
+            </div>
+            <div className="faq-answer">
+              Every purchase made through our verified store links includes an official VAT bill and manufacturer warranty card. Present these at any official brand service center in Kathmandu, Pokhara, or provincial branch hubs for warranty repairs.
+            </div>
+          </div>
         </div>
-        <div className="faq-answer">
-          Every purchase made through our verified store links includes an official VAT bill and manufacturer warranty card. You can present these at any official brand service center in Kathmandu, Pokhara, or provincial branch hubs for complimentary warranty repairs.
-        </div>
+
+        {/* Right: Quick Trust Summary */}
+        <aside className="faq-col-aside">
+          <div className="faq-trust-card">
+            <div className="faq-trust-icon">🏆</div>
+            <h3 className="faq-trust-title">Why Trust BuyerNepal?</h3>
+            <ul className="faq-trust-list">
+              <li>✅ 100% Genuine Nepal warranty on all listings</li>
+              <li>🔍 Independent editorial reviews — no paid bias</li>
+              <li>⚖️ Live price comparison across 12+ verified stores</li>
+              <li>🇳🇵 Prices in NPR — no hidden conversion markups</li>
+              <li>🎟️ Verified promo codes updated weekly</li>
+            </ul>
+            <a href="/stores" className="faq-trust-link">View Verified Stores →</a>
+          </div>
+        </aside>
       </div>
     </section>
   );

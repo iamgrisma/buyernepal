@@ -160,49 +160,28 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                     showToast(next === 'dark' ? 'OLED Dark Mode Enabled 🌙' : 'Light Mode Enabled ☀️');
                   });
                 }
-                
-                // 3. Multi-Currency Live Switcher Engine (NPR, USD, INR)
-                // Base currency: NPR (Nepali Rupee).
-                // INR is pegged: 1 INR = 1.6 NPR (100 INR = 160 NPR).
-                // USD is fetched live from GrismaInfo API (https://api.grisma.info.np/api/forex/latest) / NRB.
-                // Ceiling rounding specifications:
-                // - NPR: Base currency, round up to whole rupees (Math.ceil).
-                // - INR: Round up to whole rupees (Math.ceil(npr / 1.6)). E.g., Rs. 16,000 -> ₹10,000.
-                // - USD: Round up to 1 decimal place (Math.ceil(usd * 10) / 10). E.g., 100.01 -> 100.1, 100.11 -> 100.2.
-                const currencyBtns = document.querySelectorAll('.currency-btn');
+                // 3. Multi-Currency Live Switcher (NPR default, dropdown UI)
+                // Rates always fetched live from /api/forex (GrismaInfo/NRB).
+                // FALLBACK-ONLY: these values are used ONLY if the API call fails completely.
                 let forexRates = { NPR: 1, USD: 151.48, INR: 1.6 };
                 let currentCurrency = localStorage.getItem('bn_currency') || 'NPR';
 
                 function formatCurrencyPrice(baseNpr, cur) {
                   const val = parseFloat(baseNpr);
                   if (isNaN(val) || val <= 0) return cur === 'USD' ? '$0' : cur === 'INR' ? '₹0' : 'Rs. 0';
-
                   if (cur === 'USD') {
-                    const usdRate = forexRates.USD || 151.48;
-                    // Ceiling to 1 whole dollar (e.g. 100.01 -> 101, 1500.20 -> 1501)
-                    const usdCeil = Math.ceil(val / usdRate);
-                    return '$' + usdCeil.toLocaleString('en-US');
+                    return '$' + Math.ceil(val / forexRates.USD).toLocaleString('en-US');
                   }
-
                   if (cur === 'INR') {
-                    const inrRate = forexRates.INR || 1.6;
-                    // Ceiling to next multiple of 5 INR (e.g. 461 -> 465, 497 -> 500)
-                    const inrRaw = val / inrRate;
-                    const inrCeil = Math.ceil(inrRaw / 5) * 5;
-                    return '₹' + inrCeil.toLocaleString('en-IN');
+                    return '₹' + (Math.ceil((val / forexRates.INR) / 5) * 5).toLocaleString('en-IN');
                   }
-
-                  // Default: NPR (Base Currency), ceiling to whole rupees
-                  const nprCeil = Math.ceil(val);
-                  return 'Rs. ' + nprCeil.toLocaleString('en-NP');
+                  return 'Rs. ' + Math.ceil(val).toLocaleString('en-NP');
                 }
 
                 function updateAllPrices() {
                   document.querySelectorAll('[data-base-npr]').forEach(el => {
                     const baseNpr = parseFloat(el.getAttribute('data-base-npr') || '0');
-                    if (baseNpr > 0) {
-                      el.textContent = formatCurrencyPrice(baseNpr, currentCurrency);
-                    }
+                    if (baseNpr > 0) el.textContent = formatCurrencyPrice(baseNpr, currentCurrency);
                   });
                   if (typeof renderWishlist === 'function') renderWishlist();
                   if (typeof renderCompareDock === 'function') renderCompareDock();
@@ -211,65 +190,66 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                 function setCurrency(cur) {
                   currentCurrency = cur;
                   localStorage.setItem('bn_currency', cur);
-                  currencyBtns.forEach(b => {
-                    b.classList.toggle('active', b.getAttribute('data-currency') === cur);
-                  });
+                  const dd = document.getElementById('currencyDropdown');
+                  if (dd) dd.value = cur;
                   updateAllPrices();
                 }
 
-                currencyBtns.forEach(btn => {
-                  btn.addEventListener('click', () => {
-                    const c = btn.getAttribute('data-currency');
-                    if (c) {
-                      setCurrency(c);
-                    }
+                // Dropdown listener
+                const currencyDropdown = document.getElementById('currencyDropdown');
+                if (currencyDropdown) {
+                  currencyDropdown.value = currentCurrency;
+                  currencyDropdown.addEventListener('change', () => {
+                    setCurrency(currencyDropdown.value);
+                    showToast('Currency: ' + currencyDropdown.value + ' 💱');
                   });
-                });
+                }
 
-                // Asynchronously fetch live forex rates from /api/forex (GrismaInfo / NRB backend)
-                function initForexRates() {
+                // Fetch LIVE forex rates from /api/forex (GrismaInfo / NRB) on every page load.
+                // 5-min session cache to avoid duplicate calls within same tab session.
+                // Prices are always updated after a fresh API response regardless of selected currency.
+                (function fetchLiveForex() {
+                  const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
                   try {
                     const cached = sessionStorage.getItem('bn_forex_rates');
                     if (cached) {
                       const parsed = JSON.parse(cached);
-                      if (parsed && parsed.rates && (Date.now() - (parsed.time || 0) < 1800000)) {
+                      if (parsed && parsed.rates && (Date.now() - (parsed.time || 0) < CACHE_TTL)) {
+                        // Use cached rates immediately, still fetch in background to refresh
                         forexRates.USD = Number(parsed.rates.USD) || forexRates.USD;
                         forexRates.INR = Number(parsed.rates.INR) || forexRates.INR;
-                        const sel = document.querySelector('.currency-selector');
-                        if (sel) {
-                          sel.setAttribute('title', 'Live Forex Rates: $1 = Rs. ' + forexRates.USD + ' | ₹1 = Rs. ' + forexRates.INR.toFixed(2) + ' Pegged');
-                        }
-                        if (currentCurrency !== 'NPR') updateAllPrices();
+                        updateAllPrices();
                       }
                     }
                   } catch(e) {}
 
+                  // Always fetch live — API is fast (GrismaInfo CDN-backed)
                   fetch('/api/forex')
-                    .then(r => r.json())
+                    .then(r => r.ok ? r.json() : null)
                     .then(data => {
                       if (data && data.rates) {
-                        forexRates.USD = Number(data.rates.USD) || forexRates.USD;
-                        forexRates.INR = Number(data.rates.INR) || forexRates.INR;
+                        const liveUSD = Number(data.rates.USD);
+                        const liveINR = Number(data.rates.INR);
+                        if (liveUSD > 0) forexRates.USD = liveUSD;
+                        if (liveINR > 0) forexRates.INR = liveINR;
                         try {
                           sessionStorage.setItem('bn_forex_rates', JSON.stringify({
-                            rates: forexRates,
+                            rates: { USD: forexRates.USD, INR: forexRates.INR },
                             date: data.date,
                             time: Date.now()
                           }));
                         } catch(e) {}
-
-                        const sel = document.querySelector('.currency-selector');
-                        if (sel) {
-                          sel.setAttribute('title', 'Live Forex Rates (' + (data.date || 'Today') + '): $1 = Rs. ' + forexRates.USD + ' | ₹1 = Rs. ' + forexRates.INR.toFixed(2) + ' Pegged');
-                        }
-                        if (currentCurrency !== 'NPR') {
-                          updateAllPrices();
-                        }
+                        // Always refresh displayed prices with live rates
+                        updateAllPrices();
+                        // Update dropdown title with live rate info
+                        const ddWrap = document.querySelector('.currency-dropdown-wrap');
+                        if (ddWrap) ddWrap.title = 'Live NRB Rates — $1 = Rs. ' + forexRates.USD + ' | ₹100 = Rs. ' + Math.round(forexRates.INR * 100);
                       }
                     })
-                    .catch(() => {});
-                }
-                initForexRates();
+                    .catch(() => {
+                      // Silent fail — fallback rates remain active
+                    });
+                })();
 
                 // 4. Wishlist Sliding Drawer & LocalStorage Engine
                 let wishlist = [];

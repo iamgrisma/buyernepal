@@ -101,6 +101,7 @@ export interface Article {
   featured_product_ids?: string;
   seo_title?: string;
   seo_description?: string;
+  focus_keyword?: string;
   published_at?: string;
   created_at?: string;
   updated_at?: string;
@@ -225,6 +226,9 @@ export interface SiteSettings {
   blog_section_enabled?: string;
   faq_section_enabled?: string;
   editorial_banner_enabled?: string;
+  trending_section_enabled?: string;
+  brands_strip_enabled?: string;
+  newsletter_section_enabled?: string;
 
   // 3. Navigation Menu Manager
   menu_show_deals?: string;
