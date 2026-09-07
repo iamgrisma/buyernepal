@@ -133,7 +133,6 @@ export const Header: FC<{
                   <a
                     href="/compare"
                     className={`nav-pill ${activeSlug === 'compare' ? 'nav-pill-active' : ''}`}
-                    style={{ borderColor: 'rgba(99, 102, 241, 0.35)', background: activeSlug === 'compare' ? 'var(--primary)' : 'rgba(99, 102, 241, 0.08)' }}
                   >
                     <span>⚖️</span>
                     <span>Compare</span>
@@ -143,7 +142,6 @@ export const Header: FC<{
                   <a
                     href="/charts"
                     className={`nav-pill ${activeSlug === 'charts' ? 'nav-pill-active' : ''}`}
-                    style={{ borderColor: 'rgba(234, 179, 8, 0.35)', background: activeSlug === 'charts' ? 'var(--primary)' : 'rgba(234, 179, 8, 0.08)' }}
                   >
                     <span>🏆</span>
                     <span>Top Charts</span>
@@ -153,7 +151,6 @@ export const Header: FC<{
                   <a
                     href="/blog"
                     className={`nav-pill ${activeSlug === 'blog' ? 'nav-pill-active' : ''}`}
-                    style={{ borderColor: 'rgba(217, 119, 6, 0.35)', background: activeSlug === 'blog' ? 'var(--primary)' : 'rgba(245, 158, 11, 0.08)' }}
                   >
                     <span>📰</span>
                     <span>Tech Guides &amp; Blog</span>
@@ -163,7 +160,6 @@ export const Header: FC<{
                   <a
                     href="/coupons"
                     className={`nav-pill ${activeSlug === 'coupons' ? 'nav-pill-active' : ''}`}
-                    style={{ borderColor: 'rgba(225, 29, 72, 0.35)', background: activeSlug === 'coupons' ? 'var(--primary)' : 'rgba(225, 29, 72, 0.08)' }}
                   >
                     <span>🎟️</span>
                     <span>Coupons &amp; Deals</span>
@@ -215,77 +211,77 @@ export const Header: FC<{
             {/* Trust badges moved to hero section — removed from nav to keep full menu visible */}
           </div>
         </div>
+      </header>
 
-        {/* Mobile Navigation Drawer */}
-        <div id="mobileDrawerBackdrop" className="mobile-drawer-backdrop" />
-        <div id="mobileDrawer" className="mobile-drawer">
-          <div className="mobile-drawer-header">
-            <div className="store-brand">
-              <span className="store-logo-mark">B</span>
-              <span>
-                <strong>{title}</strong>
-                <small>SHOP SMARTER</small>
-              </span>
-            </div>
-            <button id="closeMobileMenuBtn" className="mobile-drawer-close" type="button" aria-label="Close menu">
-              ×
-            </button>
+      {/* Mobile Navigation Drawer (mounted outside header to prevent backdrop-filter containing block overflow) */}
+      <div id="mobileDrawerBackdrop" className="mobile-drawer-backdrop" />
+      <div id="mobileDrawer" className="mobile-drawer">
+        <div className="mobile-drawer-header">
+          <div className="store-brand">
+            <span className="store-logo-mark">B</span>
+            <span>
+              <strong>{title}</strong>
+              <small>SHOP SMARTER</small>
+            </span>
           </div>
+          <button id="closeMobileMenuBtn" className="mobile-drawer-close" type="button" aria-label="Close menu">
+            ×
+          </button>
+        </div>
 
-          <div className="mobile-drawer-content">
-            <span className="mobile-drawer-label">EXPLORE DEPARTMENTS &amp; TOOLS</span>
+        <div className="mobile-drawer-content">
+          <span className="mobile-drawer-label">EXPLORE DEPARTMENTS &amp; TOOLS</span>
+          <nav className="mobile-nav-links">
+            <a href="/" className={!activeSlug ? 'active' : ''}>
+              🏠 All Products &amp; Deals
+            </a>
+            <a href="/compare" className={activeSlug === 'compare' ? 'active' : ''}>
+              ⚖️ Head-to-Head Compare
+            </a>
+            <a href="/charts" className={activeSlug === 'charts' ? 'active' : ''}>
+              🏆 Top 10 Ranked Charts
+            </a>
+            <a href="/blog" className={activeSlug === 'blog' ? 'active' : ''}>
+              📰 Tech Blog &amp; Guides
+            </a>
+            <a href="/coupons" className={activeSlug === 'coupons' ? 'active' : ''}>
+              🎟️ Verified Promo Codes
+            </a>
+            <a href="/stores" className={activeSlug === 'stores' ? 'active' : ''}>
+              🏪 Verified Nepal Stores
+            </a>
+            <a href="/brands" className={activeSlug === 'brands' ? 'active' : ''}>
+              🏷️ Official Brands
+            </a>
+            <a href="/track-order" className={activeSlug === 'orders' ? 'active' : ''}>
+              📦 Track My Order
+            </a>
+            {categories.map((cat) => (
+              <a
+                key={cat.id}
+                href={`/category/${cat.slug}`}
+                className={activeSlug === cat.slug ? 'active' : ''}
+              >
+                <span>{cat.icon || '📁'}</span>
+                <span>{cat.name}</span>
+              </a>
+            ))}
+          </nav>
+
+          <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
+            <span className="mobile-drawer-label">MANAGEMENT &amp; SUPPORT</span>
             <nav className="mobile-nav-links">
-              <a href="/" className={!activeSlug ? 'active' : ''}>
-                🏠 All Products &amp; Deals
-              </a>
-              <a href="/compare" className={activeSlug === 'compare' ? 'active' : ''}>
-                ⚖️ Head-to-Head Compare
-              </a>
-              <a href="/charts" className={activeSlug === 'charts' ? 'active' : ''}>
-                🏆 Top 10 Ranked Charts
-              </a>
-              <a href="/blog" className={activeSlug === 'blog' ? 'active' : ''}>
-                📰 Tech Blog &amp; Guides
-              </a>
-              <a href="/coupons" className={activeSlug === 'coupons' ? 'active' : ''}>
-                🎟️ Verified Promo Codes
-              </a>
-              <a href="/stores" className={activeSlug === 'stores' ? 'active' : ''}>
-                🏪 Verified Nepal Stores
-              </a>
-              <a href="/brands" className={activeSlug === 'brands' ? 'active' : ''}>
-                🏷️ Official Brands
-              </a>
-              <a href="/track-order" className={activeSlug === 'orders' ? 'active' : ''}>
-                📦 Track My Order
-              </a>
-              {categories.map((cat) => (
-                <a
-                  key={cat.id}
-                  href={`/category/${cat.slug}`}
-                  className={activeSlug === cat.slug ? 'active' : ''}
-                >
-                  <span>{cat.icon || '📁'}</span>
-                  <span>{cat.name}</span>
+              <a href="/admin">🔐 Admin Portal Login</a>
+              {settings.contact_email && <a href={`mailto:${settings.contact_email}`}>✉️ {settings.contact_email}</a>}
+              {settings.whatsapp_number && (
+                <a href={`https://wa.me/${settings.whatsapp_number.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer">
+                  💬 WhatsApp Support
                 </a>
-              ))}
+              )}
             </nav>
-
-            <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
-              <span className="mobile-drawer-label">MANAGEMENT &amp; SUPPORT</span>
-              <nav className="mobile-nav-links">
-                <a href="/admin">🔐 Admin Portal Login</a>
-                {settings.contact_email && <a href={`mailto:${settings.contact_email}`}>✉️ {settings.contact_email}</a>}
-                {settings.whatsapp_number && (
-                  <a href={`https://wa.me/${settings.whatsapp_number.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer">
-                    💬 WhatsApp Support
-                  </a>
-                )}
-              </nav>
-            </div>
           </div>
         </div>
-      </header>
+      </div>
     </>
   );
 };
