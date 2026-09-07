@@ -1,14 +1,7 @@
 {
   "compatibility_date": "2025-10-08",
-  "main": "src/index.ts",
+  "main": "src/index.tsx",
   "name": "buyernepal",
-  "build": {
-    "command": "npm run build"
-  },
-  "assets": {
-    "directory": "dist",
-    "binding": "ASSETS"
-  },
   "upload_source_maps": true,
   "d1_databases": [
     {

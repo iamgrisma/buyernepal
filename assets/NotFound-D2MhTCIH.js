@@ -1,2 +1,0 @@
-import{j as e,L as s}from"./index-D4-gPOyc.js";function r(){return e.jsx("div",{className:"store-page",children:e.jsxs("div",{className:"store-shell store-empty",style:{marginTop:80},children:[e.jsx("div",{className:"empty-icon",children:"404"}),e.jsx("h1",{children:"Page not found"}),e.jsx("p",{children:"The page you're looking for doesn't exist or has moved."}),e.jsx(s,{to:"/",className:"primary-action",children:"Back to BuyerNepal"})]})})}export{r as default};
-//# sourceMappingURL=NotFound-D2MhTCIH.js.map
