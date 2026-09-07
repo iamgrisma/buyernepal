@@ -2719,8 +2719,8 @@ export const AdminDashboardView: FC<{
               </div>
             </div>
           )}
-        </main>
-      </div>
+
+
 
       {/* Modal: Add New Curated Product */}
       <div id="addProductModal" className="admin-modal-backdrop">
