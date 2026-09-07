@@ -143,6 +143,8 @@ out
 .nuxt
 dist/*
 !dist/.gitkeep
+!dist/_routes.json
+!dist/index.html
 assets/
 
 # Gatsby files
