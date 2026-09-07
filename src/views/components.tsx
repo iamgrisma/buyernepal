@@ -119,6 +119,14 @@ export const Header: FC<{
                   <span>🏠</span>
                   <span>All Deals</span>
                 </a>
+                <a
+                  href="/blog"
+                  className={`nav-pill ${activeSlug === 'blog' ? 'nav-pill-active' : ''}`}
+                  style={{ borderColor: 'rgba(217, 119, 6, 0.35)', background: activeSlug === 'blog' ? 'var(--primary)' : 'rgba(245, 158, 11, 0.08)' }}
+                >
+                  <span>📰</span>
+                  <span>Tech Guides & Blog</span>
+                </a>
                 {categories.map((cat) => (
                   <a
                     key={cat.id}
@@ -601,13 +609,13 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
               href={product.affiliate_url}
               target="_blank"
               rel="noopener noreferrer nofollow"
-              title={`Buy on ${storeName}`}
+              title={`View verified deal on ${storeName} (Direct Store Link)`}
             >
-              Shop <span>↗</span>
+              Deal <span>↗</span>
             </a>
           ) : (
             <a className="product-buy" href={`/product/${product.id}`}>
-              View <span>→</span>
+              Details <span>→</span>
             </a>
           )}
         </div>
@@ -911,6 +919,10 @@ export const Footer: FC<{ settings: SiteSettings; categories: Category[] }> = ({
             Built with pure Hono Edge SSR on Cloudflare Workers + D1 database in Kathmandu, Nepal.
           </span>
         </div>
+      </div>
+
+      <div className="store-shell" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '16px 0', fontSize: '11.5px', color: '#94a3b8', lineHeight: '1.6' }}>
+        <strong style={{ color: '#cbd5e1' }}>Affiliate Transparency Disclosure:</strong> BuyerNepal is an independent consumer guide and price comparison platform in Nepal. We research and verify products independently. When you click our partner links to retailers (such as Daraz, Hamrobazar, Oliz Store, Samsung Plaza) and make a purchase, we may receive a referral commission at no additional cost to you.
       </div>
 
       <div className="store-shell footer-bottom">

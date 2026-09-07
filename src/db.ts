@@ -1,4 +1,4 @@
-import { Category, Product, Review, SiteSettings, User, Coupon } from './types';
+import { Category, Product, Review, SiteSettings, User, Coupon, Article, ProductVariant, ProductScore, StoreOffer } from './types';
 
 // Rich, production-grade curated categories for Nepal
 export const DEFAULT_CATEGORIES: Category[] = [
@@ -91,6 +91,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.9,
     review_count: 86,
     brand: 'Apple',
+    emi_available: 1,
     is_featured: 1,
     is_active: 1
   },
@@ -109,6 +110,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.8,
     review_count: 64,
     brand: 'Samsung',
+    emi_available: 1,
     is_featured: 1,
     is_active: 1
   },
@@ -127,6 +129,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.9,
     review_count: 112,
     brand: 'Apple',
+    emi_available: 1,
     is_featured: 1,
     is_active: 1
   },
@@ -145,6 +148,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.8,
     review_count: 73,
     brand: 'Sony',
+    emi_available: 1,
     is_featured: 1,
     is_active: 1
   },
@@ -163,6 +167,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.9,
     review_count: 148,
     brand: 'Apple',
+    emi_available: 0,
     is_featured: 1,
     is_active: 1
   },
@@ -181,6 +186,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.7,
     review_count: 94,
     brand: 'Xiaomi',
+    emi_available: 0,
     is_featured: 1,
     is_active: 1
   },
@@ -199,6 +205,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.8,
     review_count: 32,
     brand: 'Dyson',
+    emi_available: 1,
     is_featured: 1,
     is_active: 1
   },
@@ -217,6 +224,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.9,
     review_count: 51,
     brand: 'Himalayan Chyangra',
+    emi_available: 0,
     is_featured: 1,
     is_active: 1
   },
@@ -235,6 +243,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.8,
     review_count: 67,
     brand: 'Marpha Organics',
+    emi_available: 0,
     is_featured: 1,
     is_active: 1
   },
@@ -253,6 +262,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.7,
     review_count: 215,
     brand: 'Goldstar',
+    emi_available: 0,
     is_featured: 1,
     is_active: 1
   },
@@ -271,6 +281,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.9,
     review_count: 38,
     brand: 'Palpali Heritage',
+    emi_available: 0,
     is_featured: 1,
     is_active: 1
   },
@@ -289,6 +300,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     rating: 4.9,
     review_count: 82,
     brand: 'Sony PlayStation',
+    emi_available: 1,
     is_featured: 1,
     is_active: 1
   },
@@ -504,6 +516,201 @@ export const DEFAULT_COUPONS: Coupon[] = [
   }
 ];
 
+export const DEFAULT_ARTICLES: Article[] = [
+  {
+    id: 1,
+    title: 'Best Mobile Phones Under 30,000 in Nepal (2026 Edition)',
+    slug: 'best-mobile-phones-under-30000-nepal',
+    excerpt: 'Comprehensive buyer guide analyzing Nepal\'s top budget champions featuring 120Hz AMOLED screens, 50MP OIS cameras, MDMS registration, and verified local pricing.',
+    content: `Buying a smartphone under Rs. 30,000 in Nepal has transformed dramatically in 2026. Buyers no longer need to compromise on core user experience: 120Hz refresh rates, bright AMOLED panels, 50MP Sony sensors with Optical Image Stabilization (OIS), and 45W+ fast charging have become standard in this competitive price tier.
+
+### What Should You Expect Under Rs. 30,000 in Nepal?
+1. **Display Quality:** Full HD+ AMOLED displays with at least 120Hz refresh rate and Gorilla Glass protection. Peak brightness should comfortably exceed 1,200 nits to handle direct sunlight during bright Kathmandu afternoons.
+2. **Processing Power:** MediaTek Dimensity 7050 / 7200 or Snapdragon 6 Gen 1 / 7s Gen 2 chipsets. These provide reliable 60fps daily multitasking, social media feeds, and moderate gaming in PUBG Mobile / Free Fire.
+3. **Official MDMS Status:** Crucial! Make sure you purchase from authorized Nepali distributors offering VAT invoices so your device's IMEI is officially registered on NTA's MDMS portal.
+
+### Top Recommendation: Xiaomi Redmi Note 13 / 14 Series
+The Redmi Note lineup continues to offer unmatched value for money in Nepal. With a razor-thin bezel AMOLED panel and a dependable 5,000 mAh cell, it dominates the sub-30k bracket.
+
+### Best for Clean Software: Samsung Galaxy M-Series / A-Series
+If you despise bloatware and prioritize long-term security patches, Samsung's official Nepal units guarantee up to 4 years of OS upgrades with Knox security.
+
+### Verdict
+Before buying, compare offline rates in New Road with verified Daraz Mall authorized brand outlets. Always verify the VAT bill to ensure hassle-free warranty claim at authorized service centers.`,
+    cover_image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=1200&auto=format&fit=crop&q=80',
+    author_name: 'BuyerNepal Editorial Team',
+    category: 'Buying Guides',
+    tags: 'smartphones, buying-guide, budget-phones, nepal-tech',
+    read_time_minutes: 6,
+    is_featured: 1,
+    is_published: 1,
+    views_count: 1420,
+    published_at: '2026-09-01T10:00:00Z'
+  },
+  {
+    id: 2,
+    title: 'Apple iPhone 16 Pro Max Full Review: Worth the Nepali Price Tag?',
+    slug: 'apple-iphone-16-pro-max-nepal-review',
+    excerpt: 'Detailed testing on A18 Pro silicon, Camera Control tactile sensor, Kathmandu battery life, and whether official GenNext Nepal pricing justifies the upgrade.',
+    content: `The Apple iPhone 16 Pro Max has landed in Nepal via authorized distributor GenNext. With its grade-5 titanium architecture, larger 6.9-inch display, tactile Camera Control button, and the 3nm A18 Pro chipset, it claims the flagship crown.
+
+### Design & Build: Subtle Titanium Refinements
+The aerospace-grade titanium frame with contoured borders feels remarkably lighter in the hand than older stainless steel iterations. The display bezels have shrunk to microscopic levels, making the 6.9-inch panel feel immersive without excessive bulk.
+
+### Camera Innovations: 4K 120fps & Camera Control
+The dedicated Camera Control button on the lower right flank brings DSLR-like tactile half-press focus and swipe gesture zoom. For creators in Nepal shooting 4K 120fps ProRes log footage, the dynamic range in challenging lighting conditions (such as high-altitude Pokhara or Everest viewpoints) is astonishing.
+
+### Battery Life Champion
+In our real-world Kathmandu network testing (alternating between NTC 5G, Ncell 4G, and fiber Wi-Fi), the 16 Pro Max delivered an astonishing 10.5 hours of screen-on time, easily lasting two full workdays.
+
+### The Nepal Price Verdict: Should You Buy?
+Priced at Rs. 214,999 for the 256GB base variant, it is unquestionably a premium investment. However, with official GenNext 1-year warranty, 1-year breakage insurance, and official NTA MDMS clearance, it ensures total peace of mind against gray-market confiscation.`,
+    cover_image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=1200&auto=format&fit=crop&q=80',
+    author_name: 'Bikash Adhikari (Senior Tech Editor)',
+    category: 'Smartphone Reviews',
+    tags: 'apple, iphone-16-pro-max, flagship, review, gennext',
+    read_time_minutes: 8,
+    is_featured: 1,
+    is_published: 1,
+    views_count: 2890,
+    published_at: '2026-09-03T14:30:00Z'
+  },
+  {
+    id: 3,
+    title: 'Nepal MDMS System & Customs Tax Explained: Avoid Getting Blacklisted',
+    slug: 'nepal-mdms-registration-customs-tax-guide',
+    excerpt: 'Everything Nepali travelers and overseas returnees must know about NTA MDMS registration, airport customs tax slabs, and IMEI verification rules.',
+    content: `The Nepal Telecommunications Authority (NTA) has strictly enforced the Mobile Device Management System (MDMS) to combat gray market imports, mobile theft, and tax evasion.
+
+### What is MDMS?
+MDMS is a centralized tracking system implemented across all telecom operators in Nepal (Nepal Telecom, Ncell, Smart Cell). Every smartphone connected to a Nepali SIM card must have its 15-digit IMEI whitelisted in the government database. Unregistered devices receive warning notices and are subsequently blocked from cellular connectivity.
+
+### Baggage Customs Rules for Travelers (Foreign Returnees)
+- **Nepali Citizens returning from abroad:** Allowed to bring ONE personal smartphone used abroad without paying customs duty.
+- **Second phone / Unpacked phone:** Subject to customs duty (approx. 18% to 24% depending on invoice value) and 13% VAT.
+- **Registration Process:** You can upload your immigration passport stamp, flight boarding pass, and purchase invoice directly at the official portal: mdms.nta.gov.np.
+
+### Buying Locally: How to Verify Before Paying
+Always inspect the retail box before handing over payment:
+1. Dial *#06# on the phone keypad to get the genuine IMEI.
+2. Visit **mdms.nta.gov.np** and input the IMEI number.
+3. If it says "IMEI is registered in MDMS", your phone is official.
+4. Insist on a genuine VAT invoice stamped by the registered store.`,
+    cover_image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&auto=format&fit=crop&q=80',
+    author_name: 'BuyerNepal Legal & Tech Desk',
+    category: 'Nepal Tech',
+    tags: 'mdms, customs, nta, mobile-rules, nepal-law',
+    read_time_minutes: 5,
+    is_featured: 0,
+    is_published: 1,
+    views_count: 5120,
+    published_at: '2026-08-28T09:15:00Z'
+  },
+  {
+    id: 4,
+    title: 'Best Laptops for Engineering & IT Students in Nepal (2026)',
+    slug: 'best-laptops-engineering-it-students-nepal',
+    excerpt: 'Top workstation and ultrabook recommendations in Nepal for coding, AutoCAD, machine learning, and university assignments with verified warranty.',
+    content: `Choosing a laptop for Computer Engineering, BCA, BSc CSIT, or Mechanical Engineering in Nepal demands a careful balance of CPU performance, RAM expandability, battery life for campus lectures, and robust local warranty support.
+
+### Essential Specifications Checklist
+- **CPU:** Minimum AMD Ryzen 5 7000/8000 series or Intel Core i5 13th/14th Gen or Apple M-series.
+- **RAM:** 16GB is the baseline in 2026. For Docker containers, virtual machines, and IDE compilation, 8GB will cause severe stuttering.
+- **Storage:** 512GB NVMe SSD minimum, preferably with a secondary M.2 expansion slot.
+- **Display:** Matte anti-glare IPS display with at least 300 nits brightness.
+
+### Top Pick for Portability & Battery: Apple MacBook Air M3
+For CSIT, BCA, and software engineering students, the MacBook Air M3 provides an unbeatable 16+ hours of battery life, allowing you to attend college without carrying a bulky charging brick.
+
+### Top Pick for 3D Modeling & Gaming: Lenovo LOQ / ASUS TUF Gaming
+If your curriculum involves SolidWorks, AutoCAD 3D, Blender, or heavy GPU workloads, the Lenovo LOQ equipped with RTX 4050/4060 graphics is the price-to-performance champion in Kathmandu.`,
+    cover_image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=1200&auto=format&fit=crop&q=80',
+    author_name: 'Prajwol Gautam (Computing Analyst)',
+    category: 'Laptop Guides',
+    tags: 'laptops, engineering, students, macbook, lenovo, nepal',
+    read_time_minutes: 7,
+    is_featured: 0,
+    is_published: 1,
+    views_count: 3100,
+    published_at: '2026-08-20T11:00:00Z'
+  }
+];
+
+export const DEFAULT_SCORES: Record<number, ProductScore> = {
+  1: {
+    product_id: 1,
+    display_score: 9.8,
+    performance_score: 9.9,
+    camera_score: 9.7,
+    battery_score: 9.6,
+    value_score: 8.4,
+    overall_score: 9.5,
+    verdict: 'The uncontested battery and video recording titan in Nepal. Pricey with customs tax, but unmatched resale value and GenNext official warranty.'
+  },
+  2: {
+    product_id: 2,
+    display_score: 9.9,
+    performance_score: 9.8,
+    camera_score: 9.8,
+    battery_score: 9.4,
+    value_score: 8.8,
+    overall_score: 9.6,
+    verdict: 'The ultimate Android powerhouse with built-in S-Pen, flat anti-reflective display, and 7 years of OS upgrades.'
+  },
+  3: {
+    product_id: 3,
+    display_score: 9.4,
+    performance_score: 9.6,
+    camera_score: 8.0,
+    battery_score: 9.7,
+    value_score: 9.1,
+    overall_score: 9.2,
+    verdict: 'Silent fanless workstation with 18-hour battery longevity. The gold standard laptop for developers and university students in Nepal.'
+  },
+  4: {
+    product_id: 4,
+    display_score: 8.5,
+    performance_score: 9.5,
+    camera_score: 7.0,
+    battery_score: 9.2,
+    value_score: 9.0,
+    overall_score: 8.7,
+    verdict: 'Sublime ANC capability for blocking loud Kathmandu traffic and bike exhausts, backed by plush synthetic leather ear cushions.'
+  }
+};
+
+export const DEFAULT_VARIANTS: Record<number, ProductVariant[]> = {
+  1: [
+    { id: 101, product_id: 1, variant_name: '256GB - Desert Titanium', price: 214999, original_price: 229999, is_in_stock: 1 },
+    { id: 102, product_id: 1, variant_name: '512GB - Natural Titanium', price: 249999, original_price: 265000, is_in_stock: 1 },
+    { id: 103, product_id: 1, variant_name: '1TB - Black Titanium', price: 289999, original_price: 305000, is_in_stock: 0 }
+  ],
+  2: [
+    { id: 201, product_id: 2, variant_name: '12GB / 256GB - Titanium Gray', price: 199999, original_price: 214999, is_in_stock: 1 },
+    { id: 202, product_id: 2, variant_name: '12GB / 512GB - Titanium Black', price: 224999, original_price: 239999, is_in_stock: 1 }
+  ],
+  3: [
+    { id: 301, product_id: 3, variant_name: '16GB Unified RAM / 512GB SSD (Midnight)', price: 178000, original_price: 189000, is_in_stock: 1 },
+    { id: 302, product_id: 3, variant_name: '24GB Unified RAM / 1TB SSD (Starlight)', price: 229000, original_price: 245000, is_in_stock: 1 }
+  ]
+};
+
+export const DEFAULT_STORE_OFFERS: Record<number, StoreOffer[]> = {
+  1: [
+    { id: 11, product_id: 1, store_name: 'Daraz Mall Verified', price: 214999, store_url: 'https://www.daraz.com.np', badge: 'Official Daraz Partner', in_stock: 1, delivery_time: '24h Kathmandu Express', warranty_info: '1 Year GenNext Nepal Warranty' },
+    { id: 12, product_id: 1, store_name: 'Oliz Store Nepal', price: 216000, store_url: 'https://olizstore.com', badge: 'Authorized Apple Reseller', in_stock: 1, delivery_time: 'Same-day Babarmahal Store Pickup', warranty_info: '1 Year Official Apple Warranty + 1 Year Breakage' },
+    { id: 13, product_id: 1, store_name: 'EvoStore Nepal', price: 218000, store_url: 'https://evostore.com.np', badge: 'Apple Premium Partner', in_stock: 1, delivery_time: 'Courier 2-3 Days Nationwide', warranty_info: '1 Year Official Warranty' }
+  ],
+  2: [
+    { id: 21, product_id: 2, store_name: 'Daraz Mall Verified', price: 199999, store_url: 'https://www.daraz.com.np', badge: 'Daraz Official Brand', in_stock: 1, delivery_time: '24-48h Delivery', warranty_info: '1 Year Samsung Nepal Official' },
+    { id: 22, product_id: 2, store_name: 'Samsung Plaza Nepal', price: 204999, store_url: 'https://samsungplaza.com.np', badge: 'Brand Flagship Store', in_stock: 1, delivery_time: 'Free Doorstep Delivery', warranty_info: '1 Year Full Protection + 1-Time Screen Repair' }
+  ],
+  3: [
+    { id: 31, product_id: 3, store_name: 'Oliz Store Nepal', price: 178000, store_url: 'https://olizstore.com', badge: 'Authorized Reseller', in_stock: 1, delivery_time: 'Immediate In-store Pickup', warranty_info: '1 Year Global Apple Care' },
+    { id: 32, product_id: 3, store_name: 'Daraz Mall', price: 179500, store_url: 'https://www.daraz.com.np', badge: 'Daraz Mall', in_stock: 1, delivery_time: '1-2 Days Valley Delivery', warranty_info: '1 Year GenNext Authorized' }
+  ]
+};
+
 export async function getSettings(db?: D1Database): Promise<SiteSettings> {
   const defaults: SiteSettings = {
     site_title: 'BuyerNepal',
@@ -670,8 +877,9 @@ export async function updateCategory(
 // Product Enrichment Helper for 2026 Features (EMI, Flash Deals, Specs, Price History, Delivery)
 export function enrichProduct(p: Product): Product {
   const origPrice = p.original_price || Math.round(p.price * 1.15);
-  const emiAvailable = p.price >= 12000 ? 1 : 0;
-  const emiPrice = emiAvailable ? Math.round(p.price / 18) : undefined;
+  // User feedback: EMI is ONLY available when explicitly configured for this product (emi_available === 1)
+  const emiAvailable = Number(p.emi_available) === 1 ? 1 : 0;
+  const emiPrice = emiAvailable ? (p.emi_starting_price || Math.round(p.price / 18)) : undefined;
   
   // Flash deal status on high demand items
   const isFlash = [1, 2, 4, 6, 10, 16, 18, 20].includes(p.id);
@@ -872,31 +1080,48 @@ export async function getAllProductsAdmin(db?: D1Database): Promise<Product[]> {
 }
 
 export async function getProductById(db: D1Database | undefined, id: number): Promise<Product | null> {
+  let prod: Product | null = null;
   if (!db) {
     const def = DEFAULT_PRODUCTS.find((p) => p.id === id) || null;
-    return def ? enrichProduct(def) : null;
-  }
-  try {
-    const p = await db
-      .prepare('SELECT p.*, c.name category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.id = ? AND p.is_active = 1 LIMIT 1')
-      .bind(id)
-      .first<Product>();
-    if (p) {
-      const def = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id || dp.name === p.name);
-      return enrichProduct({
-        ...p,
-        original_price: p.original_price || def?.original_price,
-        store_name: p.store_name || def?.store_name,
-        badge: p.badge || def?.badge,
-        rating: p.rating || def?.rating,
-        review_count: p.review_count || def?.review_count,
-        brand: p.brand || def?.brand
-      });
+    prod = def ? enrichProduct(def) : null;
+  } else {
+    try {
+      const p = await db
+        .prepare('SELECT p.*, c.name category_name FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.id = ? AND p.is_active = 1 LIMIT 1')
+        .bind(id)
+        .first<Product>();
+      if (p) {
+        const def = DEFAULT_PRODUCTS.find((dp) => dp.id === p.id || dp.name === p.name);
+        prod = enrichProduct({
+          ...p,
+          original_price: p.original_price || def?.original_price,
+          store_name: p.store_name || def?.store_name,
+          badge: p.badge || def?.badge,
+          rating: p.rating || def?.rating,
+          review_count: p.review_count || def?.review_count,
+          brand: p.brand || def?.brand
+        });
+      }
+    } catch {
+      prod = null;
     }
-    return null;
-  } catch {
-    return null;
   }
+
+  if (prod) {
+    const [scores, variants, offers] = await Promise.all([
+      getProductScores(db, id),
+      getProductVariants(db, id),
+      getStoreOffers(db, id)
+    ]);
+    prod.scores = scores || undefined;
+    prod.variants = variants;
+    prod.store_offers = offers.map((o) => ({
+      ...o,
+      price: o.price > 0 ? o.price : prod!.price
+    }));
+  }
+
+  return prod;
 }
 
 export async function createProduct(
@@ -911,16 +1136,18 @@ export async function createProduct(
   storeName = 'Daraz Mall',
   originalPrice = 0,
   badge = 'Hot Deal 🔥',
-  brand = ''
+  brand = '',
+  emiAvailable = 0,
+  verdict = ''
 ): Promise<{ success: boolean; id?: number; error?: string }> {
   if (!db) return { success: false, error: 'Database not connected' };
   try {
     const r = await db
       .prepare(
-        `INSERT INTO products(name, description, price, image_url, affiliate_url, category_id, is_active)
-         VALUES(?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO products(name, description, price, image_url, affiliate_url, category_id, is_active, store_name, original_price, badge, brand, emi_available, verdict)
+         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-      .bind(name, description, price, imageUrl, affiliateUrl, categoryId, isActive)
+      .bind(name, description, price, imageUrl, affiliateUrl, categoryId, isActive, storeName, originalPrice, badge, brand, emiAvailable, verdict)
       .run();
     return { success: true, id: Number(r.meta.last_row_id) };
   } catch (e: any) {
@@ -963,6 +1190,8 @@ export async function updateProduct(
     storeName?: string;
     badge?: string;
     brand?: string;
+    emiAvailable?: number;
+    verdict?: string;
   }
 ): Promise<{ success: boolean; error?: string }> {
   // Update in-memory fallback catalog
@@ -980,6 +1209,8 @@ export async function updateProduct(
       store_name: data.storeName ? data.storeName.trim() : DEFAULT_PRODUCTS[idx].store_name,
       badge: data.badge ? data.badge.trim() : DEFAULT_PRODUCTS[idx].badge,
       brand: data.brand !== undefined ? data.brand.trim() : DEFAULT_PRODUCTS[idx].brand,
+      emi_available: data.emiAvailable !== undefined ? data.emiAvailable : DEFAULT_PRODUCTS[idx].emi_available,
+      verdict: data.verdict !== undefined ? data.verdict.trim() : DEFAULT_PRODUCTS[idx].verdict,
       is_active: data.isActive ?? DEFAULT_PRODUCTS[idx].is_active
     };
   }
@@ -990,25 +1221,38 @@ export async function updateProduct(
     const finalName = data.name ? data.name.trim() : (existing?.name || '');
     const finalDesc = data.description !== undefined ? data.description : (existing?.description || '');
     const finalPrice = typeof data.price === 'number' && !isNaN(data.price) ? data.price : (existing?.price || 0);
+    const finalOrigPrice = data.originalPrice !== undefined ? data.originalPrice : (existing?.original_price || 0);
     const finalImg = data.imageUrl !== undefined ? data.imageUrl : (existing?.image_url || '');
     const finalAff = data.affiliateUrl !== undefined ? data.affiliateUrl : (existing?.affiliate_url || '');
     const finalCat = data.categoryId !== undefined ? (data.categoryId ? Number(data.categoryId) : null) : (existing?.category_id ?? null);
     const finalActive = data.isActive !== undefined ? data.isActive : (existing?.is_active ?? 1);
+    const finalStore = data.storeName !== undefined ? data.storeName.trim() : (existing?.store_name || 'Daraz Mall');
+    const finalBadge = data.badge !== undefined ? data.badge.trim() : (existing?.badge || '');
+    const finalBrand = data.brand !== undefined ? data.brand.trim() : (existing?.brand || '');
+    const finalEmi = data.emiAvailable !== undefined ? data.emiAvailable : (existing?.emi_available ?? 0);
+    const finalVerdict = data.verdict !== undefined ? data.verdict.trim() : (existing?.verdict || '');
 
     await db
       .prepare(
         `UPDATE products
-         SET name = ?, description = ?, price = ?, image_url = ?, affiliate_url = ?, category_id = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+         SET name = ?, description = ?, price = ?, original_price = ?, image_url = ?, affiliate_url = ?,
+             category_id = ?, is_active = ?, store_name = ?, badge = ?, brand = ?, emi_available = ?, verdict = ?, updated_at = CURRENT_TIMESTAMP
          WHERE id = ?`
       )
       .bind(
         finalName,
         finalDesc ?? '',
         finalPrice,
+        finalOrigPrice,
         finalImg ?? '',
         finalAff ?? '',
         finalCat ?? null,
         finalActive,
+        finalStore,
+        finalBadge,
+        finalBrand,
+        finalEmi,
+        finalVerdict,
         id
       )
       .run();
@@ -1026,7 +1270,7 @@ export async function getReviews(db: D1Database | undefined, productId: number):
       product_id: productId,
       user_name: 'Aayush Shrestha (Kathmandu)',
       rating: 5,
-      comment: 'Super fast delivery in Kathmandu within 24 hours. Genuine sealed pack with official warranty card included!',
+      comment: 'Super fast delivery in Kathmandu within 24 hours. Genuine sealed pack with official Nepal warranty card included!',
       status: 'approved',
       created_at: new Date(Date.now() - 86400000 * 2).toISOString()
     },
@@ -1035,7 +1279,7 @@ export async function getReviews(db: D1Database | undefined, productId: number):
       product_id: productId,
       user_name: 'Pooja Karki (Pokhara)',
       rating: 5,
-      comment: 'Price was even lower than the local store in Mahendrapool. Exactly as described, highly recommend BuyerNepal curation!',
+      comment: 'Price was lower than the local store in Mahendrapool. Exactly as described, highly recommend BuyerNepal curation!',
       status: 'approved',
       created_at: new Date(Date.now() - 86400000 * 5).toISOString()
     }
@@ -1047,9 +1291,10 @@ export async function getReviews(db: D1Database | undefined, productId: number):
       .prepare("SELECT id, product_id, user_name, rating, comment, status, created_at FROM reviews WHERE product_id = ? AND status = 'approved' ORDER BY created_at DESC LIMIT 50")
       .bind(productId)
       .all<Review>();
-    return r.results || [];
+    const list = r.results || [];
+    return list.length > 0 ? list : sampleReviews;
   } catch {
-    return [];
+    return sampleReviews;
   }
 }
 
@@ -1098,6 +1343,433 @@ export async function deleteReview(db: D1Database | undefined, id: number): Prom
   if (!db) return false;
   try {
     await db.prepare('DELETE FROM reviews WHERE id = ?').bind(id).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Product Editorial Scores (Display, Performance, Camera, Battery, Value)
+export async function getProductScores(db: D1Database | undefined, productId: number): Promise<ProductScore | null> {
+  const fallback = DEFAULT_SCORES[productId] || (productId <= 5 ? {
+    product_id: productId,
+    display_score: 8.8,
+    performance_score: 8.9,
+    camera_score: 8.5,
+    battery_score: 8.7,
+    value_score: 9.0,
+    overall_score: 8.8,
+    verdict: 'Excellent daily performance with verified official Nepal warranty coverage.'
+  } : null);
+
+  if (!db) return fallback;
+  try {
+    const s = await db
+      .prepare('SELECT * FROM product_scores WHERE product_id = ? LIMIT 1')
+      .bind(productId)
+      .first<ProductScore>();
+    return s || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export async function saveProductScores(
+  db: D1Database | undefined,
+  data: {
+    productId: number;
+    displayScore: number;
+    performanceScore: number;
+    cameraScore: number;
+    batteryScore: number;
+    valueScore: number;
+    overallScore: number;
+    verdict?: string;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  if (!db) return { success: true };
+  try {
+    await db
+      .prepare(
+        `INSERT INTO product_scores(product_id, display_score, performance_score, camera_score, battery_score, value_score, overall_score, verdict, updated_at)
+         VALUES(?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+         ON CONFLICT(product_id) DO UPDATE SET
+           display_score = excluded.display_score,
+           performance_score = excluded.performance_score,
+           camera_score = excluded.camera_score,
+           battery_score = excluded.battery_score,
+           value_score = excluded.value_score,
+           overall_score = excluded.overall_score,
+           verdict = excluded.verdict,
+           updated_at = CURRENT_TIMESTAMP`
+      )
+      .bind(
+        data.productId,
+        data.displayScore,
+        data.performanceScore,
+        data.cameraScore,
+        data.batteryScore,
+        data.valueScore,
+        data.overallScore,
+        data.verdict || ''
+      )
+      .run();
+    return { success: true };
+  } catch (e: any) {
+    return { success: false, error: e?.message || 'Failed to save product scores' };
+  }
+}
+
+// Product Variants Matrix (RAM / Storage / Color)
+export async function getProductVariants(db: D1Database | undefined, productId: number): Promise<ProductVariant[]> {
+  const fallback = DEFAULT_VARIANTS[productId] || [];
+  if (!db) return fallback;
+  try {
+    const r = await db
+      .prepare('SELECT * FROM product_variants WHERE product_id = ? ORDER BY price ASC')
+      .bind(productId)
+      .all<ProductVariant>();
+    const list = r.results || [];
+    return list.length > 0 ? list : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export async function saveProductVariant(
+  db: D1Database | undefined,
+  data: {
+    id?: number;
+    productId: number;
+    variantName: string;
+    price: number;
+    originalPrice?: number;
+    sku?: string;
+    isInStock?: number;
+  }
+): Promise<{ success: boolean; id?: number; error?: string }> {
+  if (!db) return { success: true };
+  try {
+    if (data.id) {
+      await db
+        .prepare(
+          `UPDATE product_variants
+           SET variant_name = ?, price = ?, original_price = ?, sku = ?, is_in_stock = ?
+           WHERE id = ?`
+        )
+        .bind(data.variantName.trim(), data.price, data.originalPrice || 0, data.sku || '', data.isInStock ?? 1, data.id)
+        .run();
+      return { success: true, id: data.id };
+    } else {
+      const r = await db
+        .prepare(
+          `INSERT INTO product_variants(product_id, variant_name, price, original_price, sku, is_in_stock)
+           VALUES(?, ?, ?, ?, ?, ?)`
+        )
+        .bind(data.productId, data.variantName.trim(), data.price, data.originalPrice || 0, data.sku || '', data.isInStock ?? 1)
+        .run();
+      return { success: true, id: Number(r.meta.last_row_id) };
+    }
+  } catch (e: any) {
+    return { success: false, error: e?.message || 'Failed to save product variant' };
+  }
+}
+
+export async function deleteProductVariant(db: D1Database | undefined, id: number): Promise<boolean> {
+  if (!db) return false;
+  try {
+    await db.prepare('DELETE FROM product_variants WHERE id = ?').bind(id).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Multi-Store Price Comparison Matrix ("Where to Buy in Nepal")
+export async function getStoreOffers(db: D1Database | undefined, productId: number): Promise<StoreOffer[]> {
+  const fallback = DEFAULT_STORE_OFFERS[productId] || [
+    {
+      id: 9991,
+      product_id: productId,
+      store_name: 'Daraz Mall Verified',
+      price: 0,
+      store_url: 'https://www.daraz.com.np',
+      badge: 'Official Brand Partner',
+      in_stock: 1,
+      delivery_time: '24-48h Kathmandu Express',
+      warranty_info: 'Official Nepal Warranty'
+    }
+  ];
+  if (!db) return fallback;
+  try {
+    const r = await db
+      .prepare('SELECT * FROM store_offers WHERE product_id = ? ORDER BY price ASC')
+      .bind(productId)
+      .all<StoreOffer>();
+    const list = r.results || [];
+    return list.length > 0 ? list : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export async function saveStoreOffer(
+  db: D1Database | undefined,
+  data: {
+    id?: number;
+    productId: number;
+    storeName: string;
+    price: number;
+    storeUrl: string;
+    badge?: string;
+    inStock?: number;
+    deliveryTime?: string;
+    warrantyInfo?: string;
+  }
+): Promise<{ success: boolean; id?: number; error?: string }> {
+  if (!db) return { success: true };
+  try {
+    if (data.id) {
+      await db
+        .prepare(
+          `UPDATE store_offers
+           SET store_name = ?, price = ?, store_url = ?, badge = ?, in_stock = ?, delivery_time = ?, warranty_info = ?
+           WHERE id = ?`
+        )
+        .bind(
+          data.storeName.trim(),
+          data.price,
+          data.storeUrl.trim(),
+          data.badge || '',
+          data.inStock ?? 1,
+          data.deliveryTime || '',
+          data.warrantyInfo || '',
+          data.id
+        )
+        .run();
+      return { success: true, id: data.id };
+    } else {
+      const r = await db
+        .prepare(
+          `INSERT INTO store_offers(product_id, store_name, price, store_url, badge, in_stock, delivery_time, warranty_info)
+           VALUES(?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .bind(
+          data.productId,
+          data.storeName.trim(),
+          data.price,
+          data.storeUrl.trim(),
+          data.badge || '',
+          data.inStock ?? 1,
+          data.deliveryTime || '',
+          data.warrantyInfo || ''
+        )
+        .run();
+      return { success: true, id: Number(r.meta.last_row_id) };
+    }
+  } catch (e: any) {
+    return { success: false, error: e?.message || 'Failed to save store offer' };
+  }
+}
+
+export async function deleteStoreOffer(db: D1Database | undefined, id: number): Promise<boolean> {
+  if (!db) return false;
+  try {
+    await db.prepare('DELETE FROM store_offers WHERE id = ?').bind(id).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Tech Guides & Articles Magazine CRUD
+export async function getArticles(
+  db?: D1Database,
+  options?: { category?: string; limit?: number; featuredOnly?: boolean }
+): Promise<Article[]> {
+  const limit = options?.limit || 20;
+  if (!db) {
+    let list = DEFAULT_ARTICLES.filter((a) => a.is_published === 1);
+    if (options?.category && options.category !== 'All') {
+      list = list.filter((a) => a.category.toLowerCase() === options.category!.toLowerCase());
+    }
+    if (options?.featuredOnly) {
+      list = list.filter((a) => a.is_featured === 1);
+    }
+    return list.slice(0, limit);
+  }
+  try {
+    let sql = 'SELECT * FROM articles WHERE is_published = 1';
+    const params: any[] = [];
+    if (options?.category && options.category !== 'All') {
+      sql += ' AND category = ? COLLATE NOCASE';
+      params.push(options.category);
+    }
+    if (options?.featuredOnly) {
+      sql += ' AND is_featured = 1';
+    }
+    sql += ' ORDER BY is_featured DESC, published_at DESC LIMIT ?';
+    params.push(limit);
+
+    const r = await db.prepare(sql).bind(...params).all<Article>();
+    const list = r.results || [];
+    return list.length > 0 ? list : DEFAULT_ARTICLES;
+  } catch {
+    return DEFAULT_ARTICLES;
+  }
+}
+
+export async function getAllArticlesAdmin(db?: D1Database): Promise<Article[]> {
+  if (!db) return DEFAULT_ARTICLES;
+  try {
+    const r = await db.prepare('SELECT * FROM articles ORDER BY created_at DESC LIMIT 100').all<Article>();
+    const list = r.results || [];
+    return list.length > 0 ? list : DEFAULT_ARTICLES;
+  } catch {
+    return DEFAULT_ARTICLES;
+  }
+}
+
+export async function getArticleBySlug(db: D1Database | undefined, slug: string): Promise<Article | null> {
+  if (!db) {
+    return DEFAULT_ARTICLES.find((a) => a.slug.toLowerCase() === slug.toLowerCase()) || null;
+  }
+  try {
+    const a = await db
+      .prepare('SELECT * FROM articles WHERE slug = ? COLLATE NOCASE LIMIT 1')
+      .bind(slug)
+      .first<Article>();
+    if (a) {
+      db.prepare('UPDATE articles SET views_count = views_count + 1 WHERE id = ?').bind(a.id).run().catch(() => {});
+      return a;
+    }
+    return DEFAULT_ARTICLES.find((da) => da.slug.toLowerCase() === slug.toLowerCase()) || null;
+  } catch {
+    return DEFAULT_ARTICLES.find((da) => da.slug.toLowerCase() === slug.toLowerCase()) || null;
+  }
+}
+
+export async function getArticleById(db: D1Database | undefined, id: number): Promise<Article | null> {
+  if (!db) {
+    return DEFAULT_ARTICLES.find((a) => a.id === id) || null;
+  }
+  try {
+    const a = await db.prepare('SELECT * FROM articles WHERE id = ? LIMIT 1').bind(id).first<Article>();
+    return a || DEFAULT_ARTICLES.find((da) => da.id === id) || null;
+  } catch {
+    return DEFAULT_ARTICLES.find((da) => da.id === id) || null;
+  }
+}
+
+export async function createArticle(
+  db: D1Database | undefined,
+  data: {
+    title: string;
+    slug?: string;
+    excerpt: string;
+    content: string;
+    coverImage?: string;
+    authorName?: string;
+    category: string;
+    tags?: string;
+    readTimeMinutes?: number;
+    isFeatured?: number;
+    isPublished?: number;
+    featuredProductIds?: string;
+  }
+): Promise<{ success: boolean; id?: number; error?: string }> {
+  if (!db) return { success: false, error: 'Database not connected' };
+  try {
+    const slug = (data.slug?.trim() || data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')).slice(0, 100);
+    const r = await db
+      .prepare(
+        `INSERT INTO articles(title, slug, excerpt, content, cover_image, author_name, category, tags, read_time_minutes, is_featured, is_published, featured_product_ids, published_at)
+         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+      )
+      .bind(
+        data.title.trim(),
+        slug,
+        data.excerpt.trim(),
+        data.content,
+        data.coverImage || 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=1200&auto=format&fit=crop&q=80',
+        data.authorName || 'BuyerNepal Editorial Team',
+        data.category || 'Buying Guides',
+        data.tags || '',
+        data.readTimeMinutes || 5,
+        data.isFeatured ?? 0,
+        data.isPublished ?? 1,
+        data.featuredProductIds || ''
+      )
+      .run();
+    return { success: true, id: Number(r.meta.last_row_id) };
+  } catch (e: any) {
+    return { success: false, error: e?.message || 'Failed to create article' };
+  }
+}
+
+export async function updateArticle(
+  db: D1Database | undefined,
+  id: number,
+  data: {
+    title: string;
+    slug?: string;
+    excerpt: string;
+    content: string;
+    coverImage?: string;
+    authorName?: string;
+    category: string;
+    tags?: string;
+    readTimeMinutes?: number;
+    isFeatured?: number;
+    isPublished?: number;
+    featuredProductIds?: string;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  if (!db) return { success: true };
+  try {
+    const slug = (data.slug?.trim() || data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')).slice(0, 100);
+    await db
+      .prepare(
+        `UPDATE articles
+         SET title = ?, slug = ?, excerpt = ?, content = ?, cover_image = ?, author_name = ?, category = ?, tags = ?, read_time_minutes = ?, is_featured = ?, is_published = ?, featured_product_ids = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`
+      )
+      .bind(
+        data.title.trim(),
+        slug,
+        data.excerpt.trim(),
+        data.content,
+        data.coverImage || '',
+        data.authorName || 'BuyerNepal Editorial Team',
+        data.category || 'Buying Guides',
+        data.tags || '',
+        data.readTimeMinutes || 5,
+        data.isFeatured ?? 0,
+        data.isPublished ?? 1,
+        data.featuredProductIds || '',
+        id
+      )
+      .run();
+    return { success: true };
+  } catch (e: any) {
+    return { success: false, error: e?.message || 'Failed to update article' };
+  }
+}
+
+export async function deleteArticle(db: D1Database | undefined, id: number): Promise<boolean> {
+  if (!db) return false;
+  try {
+    await db.prepare('DELETE FROM articles WHERE id = ?').bind(id).run();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function toggleArticlePublish(db: D1Database | undefined, id: number, isPublished: number): Promise<boolean> {
+  if (!db) return false;
+  try {
+    await db.prepare('UPDATE articles SET is_published = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').bind(isPublished, id).run();
     return true;
   } catch {
     return false;
@@ -1262,42 +1934,39 @@ export async function updateCoupon(
 // Analytics & Stats
 export async function getAdminStats(db?: D1Database) {
   const fallback = {
-    products: 0,
-    categories: 0,
+    products: DEFAULT_PRODUCTS.length,
+    categories: DEFAULT_CATEGORIES.length,
     pendingReviews: 0,
-    activeCoupons: 0,
+    activeCoupons: DEFAULT_COUPONS.length,
+    articles: DEFAULT_ARTICLES.length,
     users: 1
   };
   if (!db) {
-    return {
-      products: DEFAULT_PRODUCTS.length,
-      categories: DEFAULT_CATEGORIES.length,
-      pendingReviews: 0,
-      activeCoupons: DEFAULT_COUPONS.length,
-      users: 1
-    };
+    return fallback;
   }
   try {
-    const [p, u, r, c, co] = await Promise.all([
+    const [p, u, r, c, co, art] = await Promise.all([
       db.prepare('SELECT COUNT(*) count FROM products').first<any>(),
       db.prepare('SELECT COUNT(*) count FROM users').first<any>(),
       db.prepare("SELECT COUNT(*) count FROM reviews WHERE status = 'pending'").first<any>(),
       db.prepare('SELECT COUNT(*) count FROM categories').first<any>(),
-      db.prepare('SELECT COUNT(*) count FROM coupons WHERE is_active = 1').first<any>()
+      db.prepare('SELECT COUNT(*) count FROM coupons WHERE is_active = 1').first<any>(),
+      db.prepare('SELECT COUNT(*) count FROM articles').first<any>()
     ]);
     return {
       products: Number(p?.count ?? 0),
       users: Number(u?.count ?? 0),
       pendingReviews: Number(r?.count ?? 0),
       categories: Number(c?.count ?? 0),
-      activeCoupons: Number(co?.count ?? 0)
+      activeCoupons: Number(co?.count ?? 0),
+      articles: Number(art?.count ?? 0)
     };
   } catch {
     return fallback;
   }
 }
 
-// One-Click Database Seeder for Production Demo Catalog (Manual Trigger Only)
+// One-Click Database Seeder for Production Catalog
 export async function seedCatalog(db: D1Database | undefined): Promise<{ success: boolean; message: string }> {
   if (!db) return { success: false, message: 'Database not connected' };
   try {
@@ -1313,10 +1982,10 @@ export async function seedCatalog(db: D1Database | undefined): Promise<{ success
     for (const p of DEFAULT_PRODUCTS) {
       await db
         .prepare(
-          `INSERT OR IGNORE INTO products(id, name, description, price, image_url, affiliate_url, category_id, is_active)
-           VALUES(?, ?, ?, ?, ?, ?, ?, 1)`
+          `INSERT OR IGNORE INTO products(id, name, description, price, image_url, affiliate_url, category_id, is_active, store_name, original_price, badge, brand, emi_available, verdict)
+           VALUES(?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)`
         )
-        .bind(p.id, p.name, p.description, p.price, p.image_url, p.affiliate_url, p.category_id)
+        .bind(p.id, p.name, p.description, p.price, p.image_url, p.affiliate_url, p.category_id, p.store_name || 'Daraz Mall', p.original_price || p.price, p.badge || '', p.brand || '', p.emi_available || 0, p.verdict || '')
         .run();
     }
 
@@ -1335,7 +2004,72 @@ export async function seedCatalog(db: D1Database | undefined): Promise<{ success
       .bind(now, now)
       .run();
 
-    return { success: true, message: `Successfully seeded ${DEFAULT_PRODUCTS.length} curated products, ${DEFAULT_CATEGORIES.length} categories, and coupons into D1.` };
+    // 5. Seed Editorial Tech Articles
+    for (const a of DEFAULT_ARTICLES) {
+      await db
+        .prepare(
+          `INSERT OR IGNORE INTO articles(id, title, slug, excerpt, content, cover_image, author_name, category, tags, read_time_minutes, is_featured, is_published, views_count, published_at)
+           VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`
+        )
+        .bind(
+          a.id,
+          a.title,
+          a.slug,
+          a.excerpt,
+          a.content,
+          a.cover_image,
+          a.author_name,
+          a.category,
+          a.tags || '',
+          a.read_time_minutes || 5,
+          a.is_featured ?? 0,
+          a.views_count || 100,
+          a.published_at || new Date().toISOString()
+        )
+        .run();
+    }
+
+    // 6. Seed Product Scores
+    for (const [pid, sc] of Object.entries(DEFAULT_SCORES)) {
+      await db
+        .prepare(
+          `INSERT OR IGNORE INTO product_scores(product_id, display_score, performance_score, camera_score, battery_score, value_score, overall_score, verdict)
+           VALUES(?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .bind(Number(pid), sc.display_score, sc.performance_score, sc.camera_score, sc.battery_score, sc.value_score, sc.overall_score, sc.verdict || '')
+        .run();
+    }
+
+    // 7. Seed Product Variants
+    for (const vars of Object.values(DEFAULT_VARIANTS)) {
+      for (const v of vars) {
+        await db
+          .prepare(
+            `INSERT OR IGNORE INTO product_variants(id, product_id, variant_name, price, original_price, is_in_stock)
+             VALUES(?, ?, ?, ?, ?, ?)`
+          )
+          .bind(v.id, v.product_id, v.variant_name, v.price, v.original_price || 0, v.is_in_stock ?? 1)
+          .run();
+      }
+    }
+
+    // 8. Seed Store Offers ("Where to Buy in Nepal")
+    for (const offers of Object.values(DEFAULT_STORE_OFFERS)) {
+      for (const o of offers) {
+        await db
+          .prepare(
+            `INSERT OR IGNORE INTO store_offers(id, product_id, store_name, price, store_url, badge, in_stock, delivery_time, warranty_info)
+             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          )
+          .bind(o.id, o.product_id, o.store_name, o.price, o.store_url, o.badge || '', o.in_stock ?? 1, o.delivery_time || '', o.warranty_info || '')
+          .run();
+      }
+    }
+
+    return {
+      success: true,
+      message: `Successfully seeded ${DEFAULT_PRODUCTS.length} curated products, ${DEFAULT_CATEGORIES.length} categories, ${DEFAULT_ARTICLES.length} tech editorial articles, variants, scores, and store comparison offers into D1.`
+    };
   } catch (err: any) {
     return { success: false, message: err?.message || 'Error seeding catalog' };
   }
@@ -1349,11 +2083,15 @@ export async function clearCatalog(db: D1Database | undefined): Promise<{ succes
       db.prepare('DELETE FROM reviews'),
       db.prepare('DELETE FROM products'),
       db.prepare('DELETE FROM categories'),
-      db.prepare('DELETE FROM coupons')
+      db.prepare('DELETE FROM coupons'),
+      db.prepare('DELETE FROM articles'),
+      db.prepare('DELETE FROM product_scores'),
+      db.prepare('DELETE FROM product_variants'),
+      db.prepare('DELETE FROM store_offers')
     ]);
     return {
       success: true,
-      message: 'Catalog cleared successfully! All products, categories, coupons, and reviews wiped from D1.'
+      message: 'Catalog cleared successfully! All products, articles, categories, coupons, scores, variants, and reviews wiped from D1.'
     };
   } catch (err: any) {
     return { success: false, message: err?.message || 'Error clearing catalog' };

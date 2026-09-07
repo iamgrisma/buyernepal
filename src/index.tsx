@@ -342,6 +342,8 @@ app.post('/admin/products/new', async (c) => {
     const originalPrice = Number(body['original_price'] || 0);
     const badge = String(body['badge'] || '🔥 Hot Deal').trim();
     const brand = String(body['brand'] || '').trim();
+    const emiAvailable = body['emi_available'] ? 1 : 0;
+    const verdict = String(body['verdict'] || '').trim();
 
     if (!name || isNaN(price) || price < 0) {
       return c.redirect('/admin?tab=products&err=Invalid+product+name+or+price');
@@ -359,7 +361,9 @@ app.post('/admin/products/new', async (c) => {
       storeName,
       originalPrice,
       badge,
-      brand
+      brand,
+      emiAvailable,
+      verdict
     );
 
     if (!res.success) {
@@ -417,6 +421,8 @@ app.post('/admin/products/:id/edit', async (c) => {
     const storeName = String(body['store_name'] || 'Daraz Mall').trim();
     const badge = String(body['badge'] || '').trim();
     const brand = String(body['brand'] || '').trim();
+    const emiAvailable = body['emi_available'] ? 1 : 0;
+    const verdict = String(body['verdict'] || '').trim();
     const isActive = body['is_active'] !== undefined ? (Number(body['is_active']) === 1 ? 1 : 0) : 1;
 
     if (!name || isNaN(price) || price < 0) {
@@ -434,6 +440,8 @@ app.post('/admin/products/:id/edit', async (c) => {
       storeName,
       badge,
       brand,
+      emiAvailable,
+      verdict,
       isActive
     });
 

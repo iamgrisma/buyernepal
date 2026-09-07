@@ -489,6 +489,18 @@ export const AdminDashboardView: FC<{
                     <input name="image_url" type="url" placeholder="https://images.unsplash.com/..." />
                   </div>
 
+                  <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--card-subtle, #f8fafc)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--line, #e2e8f0)' }}>
+                    <input type="checkbox" id="addProdEmi" name="emi_available" value="1" style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                    <label htmlFor="addProdEmi" style={{ margin: 0, cursor: 'pointer', fontWeight: 700, fontSize: '13px', color: 'var(--ink)' }}>
+                      💳 0% Bank EMI Available in Nepal (Nabil, NIC Asia, Global IME, etc.)
+                    </label>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Editorial Verdict &amp; Nepal Buying Advice</label>
+                    <textarea name="verdict" rows={2} placeholder="Our bottom-line recommendation for Nepali shoppers…"></textarea>
+                  </div>
+
                   <div className="form-group">
                     <label>Description &amp; Specs Highlights</label>
                     <textarea name="description" rows={3} placeholder="Highlights, specs and warranty details…"></textarea>
@@ -512,6 +524,7 @@ export const AdminDashboardView: FC<{
                         <th>Item</th>
                         <th>Store</th>
                         <th>Price</th>
+                        <th>0% EMI</th>
                         <th>Status</th>
                         <th style={{ textAlign: 'right' }}>Actions</th>
                       </tr>
@@ -538,6 +551,17 @@ export const AdminDashboardView: FC<{
                             </span>
                           </td>
                           <td style={{ fontWeight: 800 }}>Rs. {Number(p.price).toLocaleString('en-NP')}</td>
+                          <td>
+                            {p.emi_available === 1 ? (
+                              <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', background: '#d1fae5', padding: '3px 8px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                💳 Yes
+                              </span>
+                            ) : (
+                              <span style={{ fontSize: '11px', color: '#94a3b8', background: '#f1f5f9', padding: '3px 8px', borderRadius: '12px' }}>
+                                No
+                              </span>
+                            )}
+                          </td>
                           <td>
                             <form method="post" action={`/admin/products/${p.id}/toggle`} style={{ display: 'inline' }}>
                               <input type="hidden" name="is_active" value={p.is_active ? '0' : '1'} />
@@ -567,6 +591,8 @@ export const AdminDashboardView: FC<{
                                 data-store={p.store_name || 'Daraz Mall'}
                                 data-badge={p.badge || ''}
                                 data-brand={p.brand || ''}
+                                data-emi={p.emi_available === 1 ? '1' : '0'}
+                                data-verdict={p.verdict || ''}
                                 data-affiliate={p.affiliate_url || ''}
                                 data-image={p.image_url || ''}
                                 data-desc={p.description || ''}
@@ -1223,6 +1249,18 @@ export const AdminDashboardView: FC<{
                 <input id="editProdImage" name="image_url" type="url" />
               </div>
 
+              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--card-subtle, #f8fafc)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--line, #e2e8f0)' }}>
+                <input type="checkbox" id="editProdEmiAvailable" name="emi_available" value="1" style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                <label htmlFor="editProdEmiAvailable" style={{ margin: 0, cursor: 'pointer', fontWeight: 700, fontSize: '13px', color: 'var(--ink)' }}>
+                  💳 0% Bank EMI Available in Nepal (Nabil, NIC Asia, Global IME, etc.)
+                </label>
+              </div>
+
+              <div className="form-group">
+                <label>Editorial Verdict &amp; Nepal Buying Advice</label>
+                <textarea id="editProdVerdict" name="verdict" rows={2} placeholder="Our bottom-line recommendation for Nepali shoppers…"></textarea>
+              </div>
+
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Description &amp; Specs Highlights</label>
                 <textarea id="editProdDesc" name="description" rows={3}></textarea>
@@ -1373,6 +1411,9 @@ export const AdminDashboardView: FC<{
                   setVal('editProdImage', 'data-image');
                   setVal('editProdDesc', 'data-desc');
                   setVal('editProdActive', 'data-active');
+                  setVal('editProdVerdict', 'data-verdict');
+                  const emiEl = document.getElementById('editProdEmiAvailable');
+                  if (emiEl) emiEl.checked = btn.getAttribute('data-emi') === '1';
                   if (editProdModal) editProdModal.classList.add('open');
                 });
               });

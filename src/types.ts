@@ -60,6 +60,66 @@ export interface Product {
   pros?: string[];
   cons?: string[];
   delivery_info?: string;
+  verdict?: string;
+  variants?: ProductVariant[];
+  scores?: ProductScore;
+  store_offers?: StoreOffer[];
+}
+
+export interface Article {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  cover_image: string;
+  author_name: string;
+  category: string;
+  tags?: string;
+  read_time_minutes?: number;
+  is_featured?: number;
+  is_published?: number;
+  views_count?: number;
+  featured_product_ids?: string;
+  published_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ProductVariant {
+  id: number;
+  product_id: number;
+  variant_name: string;
+  price: number;
+  original_price?: number;
+  sku?: string;
+  is_in_stock?: number;
+  created_at?: string;
+}
+
+export interface ProductScore {
+  product_id: number;
+  display_score: number;
+  performance_score: number;
+  camera_score: number;
+  battery_score: number;
+  value_score: number;
+  overall_score: number;
+  verdict?: string;
+  updated_at?: string;
+}
+
+export interface StoreOffer {
+  id: number;
+  product_id: number;
+  store_name: string;
+  price: number;
+  store_url: string;
+  badge?: string;
+  in_stock?: number;
+  delivery_time?: string;
+  warranty_info?: string;
+  created_at?: string;
 }
 
 export interface Review {

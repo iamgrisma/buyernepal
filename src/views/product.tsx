@@ -26,7 +26,7 @@ export const ProductPage: FC<{
   const badge = product.badge || 'Verified Deal';
   const rating = product.rating || 4.8;
   const brand = product.brand || 'Official';
-  const emiAvailable = product.emi_available === 1 || price >= 12000;
+  const emiAvailable = Number(product.emi_available) === 1;
   const baseMonthlyEmi = Math.round(price / 18);
 
   const priceHistory = product.price_history || [
@@ -85,6 +85,14 @@ export const ProductPage: FC<{
               </>
             )}
             <span style={{ color: 'var(--ink)', fontWeight: 700 }}>{product.name}</span>
+          </div>
+
+          {/* Affiliate Disclosure Banner */}
+          <div className="affiliate-disclosure-banner">
+            <span className="affiliate-disclosure-icon">ℹ️</span>
+            <div>
+              <strong>BuyerNepal Independent Guide:</strong> When you purchase through verified store links on our site (such as {storeName}, Hamrobazar, or official showrooms), we may earn an affiliate commission at no additional cost to you. We only recommend products tested for authentic Nepal pricing, MDMS/VAT compliance, and warranty support.
+            </div>
           </div>
 
           <div className="product-detail-grid">
@@ -208,6 +216,33 @@ export const ProductPage: FC<{
                 </span>
               </div>
 
+              {/* Storage / RAM Variant Selector Matrix */}
+              {product.variants && product.variants.length > 0 && (
+                <div className="product-variants-box">
+                  <div className="variant-label-row">
+                    <span className="variant-heading">Select Model / Storage Variant:</span>
+                    <span className="variant-mdms-tag">🛡️ NTA MDMS Registered</span>
+                  </div>
+                  <div className="variant-pills-row">
+                    {product.variants.map((v, i) => (
+                      <button
+                        key={v.id}
+                        type="button"
+                        className={`variant-pill-btn ${i === 0 ? 'active' : ''}`}
+                        data-variant-price={v.price}
+                        data-variant-orig={v.original_price || Math.round(v.price * 1.15)}
+                        data-variant-name={v.variant_name}
+                        disabled={v.is_in_stock === 0}
+                      >
+                        <span className="variant-title">{v.variant_name}</span>
+                        <span className="variant-cost">Rs. {v.price.toLocaleString()}</span>
+                        {v.is_in_stock === 0 && <span className="variant-oos">Out of Stock</span>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="detail-price-box">
                 <div>
                   <span style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase' }}>
@@ -228,19 +263,136 @@ export const ProductPage: FC<{
                 {product.description}
               </p>
 
+              {/* Primary Affiliate Outbound Deal Box */}
               {product.affiliate_url ? (
-                <a
-                  href={product.affiliate_url}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="detail-buy-btn"
-                >
-                  <span>Buy on {storeName}</span> <span>↗</span>
-                </a>
+                <div className="affiliate-deal-box">
+                  <a
+                    href={product.affiliate_url}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="detail-buy-btn"
+                  >
+                    <span>View Deal on {storeName}</span> <span>↗</span>
+                  </a>
+                  <div className="affiliate-redirect-notice">
+                    <span>🔒</span>
+                    <span>Direct partner link to {storeName}. 100% Tax-Paid Official Nepal Stock.</span>
+                  </div>
+                </div>
               ) : (
-                <button type="button" className="detail-buy-btn" disabled style={{ background: '#94a3b8', cursor: 'not-allowed' }}>
-                  Currently Out of Stock
-                </button>
+                <div className="affiliate-deal-box">
+                  <button type="button" className="detail-buy-btn" disabled style={{ background: '#94a3b8', cursor: 'not-allowed' }}>
+                    Currently Out of Stock
+                  </button>
+                  <div className="affiliate-redirect-notice">
+                    <span>⏳</span>
+                    <span>Check back soon — we track restocks across Kathmandu authorized dealers daily.</span>
+                  </div>
+                </div>
+              )}
+
+              {/* In-Depth Review Scorecard Breakdown */}
+              {product.scores ? (
+                <div className="editorial-scorecard-card">
+                  <div className="scorecard-header">
+                    <div className="scorecard-title-group">
+                      <span className="scorecard-badge">🔬 BUYERNEPAL LABS EVALUATION</span>
+                      <h3 className="scorecard-title">Performance & Hardware Evaluation</h3>
+                    </div>
+                    <div className="scorecard-overall-badge">
+                      <div className="overall-val">{product.scores.overall_score.toFixed(1)}</div>
+                      <div className="overall-scale">/ 10</div>
+                    </div>
+                  </div>
+
+                  {/* 5-Category Progress Bars */}
+                  <div className="scorecard-bars-grid">
+                    <div className="score-bar-item">
+                      <div className="score-bar-label">
+                        <span>🖥️ Display Quality</span>
+                        <strong>{product.scores.display_score.toFixed(1)} / 10</strong>
+                      </div>
+                      <div className="score-progress-track">
+                        <div className="score-progress-fill" style={{ width: `${(product.scores.display_score / 10) * 100}%` }}></div>
+                      </div>
+                    </div>
+
+                    <div className="score-bar-item">
+                      <div className="score-bar-label">
+                        <span>⚡ Processor & Gaming</span>
+                        <strong>{product.scores.performance_score.toFixed(1)} / 10</strong>
+                      </div>
+                      <div className="score-progress-track">
+                        <div className="score-progress-fill" style={{ width: `${(product.scores.performance_score / 10) * 100}%` }}></div>
+                      </div>
+                    </div>
+
+                    <div className="score-bar-item">
+                      <div className="score-bar-label">
+                        <span>📸 Camera & Video</span>
+                        <strong>{product.scores.camera_score.toFixed(1)} / 10</strong>
+                      </div>
+                      <div className="score-progress-track">
+                        <div className="score-progress-fill" style={{ width: `${(product.scores.camera_score / 10) * 100}%` }}></div>
+                      </div>
+                    </div>
+
+                    <div className="score-bar-item">
+                      <div className="score-bar-label">
+                        <span>🔋 Battery & Charging</span>
+                        <strong>{product.scores.battery_score.toFixed(1)} / 10</strong>
+                      </div>
+                      <div className="score-progress-track">
+                        <div className="score-progress-fill" style={{ width: `${(product.scores.battery_score / 10) * 100}%` }}></div>
+                      </div>
+                    </div>
+
+                    <div className="score-bar-item">
+                      <div className="score-bar-label">
+                        <span>💰 Nepal Value for Money</span>
+                        <strong>{product.scores.value_score.toFixed(1)} / 10</strong>
+                      </div>
+                      <div className="score-progress-track">
+                        <div className="score-progress-fill" style={{ width: `${(product.scores.value_score / 10) * 100}%` }}></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="scorecard-verdict-box">
+                    <strong>Editor Verdict: </strong>
+                    <span>{product.scores.verdict || product.verdict || 'Standout performer with verified official Nepal warranty coverage.'}</span>
+                  </div>
+                </div>
+              ) : (
+                /* Fallback Editorial Verdict Card */
+                <div className="editorial-verdict-card">
+                  <div className="verdict-top-bar">
+                    <div className="verdict-label">
+                      <span>🏅</span> BuyerNepal Editorial Verdict
+                    </div>
+                    <div className="verdict-score-pill">
+                      ★ {rating.toFixed(1)} / 5.0 Rating
+                    </div>
+                  </div>
+                  <div className="verdict-body">
+                    {product.verdict ||
+                      `${product.name} delivers standout performance and verified value for shoppers in Nepal. Backed by official importer warranty and reliable after-sales service.`}
+                  </div>
+                  <div className="verdict-highlights">
+                    <span className="verdict-highlight-pill">✓ 100% Genuine Nepal Stock</span>
+                    <span className="verdict-highlight-pill">✓ Official Distributor Warranty</span>
+                    {emiAvailable ? (
+                      <span className="verdict-highlight-pill" style={{ borderColor: 'var(--emerald)', color: 'var(--emerald)', fontWeight: 800 }}>
+                        💳 0% Bank EMI Eligible
+                      </span>
+                    ) : (
+                      <span className="verdict-highlight-pill">
+                        💵 Standard Cash / Card / Fonepay
+                      </span>
+                    )}
+                    <span className="verdict-highlight-pill">🚚 Express Delivery in Nepal</span>
+                  </div>
+                </div>
               )}
 
               {/* Interactive Nepal Bank 0% EMI Calculator Widget */}
@@ -294,38 +446,78 @@ export const ProductPage: FC<{
                 </div>
               )}
 
-              {/* Multi-Store Price Comparison Matrix */}
+              {/* Multi-Store Price Comparison Matrix ("Where to Buy in Nepal") */}
               <div className="price-comparison-card" style={{ marginTop: '20px' }}>
                 <div className="price-comparison-header">
-                  <span>🏪</span> Compare Prices Across Nepal Stores
-                </div>
-                <div className="store-compare-row">
-                  <div>
-                    <span className="store-compare-name">{storeName}</span>
-                    <span className="store-compare-badge">Best Verified Deal</span>
-                    <span style={{ display: 'block', fontSize: '11px', color: 'var(--muted)' }}>100% Genuine • Official Warranty</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '18px' }}>🏪</span>
+                    <strong>Where to Buy in Nepal (Authorized Stores)</strong>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span className="store-compare-price" data-base-npr={price}>Rs. {formattedPrice}</span>
-                    <div style={{ marginTop: '4px' }}>
-                      <a href={product.affiliate_url || '#'} target="_blank" rel="noopener noreferrer nofollow" className="store-compare-btn">
-                        Go to Store ↗
-                      </a>
-                    </div>
-                  </div>
+                  <span className="price-match-guarantee">🛡️ VAT Bills &amp; MDMS Verified</span>
                 </div>
 
-                <div className="store-compare-row">
-                  <div>
-                    <span className="store-compare-name">New Road / Bishal Bazar Offline</span>
-                    <span style={{ display: 'block', fontSize: '11px', color: 'var(--muted)' }}>Retail Store Pickup</span>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span className="store-compare-price" data-base-npr={Math.round(price * 1.05)}>
-                      Rs. {Math.round(price * 1.05).toLocaleString()}
-                    </span>
-                    <span style={{ display: 'block', fontSize: '10px', color: 'var(--muted)' }}>Estimated Retail</span>
-                  </div>
+                <div className="stores-matrix-table">
+                  {(product.store_offers && product.store_offers.length > 0
+                    ? product.store_offers
+                    : [
+                        {
+                          id: 1,
+                          product_id: product.id,
+                          store_name: storeName,
+                          price: price,
+                          store_url: product.affiliate_url || '#',
+                          badge: 'Official Distributor',
+                          in_stock: 1,
+                          delivery_time: '24h Kathmandu Express',
+                          warranty_info: 'Official Nepal Warranty'
+                        },
+                        {
+                          id: 2,
+                          product_id: product.id,
+                          store_name: 'New Road Offline Outlets',
+                          price: Math.round(price * 1.04),
+                          store_url: product.affiliate_url || '#',
+                          badge: 'Authorized Retailer',
+                          in_stock: 1,
+                          delivery_time: 'Immediate Walk-in Pickup',
+                          warranty_info: 'Official Distributor Bill'
+                        }
+                      ]
+                  ).map((offer, idx) => (
+                    <div key={offer.id || idx} className="store-matrix-row">
+                      <div className="store-identity">
+                        <div className="store-title-row">
+                          <span className="store-icon">🏬</span>
+                          <strong>{offer.store_name}</strong>
+                          {offer.badge && <span className="store-pill-badge">{offer.badge}</span>}
+                        </div>
+                        <div className="store-subtext">
+                          <span>🚚 {offer.delivery_time || 'Express Delivery'}</span>
+                          <span>•</span>
+                          <span>🛡️ {offer.warranty_info || '1 Year Official Warranty'}</span>
+                        </div>
+                      </div>
+
+                      <div className="store-pricing-action">
+                        <div className="store-price-display">
+                          <span className="store-price-val" data-base-npr={offer.price}>
+                            Rs. {offer.price.toLocaleString()}
+                          </span>
+                          <span className="store-stock-indicator">
+                            {offer.in_stock ? '🟢 In Stock' : '🔴 Pre-Order'}
+                          </span>
+                        </div>
+                        <a
+                          href={offer.store_url}
+                          target="_blank"
+                          rel="noopener noreferrer nofollow"
+                          className="store-visit-btn"
+                        >
+                          Go to Store ↗
+                        </a>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -417,6 +609,69 @@ export const ProductPage: FC<{
               </div>
               <span className="section-count">{reviews.length} Verified Reviews</span>
             </div>
+
+            {/* Rating Breakdown & Customer Sentiment Summary */}
+            {(() => {
+              const total = reviews.length;
+              const c5 = reviews.filter((r) => r.rating === 5).length;
+              const c4 = reviews.filter((r) => r.rating === 4).length;
+              const c3 = reviews.filter((r) => r.rating === 3).length;
+              const c2 = reviews.filter((r) => r.rating === 2).length;
+              const c1 = reviews.filter((r) => r.rating === 1).length;
+              const p5 = total > 0 ? Math.round((c5 / total) * 100) : 80;
+              const p4 = total > 0 ? Math.round((c4 / total) * 100) : 15;
+              const p3 = total > 0 ? Math.round((c3 / total) * 100) : 5;
+              const p2 = total > 0 ? Math.round((c2 / total) * 100) : 0;
+              const p1 = total > 0 ? Math.round((c1 / total) * 100) : 0;
+              const avgScore = total > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / total).toFixed(1) : rating.toFixed(1);
+
+              return (
+                <div className="rating-summary-card">
+                  <div className="rating-big-score">
+                    <div className="rating-big-number">{avgScore}</div>
+                    <div className="rating-big-stars">★ ★ ★ ★ ★</div>
+                    <div className="rating-big-count">{total} Verified Nepal Reviews</div>
+                  </div>
+                  <div className="rating-breakdown-bars">
+                    <div className="rating-bar-row">
+                      <span>5 Star</span>
+                      <div className="rating-bar-track">
+                        <div className="rating-bar-fill" style={{ width: `${p5}%` }} />
+                      </div>
+                      <span>{p5}%</span>
+                    </div>
+                    <div className="rating-bar-row">
+                      <span>4 Star</span>
+                      <div className="rating-bar-track">
+                        <div className="rating-bar-fill" style={{ width: `${p4}%` }} />
+                      </div>
+                      <span>{p4}%</span>
+                    </div>
+                    <div className="rating-bar-row">
+                      <span>3 Star</span>
+                      <div className="rating-bar-track">
+                        <div className="rating-bar-fill" style={{ width: `${p3}%` }} />
+                      </div>
+                      <span>{p3}%</span>
+                    </div>
+                    <div className="rating-bar-row">
+                      <span>2 Star</span>
+                      <div className="rating-bar-track">
+                        <div className="rating-bar-fill" style={{ width: `${p2}%` }} />
+                      </div>
+                      <span>{p2}%</span>
+                    </div>
+                    <div className="rating-bar-row">
+                      <span>1 Star</span>
+                      <div className="rating-bar-track">
+                        <div className="rating-bar-fill" style={{ width: `${p1}%` }} />
+                      </div>
+                      <span>{p1}%</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Interactive Review Form */}
             <div className="review-form-card">
@@ -575,7 +830,32 @@ export const ProductPage: FC<{
         dangerouslySetInnerHTML={{
           __html: `
 (function() {
-  const basePrice = ${price};
+  let currentBasePrice = ${price};
+
+  // 0. Model / Storage Variant Selection
+  const variantBtns = document.querySelectorAll('.variant-pill-btn');
+  variantBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      variantBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const vPrice = parseInt(btn.getAttribute('data-variant-price') || '0', 10);
+      const vOrig = parseInt(btn.getAttribute('data-variant-orig') || '0', 10);
+      if (vPrice > 0) {
+        currentBasePrice = vPrice;
+        const mainPriceEl = document.querySelector('.detail-main-price');
+        if (mainPriceEl) {
+          mainPriceEl.setAttribute('data-base-npr', vPrice);
+          mainPriceEl.textContent = 'Rs. ' + vPrice.toLocaleString();
+        }
+        const origPriceEl = document.querySelector('.detail-original-price');
+        if (origPriceEl && vOrig > 0) {
+          origPriceEl.setAttribute('data-base-npr', vOrig);
+          origPriceEl.textContent = 'Rs. ' + vOrig.toLocaleString();
+        }
+        updateEmi();
+      }
+    });
+  });
 
   // 1. EMI Calculator Interactivity
   const bankBtns = document.querySelectorAll('.emi-bank-btn');
@@ -587,8 +867,8 @@ export const ProductPage: FC<{
   let selectedBank = 'Nabil Bank';
 
   function updateEmi() {
-    if (amountEl && basePrice > 0) {
-      const monthly = Math.round(basePrice / selectedTenure);
+    if (amountEl && currentBasePrice > 0) {
+      const monthly = Math.round(currentBasePrice / selectedTenure);
       amountEl.textContent = 'Rs. ' + monthly.toLocaleString() + ' / mo';
     }
     if (bankLabel) {
