@@ -75,20 +75,35 @@ export const storefrontCss = `
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
+  overflow-x: clip;
   overflow-x: hidden;
-  max-width: 100%;
+  max-width: 100vw;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 body {
+  overflow-x: clip;
   overflow-x: hidden;
-  max-width: 100%;
+  max-width: 100vw;
+  width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-main, 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   padding-bottom: 70px;
+}
+
+.store-page {
+  overflow-x: clip;
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+  position: relative;
 }
 
 @media (min-width: 768px) {
@@ -472,37 +487,43 @@ button { font-family: inherit; cursor: pointer; }
 
 /* Mobile Navigation Drawer */
 .mobile-drawer-backdrop {
-  display: none;
+  display: none !important;
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.65);
   z-index: 9998;
   backdrop-filter: blur(4px);
 }
-.mobile-drawer-backdrop.open { display: block; }
+.mobile-drawer-backdrop.open { 
+  display: block !important; 
+}
 .mobile-drawer {
+  display: none !important;
   position: fixed;
   top: 0;
   right: 0;
   width: min(320px, 85vw);
+  max-width: 320px;
   height: 100vh;
   height: 100dvh;
   background: var(--surface);
   color: var(--ink);
   z-index: 9999;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.25);
-  transform: translateX(100%);
-  visibility: hidden;
-  pointer-events: none;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s ease;
-  display: flex;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.35);
   flex-direction: column;
   overflow-y: auto;
 }
 .mobile-drawer.open {
-  transform: translateX(0);
-  visibility: visible;
-  pointer-events: auto;
+  display: flex !important;
+  animation: drawerSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes drawerSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 @media (min-width: 769px) {
   .mobile-drawer,
@@ -1032,6 +1053,12 @@ button { font-family: inherit; cursor: pointer; }
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 20px;
+}
+@media (max-width: 540px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 /* ========================================================
@@ -2589,39 +2616,32 @@ button { font-family: inherit; cursor: pointer; }
 .wishlist-drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(4px);
   z-index: 9998;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  display: none !important;
 }
 .wishlist-drawer-backdrop.open {
-  opacity: 1;
-  pointer-events: auto;
+  display: block !important;
 }
 .wishlist-drawer {
+  display: none !important;
   position: fixed;
   top: 0;
   right: 0;
-  width: min(400px, 100vw);
+  width: min(380px, 88vw);
+  max-width: 380px;
   height: 100vh;
   height: 100dvh;
-  background: var(--card-bg);
+  background: var(--surface);
   color: var(--ink);
   z-index: 9999;
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.3);
-  display: flex;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.35);
   flex-direction: column;
-  transform: translateX(100%);
-  visibility: hidden;
-  pointer-events: none;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
 }
 .wishlist-drawer.open {
-  transform: translateX(0);
-  visibility: visible;
-  pointer-events: auto;
+  display: flex !important;
+  animation: drawerSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .wishlist-drawer-header {
   padding: 20px;
@@ -2678,6 +2698,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* Product Comparison Floating Dock */
 .compare-dock {
+  display: none !important;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -2686,11 +2707,18 @@ button { font-family: inherit; cursor: pointer; }
   border-top: 2px solid var(--accent);
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
   z-index: 9990;
-  transform: translateY(105%);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .compare-dock.open {
-  transform: translateY(0);
+  display: block !important;
+  animation: dockSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes dockSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 .compare-dock-header {
   padding: 12px 20px;
@@ -5828,6 +5856,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 /* 10. Sticky Bottom Floating Buy Bar */
 .sticky-product-bar {
+  display: none !important;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -5836,12 +5865,11 @@ input:checked + .slider:before { transform: translateX(20px); }
   border-top: 1px solid var(--line);
   box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
   z-index: 85;
-  transform: translateY(110%);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 10px 0;
 }
 .sticky-product-bar.visible {
-  transform: translateY(0);
+  display: block !important;
+  animation: dockSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .sticky-product-inner {
   display: flex;
