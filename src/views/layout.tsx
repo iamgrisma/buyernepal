@@ -122,12 +122,56 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                     showToast(next === 'dark' ? 'OLED Dark Mode Enabled 🌙' : 'Light Mode Enabled ☀️');
                   });
                 }
-
-                // 3. Multi-Currency Switcher Engine (NPR, USD, INR)
+                
+                // 3. Multi-Currency Live Switcher Engine (NPR, USD, INR)
+                // Base currency: NPR (Nepali Rupee).
+                // INR is pegged: 1 INR = 1.6 NPR (100 INR = 160 NPR).
+                // USD is fetched live from GrismaInfo API (https://api.grisma.info.np/api/forex/latest) / NRB.
+                // Ceiling rounding specifications:
+                // - NPR: Base currency, round up to whole rupees (Math.ceil).
+                // - INR: Round up to whole rupees (Math.ceil(npr / 1.6)). E.g., Rs. 16,000 -> ₹10,000.
+                // - USD: Round up to 1 decimal place (Math.ceil(usd * 10) / 10). E.g., 100.01 -> 100.1, 100.11 -> 100.2.
                 const currencyBtns = document.querySelectorAll('.currency-btn');
-                const rates = { NPR: 1, USD: 0.00752, INR: 0.625 };
-                const symbols = { NPR: 'Rs. ', USD: '$', INR: '₹' };
+                let forexRates = { NPR: 1, USD: 151.48, INR: 1.6 };
                 let currentCurrency = localStorage.getItem('bn_currency') || 'NPR';
+
+                function formatCurrencyPrice(baseNpr, cur) {
+                  const val = parseFloat(baseNpr);
+                  if (isNaN(val) || val <= 0) return cur === 'USD' ? '$0' : cur === 'INR' ? '₹0' : 'Rs. 0';
+
+                  if (cur === 'USD') {
+                    const usdRate = forexRates.USD || 151.48;
+                    // Ceiling to 1 decimal place: 100.01 -> 100.1, 100.11 -> 100.2
+                    const rawUsd = val / usdRate;
+                    const usdCeil = Math.ceil(rawUsd * 10) / 10;
+                    const str = usdCeil % 1 === 0
+                      ? usdCeil.toLocaleString('en-US')
+                      : usdCeil.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+                    return '$' + str;
+                  }
+
+                  if (cur === 'INR') {
+                    const inrRate = forexRates.INR || 1.6;
+                    // Pegged rate: 1 INR = 1.6 NPR. Ceiling to whole rupees (e.g. 16000 NPR -> 10000 INR)
+                    const inrCeil = Math.ceil(val / inrRate);
+                    return '₹' + inrCeil.toLocaleString('en-IN');
+                  }
+
+                  // Default: NPR (Base Currency), ceiling to whole rupees
+                  const nprCeil = Math.ceil(val);
+                  return 'Rs. ' + nprCeil.toLocaleString('en-NP');
+                }
+
+                function updateAllPrices() {
+                  document.querySelectorAll('[data-base-npr]').forEach(el => {
+                    const baseNpr = parseFloat(el.getAttribute('data-base-npr') || '0');
+                    if (baseNpr > 0) {
+                      el.textContent = formatCurrencyPrice(baseNpr, currentCurrency);
+                    }
+                  });
+                  if (typeof renderWishlist === 'function') renderWishlist();
+                  if (typeof renderCompareDock === 'function') renderCompareDock();
+                }
 
                 function setCurrency(cur) {
                   currentCurrency = cur;
@@ -135,27 +179,68 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                   currencyBtns.forEach(b => {
                     b.classList.toggle('active', b.getAttribute('data-currency') === cur);
                   });
-
-                  // Recalculate all prices on page
-                  document.querySelectorAll('[data-base-npr]').forEach(el => {
-                    const baseNpr = parseFloat(el.getAttribute('data-base-npr') || '0');
-                    if (baseNpr > 0) {
-                      const converted = Math.round(baseNpr * rates[cur]);
-                      el.textContent = symbols[cur] + converted.toLocaleString();
-                    }
-                  });
+                  updateAllPrices();
                 }
-                setCurrency(currentCurrency);
 
                 currencyBtns.forEach(btn => {
                   btn.addEventListener('click', () => {
                     const c = btn.getAttribute('data-currency');
-                    if (c && rates[c]) {
+                    if (c) {
                       setCurrency(c);
-                      showToast('Prices converted to ' + c + ' ' + (c === 'NPR' ? '🇳🇵' : c === 'USD' ? '🇺🇸' : '🇮🇳'));
+                      const detail = c === 'NPR'
+                        ? '🇳🇵 NPR (Base Currency)'
+                        : c === 'USD'
+                        ? '🇺🇸 USD ($1 = Rs. ' + (forexRates.USD || 151.48) + ', ceiling 0.1)'
+                        : '🇮🇳 INR (₹1 = Rs. ' + (forexRates.INR || 1.6).toFixed(2) + ' Pegged, ceiling ₹1)';
+                      showToast('Prices converted to ' + detail);
                     }
                   });
                 });
+
+                // Asynchronously fetch live forex rates from /api/forex (GrismaInfo / NRB backend)
+                function initForexRates() {
+                  try {
+                    const cached = sessionStorage.getItem('bn_forex_rates');
+                    if (cached) {
+                      const parsed = JSON.parse(cached);
+                      if (parsed && parsed.rates && (Date.now() - (parsed.time || 0) < 1800000)) {
+                        forexRates.USD = Number(parsed.rates.USD) || forexRates.USD;
+                        forexRates.INR = Number(parsed.rates.INR) || forexRates.INR;
+                        const sel = document.querySelector('.currency-selector');
+                        if (sel) {
+                          sel.setAttribute('title', 'Live Forex Rates: $1 = Rs. ' + forexRates.USD + ' | ₹1 = Rs. ' + forexRates.INR.toFixed(2) + ' Pegged');
+                        }
+                        if (currentCurrency !== 'NPR') updateAllPrices();
+                      }
+                    }
+                  } catch(e) {}
+
+                  fetch('/api/forex')
+                    .then(r => r.json())
+                    .then(data => {
+                      if (data && data.rates) {
+                        forexRates.USD = Number(data.rates.USD) || forexRates.USD;
+                        forexRates.INR = Number(data.rates.INR) || forexRates.INR;
+                        try {
+                          sessionStorage.setItem('bn_forex_rates', JSON.stringify({
+                            rates: forexRates,
+                            date: data.date,
+                            time: Date.now()
+                          }));
+                        } catch(e) {}
+
+                        const sel = document.querySelector('.currency-selector');
+                        if (sel) {
+                          sel.setAttribute('title', 'Live Forex Rates (' + (data.date || 'Today') + '): $1 = Rs. ' + forexRates.USD + ' | ₹1 = Rs. ' + forexRates.INR.toFixed(2) + ' Pegged');
+                        }
+                        if (currentCurrency !== 'NPR') {
+                          updateAllPrices();
+                        }
+                      }
+                    })
+                    .catch(() => {});
+                }
+                initForexRates();
 
                 // 4. Wishlist Sliding Drawer & LocalStorage Engine
                 let wishlist = [];
@@ -200,7 +285,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                         <p style="font-size: 13px; margin-top: 6px;">Click the heart icon on any product to save it here for later.</p>
                       </div>
                     \`;
-                    if (wishlistTotalEl) wishlistTotalEl.textContent = 'Rs. 0';
+                    if (wishlistTotalEl) wishlistTotalEl.textContent = formatCurrencyPrice(0, currentCurrency);
                     return;
                   }
 
@@ -212,7 +297,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                         <img src="\${item.image}" alt="\${item.name}" />
                         <div class="wishlist-item-info">
                           <a href="\${item.url}" class="wishlist-item-title">\${item.name}</a>
-                          <div class="wishlist-item-price">Rs. \${item.price.toLocaleString()}</div>
+                          <div class="wishlist-item-price">\${formatCurrencyPrice(item.price, currentCurrency)}</div>
                           <div style="display: flex; gap: 8px; margin-top: 6px;">
                             <a href="\${item.url}" class="product-buy" style="padding: 4px 10px; font-size: 11px;">View Deal ↗</a>
                             <button type="button" class="filter-pill remove-wishlist-btn" data-id="\${item.id}" style="padding: 4px 8px; font-size: 11px;">Remove</button>
@@ -222,7 +307,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                     \`;
                   }).join('');
 
-                  if (wishlistTotalEl) wishlistTotalEl.textContent = 'Rs. ' + total.toLocaleString();
+                  if (wishlistTotalEl) wishlistTotalEl.textContent = formatCurrencyPrice(total, currentCurrency);
 
                   // Wire remove buttons
                   wishlistItemsList.querySelectorAll('.remove-wishlist-btn').forEach(b => {
@@ -326,7 +411,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                       <button type="button" class="remove-compare-btn" data-id="\${item.id}" style="position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.6); color: #fff; border:none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">×</button>
                       <img src="\${item.image}" alt="\${item.name}" />
                       <strong style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">\${item.name}</strong>
-                      <span style="font-size: 13px; font-weight: 800; color: var(--accent);">Rs. \${item.price.toLocaleString()}</span>
+                      <span style="font-size: 13px; font-weight: 800; color: var(--accent);">\${formatCurrencyPrice(item.price, currentCurrency)}</span>
                       <small style="font-size: 11px; color: var(--muted);">\${item.store}</small>
                     </div>
                   \`).join('');
@@ -402,7 +487,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                           <tbody>
                             <tr>
                               <td><strong>Price in Nepal</strong></td>
-                              \${compareItems.map(i => \`<td style="font-size: 16px; font-weight: 900; color: var(--accent); text-align: center;">Rs. \${i.price.toLocaleString()}</td>\`).join('')}
+                              \${compareItems.map(i => \`<td style="font-size: 16px; font-weight: 900; color: var(--accent); text-align: center;">\${formatCurrencyPrice(i.price, currentCurrency)}</td>\`).join('')}
                             </tr>
                             <tr>
                               <td><strong>Authorized Store</strong></td>
@@ -414,7 +499,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                             </tr>
                             <tr>
                               <td><strong>0% Bank EMI Option</strong></td>
-                              \${compareItems.map(i => \`<td style="text-align: center; color: var(--emerald); font-weight: 700;">\${i.price >= 12000 ? 'Available (From Rs. ' + Math.round(i.price/18).toLocaleString() + '/mo)' : 'N/A'}</td>\`).join('')}
+                              \${compareItems.map(i => \`<td style="text-align: center; color: var(--emerald); font-weight: 700;">\${i.price >= 12000 ? 'Available (From ' + formatCurrencyPrice(Math.round(i.price/18), currentCurrency) + '/mo)' : 'N/A'}</td>\`).join('')}
                             </tr>
                             <tr>
                               <td><strong>Delivery Coverage</strong></td>

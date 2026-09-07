@@ -46,6 +46,95 @@ api.get('/products/:id', async (c) => {
   return c.json({ product, reviews });
 });
 
+// Live Forex Exchange Rates (from GrismaInfo API with NRB fallback)
+let forexCache: { data: any; expiresAt: number } | null = null;
+
+api.get('/forex', async (c) => {
+  const now = Date.now();
+  if (forexCache && forexCache.expiresAt > now) {
+    return c.json({ ...forexCache.data, cached: true });
+  }
+
+  // Fallback defaults based on official NRB peg and recent USD rates
+  let usdSell = 151.48;
+  let usdBuy = 150.88;
+  let inrBuy = 160;
+  let date = new Date().toISOString().split('T')[0];
+  let source = 'fallback';
+
+  // 1. Try GrismaInfo API (user's primary API: https://api.grisma.info.np/api/forex/latest)
+  try {
+    const res = await fetch('https://api.grisma.info.np/api/forex/latest', {
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(4000)
+    });
+    if (res.ok) {
+      const data: any = await res.json();
+      if (data && (data.USD_sell || data.USD_buy)) {
+        usdSell = Number(data.USD_sell || data.USD_buy || usdSell);
+        usdBuy = Number(data.USD_buy || usdBuy);
+        inrBuy = Number(data.INR_buy || 160);
+        date = String(data.date || date);
+        source = 'grismainfo';
+      }
+    }
+  } catch {
+    // 2. Secondary fallback: direct NRB API
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const nrbRes = await fetch(`https://www.nrb.org.np/api/forex/v1/rates?page=1&per_page=1&from=${today}&to=${today}`, {
+        headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' },
+        signal: AbortSignal.timeout(3000)
+      });
+      if (nrbRes.ok) {
+        const nrbData: any = await nrbRes.json();
+        const payload = nrbData?.data?.payload?.[0]?.rates;
+        if (Array.isArray(payload)) {
+          const usdObj = payload.find((r: any) => r?.currency?.iso3 === 'USD');
+          const inrObj = payload.find((r: any) => r?.currency?.iso3 === 'INR');
+          if (usdObj) {
+            usdSell = Number(usdObj.sell || usdSell);
+            usdBuy = Number(usdObj.buy || usdBuy);
+          }
+          if (inrObj) {
+            inrBuy = Number(inrObj.buy || 160);
+          }
+          source = 'nrb_direct';
+        }
+      }
+    } catch {
+      // Use fallback defaults
+    }
+  }
+
+  // Base currency is NPR (Nepali Rupee).
+  // INR is pegged: 100 INR = 160 NPR, so 1 INR = 1.6 NPR
+  const inrNpr = inrBuy ? inrBuy / 100 : 1.6;
+  const result = {
+    success: true,
+    source,
+    date,
+    base: 'NPR',
+    rates: {
+      NPR: 1,
+      USD: usdSell, // 1 USD = usdSell NPR
+      INR: inrNpr   // 1 INR = 1.6 NPR
+    },
+    raw: {
+      USD_sell: usdSell,
+      USD_buy: usdBuy,
+      INR_buy: inrBuy
+    },
+    cached: false,
+    timestamp: now
+  };
+
+  // Cache in-memory for 30 minutes
+  forexCache = { data: result, expiresAt: now + 30 * 60 * 1000 };
+  c.header('Cache-Control', 'public, max-age=1800');
+  return c.json(result);
+});
+
 // Authentication APIs
 api.post('/auth/login', async (c) => {
   let body: any;
