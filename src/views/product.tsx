@@ -101,55 +101,61 @@ export const ProductPage: FC<{
             <div className="product-hero-media">
               <div className="product-stage-box">
                 {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} id="mainProductImage" />
+                  <img src={product.image_url} alt={product.name} id="mainProductImage" className="product-stage-image" />
                 ) : (
                   <div className="product-image-placeholder">BN</div>
                 )}
-                {discountPercent > 0 ? (
-                  <span className="product-badge-overlay deal-accent">🔥 Save Rs. {(originalPrice - price).toLocaleString()}</span>
-                ) : (
-                  <span className="product-badge-overlay">{badge}</span>
-                )}
-                <span className="product-store-badge">✓ Verified on {storeName}</span>
-              </div>
 
-              {/* Action Buttons: Wishlist & Compare */}
-              <div className="product-media-actions">
+                {/* Absolute Top-Left Badges */}
+                <div className="stage-badges-wrap">
+                  {discountPercent > 0 ? (
+                    <span className="stage-badge-deal">🔥 Save Rs. {(originalPrice - price).toLocaleString()}</span>
+                  ) : (
+                    <span className="stage-badge-deal">{badge}</span>
+                  )}
+                  <span className="stage-badge-store">✓ Verified on {storeName}</span>
+                </div>
+
+                {/* Absolute Top-Right Floating Wishlist Heart */}
                 <button
                   type="button"
-                  className="filter-pill btn-wishlist-add"
+                  className="stage-wishlist-btn btn-wishlist-add"
                   data-id={product.id}
                   data-name={product.name}
                   data-price={price}
                   data-image={product.image_url}
                   data-url={`/product/${product.id}`}
-                  style={{ flex: 1, padding: '11px', justifyContent: 'center' }}
+                  title="Save to Wishlist"
+                  aria-label="Save to Wishlist"
                 >
-                  ❤️ Save to Wishlist
+                  ❤️
                 </button>
+              </div>
+
+              {/* Action Buttons: 2 Equal Clean Pills Below Image */}
+              <div className="product-media-actions">
                 <button
                   type="button"
-                  className="filter-pill btn-compare-add"
+                  className="media-action-pill btn-compare-add"
                   data-id={product.id}
                   data-name={product.name}
                   data-price={price}
                   data-image={product.image_url}
                   data-store={storeName}
                   data-warranty={product.specs?.['Official Warranty'] || '1 Year Official'}
-                  style={{ flex: 1, padding: '11px', justifyContent: 'center' }}
+                  title="Add to Comparison"
                 >
-                  ⚖️ Compare Item
+                  ⚖️ Add to Compare
+                </button>
+                <button
+                  id="openPriceAlertBtn"
+                  type="button"
+                  className="media-action-pill price-alert-trigger"
+                  title="Set Free Price Drop Alert"
+                >
+                  🔔 Set Price Alert
                 </button>
               </div>
-
-              <button
-                id="openPriceAlertBtn"
-                type="button"
-                className="filter-pill"
-                style={{ width: '100%', padding: '11px', justifyContent: 'center', borderColor: 'var(--accent)', color: 'var(--accent)' }}
-              >
-                🔔 Set Free Price Drop Alert
-              </button>
 
               {/* Nepal Regulatory & Trust Guarantees */}
               <div className="product-trust-card">

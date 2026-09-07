@@ -366,15 +366,18 @@ export const FlashSaleSection: FC<{ products: Product[] }> = ({ products }) => {
                 className="product-card"
                 style={{ background: 'var(--card-bg)', border: '1px solid rgba(244, 63, 94, 0.3)' }}
               >
-                <div style={{ position: 'relative' }}>
-                  <a href={`/product/${p.id}`} className="product-image-link">
-                    <img src={p.image_url} alt={p.name} loading="lazy" style={{ height: '180px', objectFit: 'cover' }} />
-                    <span className="product-badge-overlay" style={{ background: '#e11d48', color: '#ffffff' }}>
-                      🔥 -{discountPercent}%
-                    </span>
-                    <span className="product-store-badge">{p.store_name || 'Daraz Mall'}</span>
+                <div className="product-card-top-stage">
+                  <a href={`/product/${p.id}`} className="product-image-link" aria-label={`View deal for ${p.name}`}>
+                    <img src={p.image_url} alt={p.name} loading="lazy" decoding="async" />
                   </a>
 
+                  {/* Floating Badges */}
+                  <div className="product-card-badges">
+                    <span className="product-badge-overlay deal-accent">🔥 -{discountPercent}%</span>
+                    <span className="product-store-badge">✓ {p.store_name || 'Daraz Mall'}</span>
+                  </div>
+
+                  {/* Floating Action Circles */}
                   <div className="card-actions-float">
                     <button
                       type="button"
@@ -385,6 +388,7 @@ export const FlashSaleSection: FC<{ products: Product[] }> = ({ products }) => {
                       data-image={p.image_url}
                       data-url={`/product/${p.id}`}
                       title="Save to Wishlist"
+                      aria-label="Save to Wishlist"
                     >
                       ❤️
                     </button>
@@ -398,6 +402,7 @@ export const FlashSaleSection: FC<{ products: Product[] }> = ({ products }) => {
                       data-store={p.store_name || 'Daraz Mall'}
                       data-warranty={p.specs?.['Official Warranty'] || '1 Year Official'}
                       title="Add to Comparison"
+                      aria-label="Add to Comparison"
                     >
                       ⚖️
                     </button>
@@ -534,13 +539,17 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
               <span>BN</span>
             </div>
           )}
+        </a>
+
+        {/* Floating Badges */}
+        <div className="product-card-badges">
           {discountPercent > 0 ? (
             <span className="product-badge-overlay deal-accent">🔥 -{discountPercent}% OFF</span>
           ) : (
             <span className="product-badge-overlay">{badge}</span>
           )}
           <span className="product-store-badge">✓ {storeName}</span>
-        </a>
+        </div>
 
         {/* Quick Action Floating Circles: Wishlist Heart + Comparison Balance */}
         <div className="card-actions-float">
