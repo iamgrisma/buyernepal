@@ -32,12 +32,26 @@ import {
   getAdminStats,
   seedCatalog,
   clearCatalog,
-  savePriceAlert
+  savePriceAlert,
+  getArticles,
+  getAllArticlesAdmin,
+  getArticleBySlug,
+  getArticleById,
+  createArticle,
+  updateArticle,
+  deleteArticle,
+  toggleArticlePublish,
+  saveProductScores,
+  saveProductVariant,
+  deleteProductVariant,
+  saveStoreOffer,
+  deleteStoreOffer
 } from './db';
 import { getSession, createSession, clearSession, passwordHash, safeEqual, digest } from './auth';
 import { HomePage } from './views/home';
 import { CategoryPage } from './views/category';
 import { ProductPage } from './views/product';
+import { BlogIndexPage, ArticleDetailPage } from './views/blog';
 import { AdminLoginView, AdminDashboardView } from './views/admin';
 import { api } from './api';
 
@@ -64,10 +78,15 @@ app.get('/robots.txt', (c) => {
 
 // SEO: dynamic sitemap.xml for Google/Bing indexing
 app.get('/sitemap.xml', async (c) => {
-  const categories = await getCategories(c.env?.DB);
-  const products = await getProducts(c.env?.DB);
+  const [categories, products, articles] = await Promise.all([
+    getCategories(c.env?.DB),
+    getProducts(c.env?.DB),
+    getArticles(c.env?.DB, { limit: 100 })
+  ]);
   const urls = [
     'https://buyernepal.iamgrisma.workers.dev/',
+    'https://buyernepal.iamgrisma.workers.dev/blog',
+    ...articles.map((art) => `https://buyernepal.iamgrisma.workers.dev/blog/${art.slug}`),
     ...categories.map((cat) => `https://buyernepal.iamgrisma.workers.dev/category/${cat.slug}`),
     ...products.map((prod) => `https://buyernepal.iamgrisma.workers.dev/product/${prod.id}`)
   ];
@@ -92,6 +111,54 @@ app.get('/', async (c) => {
       categories={categories}
       products={products}
       coupons={coupons}
+    />
+  );
+});
+
+// SSR: Magazine Blog Index
+app.get('/blog', async (c) => {
+  const categoryQuery = c.req.query('category') || 'All';
+  const [settings, categories, articles] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB),
+    getArticles(c.env?.DB, { category: categoryQuery !== 'All' ? categoryQuery : undefined })
+  ]);
+
+  return c.html(
+    <BlogIndexPage
+      articles={articles}
+      settings={settings}
+      categories={categories}
+      activeCategory={categoryQuery}
+    />
+  );
+});
+
+// SSR: Magazine Article Detail
+app.get('/blog/:slug', async (c) => {
+  const slug = c.req.param('slug');
+  const [settings, categories, article, allArticles, allProducts] = await Promise.all([
+    getSettings(c.env?.DB),
+    getCategories(c.env?.DB),
+    getArticleBySlug(c.env?.DB, slug),
+    getArticles(c.env?.DB, { limit: 4 }),
+    getProducts(c.env?.DB, undefined, 10)
+  ]);
+
+  if (!article) {
+    return c.redirect('/blog');
+  }
+
+  const related = allArticles.filter((a) => a.id !== article.id);
+  const featuredProds = allProducts.slice(0, 2);
+
+  return c.html(
+    <ArticleDetailPage
+      article={article}
+      relatedArticles={related}
+      featuredProducts={featuredProds}
+      settings={settings}
+      categories={categories}
     />
   );
 });
@@ -269,14 +336,15 @@ app.get('/admin', async (c) => {
     ? { type: 'error' as const, message: err }
     : undefined;
 
-  const [settings, categories, products, stats, users, reviews, coupons] = await Promise.all([
+  const [settings, categories, products, stats, users, reviews, coupons, articles] = await Promise.all([
     getSettings(c.env?.DB),
     getCategories(c.env?.DB, false),
     getAllProductsAdmin(c.env?.DB),
     getAdminStats(c.env?.DB),
     getUsers(c.env?.DB),
     getAllReviewsAdmin(c.env?.DB),
-    getCoupons(c.env?.DB)
+    getCoupons(c.env?.DB),
+    getAllArticlesAdmin(c.env?.DB)
   ]);
 
   return c.html(
@@ -288,6 +356,7 @@ app.get('/admin', async (c) => {
       users={users}
       reviews={reviews}
       coupons={coupons}
+      articles={articles}
       settings={settings}
       activeTab={tab}
       notice={notice}
@@ -687,6 +756,163 @@ app.post('/admin/settings', async (c) => {
     return c.redirect(`/admin?tab=${returnTab}&msg=Customizer+settings+saved+successfully`);
   } catch {
     return c.redirect('/admin?tab=settings&err=Failed+to+save+settings');
+  }
+});
+
+// Admin Action: Create Article
+app.post('/admin/articles/new', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  try {
+    const body = await c.req.parseBody();
+    const title = String(body['title'] || '').trim();
+    const category = String(body['category'] || 'Buying Guides').trim();
+    const authorName = String(body['author_name'] || 'BuyerNepal Editorial Team').trim();
+    const coverImage = String(body['cover_image'] || '').trim();
+    const excerpt = String(body['excerpt'] || '').trim();
+    const content = String(body['content'] || '').trim();
+    const tags = String(body['tags'] || '').trim();
+    const readTimeMinutes = Number(body['read_time_minutes']) || 5;
+    const isFeatured = body['is_featured'] ? 1 : 0;
+    const isPublished = body['is_published'] ? 1 : 0;
+
+    if (!title || !excerpt || !content) {
+      return c.redirect('/admin?tab=blog&err=Title,+excerpt,+and+content+are+required');
+    }
+
+    const res = await createArticle(c.env?.DB, {
+      title,
+      category,
+      authorName,
+      coverImage,
+      excerpt,
+      content,
+      tags,
+      readTimeMinutes,
+      isFeatured,
+      isPublished
+    });
+
+    if (!res.success) {
+      return c.redirect(`/admin?tab=blog&err=${encodeURIComponent(res.error || 'Failed to create article')}`);
+    }
+    return c.redirect('/admin?tab=blog&msg=Article+published+successfully');
+  } catch (err: any) {
+    return c.redirect(`/admin?tab=blog&err=${encodeURIComponent(err?.message || 'Failed to create article')}`);
+  }
+});
+
+// Admin Action: Edit Article
+app.post('/admin/articles/:id/edit', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (!id) return c.redirect('/admin?tab=blog&err=Invalid+article+ID');
+
+  try {
+    const body = await c.req.parseBody();
+    const title = String(body['title'] || '').trim();
+    const slug = String(body['slug'] || '').trim();
+    const category = String(body['category'] || 'Buying Guides').trim();
+    const authorName = String(body['author_name'] || '').trim();
+    const coverImage = String(body['cover_image'] || '').trim();
+    const excerpt = String(body['excerpt'] || '').trim();
+    const content = String(body['content'] || '').trim();
+    const tags = String(body['tags'] || '').trim();
+    const readTimeMinutes = Number(body['read_time_minutes']) || 5;
+    const isFeatured = body['is_featured'] ? 1 : 0;
+    const isPublished = body['is_published'] ? 1 : 0;
+
+    if (!title || !excerpt || !content) {
+      return c.redirect('/admin?tab=blog&err=Title,+excerpt,+and+content+are+required');
+    }
+
+    const res = await updateArticle(c.env?.DB, id, {
+      title,
+      slug,
+      category,
+      authorName,
+      coverImage,
+      excerpt,
+      content,
+      tags,
+      readTimeMinutes,
+      isFeatured,
+      isPublished
+    });
+
+    if (!res.success) {
+      return c.redirect(`/admin?tab=blog&err=${encodeURIComponent(res.error || 'Failed to update article')}`);
+    }
+    return c.redirect('/admin?tab=blog&msg=Article+updated+successfully');
+  } catch (err: any) {
+    return c.redirect(`/admin?tab=blog&err=${encodeURIComponent(err?.message || 'Failed to update article')}`);
+  }
+});
+
+// Admin Action: Toggle Article Publish Status
+app.post('/admin/articles/:id/toggle', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (id) {
+    const body = await c.req.parseBody();
+    const isPublished = Number(body['is_published']) === 1 ? 1 : 0;
+    await toggleArticlePublish(c.env?.DB, id, isPublished);
+  }
+  return c.redirect('/admin?tab=blog&msg=Article+status+updated');
+});
+
+// Admin Action: Delete Article
+app.post('/admin/articles/:id/delete', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const id = Number(c.req.param('id'));
+  if (id) {
+    await deleteArticle(c.env?.DB, id);
+  }
+  return c.redirect('/admin?tab=blog&msg=Article+deleted');
+});
+
+// Admin Action: Save Product Evaluation Scores
+app.post('/admin/products/:id/scores', async (c) => {
+  const s = await getSession(c);
+  if (!s || (s.role !== 'admin' && s.role !== 'moderator')) return c.redirect('/admin/login');
+
+  const productId = Number(c.req.param('id'));
+  if (!productId) return c.redirect('/admin?tab=products&err=Invalid+product+ID');
+
+  try {
+    const body = await c.req.parseBody();
+    const displayScore = parseFloat(String(body['displayScore'] || '8.5'));
+    const performanceScore = parseFloat(String(body['performanceScore'] || '8.5'));
+    const cameraScore = parseFloat(String(body['cameraScore'] || '8.5'));
+    const batteryScore = parseFloat(String(body['batteryScore'] || '8.5'));
+    const valueScore = parseFloat(String(body['valueScore'] || '8.5'));
+    const overallScore = parseFloat(String(body['overallScore'] || '8.5'));
+    const verdict = String(body['verdict'] || '').trim();
+
+    const res = await saveProductScores(c.env?.DB, {
+      productId,
+      displayScore,
+      performanceScore,
+      cameraScore,
+      batteryScore,
+      valueScore,
+      overallScore,
+      verdict
+    });
+
+    if (!res.success) {
+      return c.redirect(`/admin?tab=products&err=${encodeURIComponent(res.error || 'Failed to save scores')}`);
+    }
+    return c.redirect('/admin?tab=products&msg=Evaluation+scores+saved+successfully');
+  } catch (err: any) {
+    return c.redirect(`/admin?tab=products&err=${encodeURIComponent(err?.message || 'Error saving scores')}`);
   }
 });
 

@@ -1,5 +1,5 @@
 import { FC } from 'hono/jsx';
-import { Category, Product, Review, SiteSettings, User, Coupon } from '../types';
+import { Category, Product, Review, SiteSettings, User, Coupon, Article } from '../types';
 import { Layout } from './layout';
 
 export const AdminLoginView: FC<{ error?: string; success?: string }> = ({ error, success }) => {
@@ -62,12 +62,13 @@ export const AdminLoginView: FC<{ error?: string; success?: string }> = ({ error
 
 export const AdminDashboardView: FC<{
   currentUser: { id: number | string; username: string; email: string; role: string };
-  stats: { products: number; categories: number; users: number; pendingReviews: number; activeCoupons: number };
+  stats: { products: number; categories: number; users: number; pendingReviews: number; activeCoupons: number; articles?: number };
   products: Product[];
   categories: Category[];
   users: User[];
   reviews: Review[];
   coupons: Coupon[];
+  articles?: Article[];
   settings: SiteSettings;
   activeTab?: string;
   notice?: { type: 'success' | 'error'; message: string };
@@ -79,6 +80,7 @@ export const AdminDashboardView: FC<{
   users,
   reviews,
   coupons,
+  articles = [],
   settings,
   activeTab = 'overview',
   notice
@@ -137,6 +139,13 @@ export const AdminDashboardView: FC<{
             >
               <span>🏷️ Promo Vouchers</span>
               <span className="admin-nav-badge" style={{ background: '#10b981' }}>{coupons.length}</span>
+            </a>
+            <a
+              href="/admin?tab=blog"
+              className={`admin-nav-item ${activeTab === 'blog' ? 'active' : ''}`}
+            >
+              <span>📰 Tech Guides CMS</span>
+              <span className="admin-nav-badge" style={{ background: '#f59e0b' }}>{articles.length}</span>
             </a>
             <a
               href="/admin?tab=users"
@@ -259,6 +268,11 @@ export const AdminDashboardView: FC<{
                   <span className="admin-stat-label">ACTIVE PROMOS</span>
                   <strong className="admin-stat-value">{stats.activeCoupons}</strong>
                   <span className="admin-stat-trend">↑ Active vouchers</span>
+                </div>
+                <div className="admin-stat-card">
+                  <span className="admin-stat-label">TECH GUIDES &amp; BLOG</span>
+                  <strong className="admin-stat-value" style={{ color: '#d97706' }}>{stats.articles || articles.length}</strong>
+                  <span className="admin-stat-trend">↑ Editorial stories</span>
                 </div>
                 <div className="admin-stat-card">
                   <span className="admin-stat-label">AUTHORIZED USERS</span>
@@ -579,6 +593,23 @@ export const AdminDashboardView: FC<{
                               <a href={`/product/${p.id}`} target="_blank" className="primary-action" style={{ padding: '4px 8px', fontSize: '11px', background: '#0f172a' }}>
                                 View ↗
                               </a>
+                              <button
+                                type="button"
+                                className="btn-scores-product primary-action"
+                                style={{ padding: '4px 8px', fontSize: '11px', background: '#d97706', border: 0, cursor: 'pointer' }}
+                                data-id={p.id}
+                                data-name={p.name}
+                                data-display={p.scores?.display_score ?? 8.5}
+                                data-performance={p.scores?.performance_score ?? 8.5}
+                                data-camera={p.scores?.camera_score ?? 8.5}
+                                data-battery={p.scores?.battery_score ?? 8.5}
+                                data-value={p.scores?.value_score ?? 8.5}
+                                data-overall={p.scores?.overall_score ?? 8.5}
+                                data-verdict={p.scores?.verdict || p.verdict || ''}
+                                title="Edit Evaluation Scores"
+                              >
+                                🔬 Scores
+                              </button>
                               <button
                                 type="button"
                                 className="btn-edit-product primary-action"
@@ -908,6 +939,201 @@ export const AdminDashboardView: FC<{
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* TAB: TECH GUIDES & BLOG CMS */}
+          {activeTab === 'blog' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '24px' }}>
+              {/* Add Article Form */}
+              <div className="admin-card">
+                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '16px' }}>
+                  ✍️ Write New Tech Guide / Review
+                </h2>
+                <form method="post" action="/admin/articles/new">
+                  <div className="form-group">
+                    <label>Article Title *</label>
+                    <input name="title" type="text" placeholder="e.g. Best Mobile Phones Under 30,000 in Nepal (2026)" required />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div className="form-group">
+                      <label>Category *</label>
+                      <select name="category" required>
+                        <option value="Buying Guides">Buying Guides</option>
+                        <option value="Smartphone Reviews">Smartphone Reviews</option>
+                        <option value="Laptop Guides">Laptop Guides</option>
+                        <option value="Nepal Tech">Nepal Tech</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Reading Time (Minutes)</label>
+                      <input name="read_time_minutes" type="number" defaultValue={5} />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Author Byline *</label>
+                    <input name="author_name" type="text" defaultValue="BuyerNepal Editorial Team" required />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Cover Image URL *</label>
+                    <input name="cover_image" type="url" placeholder="https://images.unsplash.com/..." required />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Tags (Comma separated)</label>
+                    <input name="tags" type="text" placeholder="e.g. smartphones, budget, mdms, nepal" />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Executive Excerpt / Deck *</label>
+                    <textarea name="excerpt" rows={2} placeholder="Brief summary of the article..." required></textarea>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Article Body (Markdown supported) *</label>
+                    <textarea
+                      name="content"
+                      rows={8}
+                      placeholder="Write your in-depth guide here... Use ## for section titles, ### for subheadings, - for bullets, and > for callouts."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '20px', marginBottom: '16px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: 700 }}>
+                      <input type="checkbox" name="is_featured" value="1" />
+                      ⭐ Feature as Hero Story
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: 700 }}>
+                      <input type="checkbox" name="is_published" value="1" defaultChecked />
+                      🚀 Publish Immediately
+                    </label>
+                  </div>
+
+                  <button type="submit" className="primary-action" style={{ width: '100%', justifyContent: 'center' }}>
+                    Publish Article to Storefront
+                  </button>
+                </form>
+              </div>
+
+              {/* Articles Management Table */}
+              <div className="admin-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div>
+                    <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>
+                      Editorial Magazine Articles ({articles.length})
+                    </h2>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0' }}>
+                      Publish, moderate, or edit tech journalism and consumer buying guides.
+                    </p>
+                  </div>
+                  <a href="/blog" target="_blank" className="primary-action" style={{ padding: '6px 12px', fontSize: '12px', background: '#0f172a' }}>
+                    View Magazine ↗
+                  </a>
+                </div>
+
+                <div style={{ overflowX: 'auto', maxHeight: '700px' }}>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Guide Title</th>
+                        <th>Category</th>
+                        <th>Author</th>
+                        <th>Views</th>
+                        <th>Status</th>
+                        <th style={{ textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {articles.map((art) => (
+                        <tr key={art.id}>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <img
+                                src={art.cover_image}
+                                alt=""
+                                style={{ width: '42px', height: '32px', borderRadius: '4px', objectFit: 'cover' }}
+                              />
+                              <div>
+                                <span style={{ fontWeight: 700, display: 'block' }}>{art.title}</span>
+                                <span style={{ fontSize: '11px', color: '#64748b' }}>
+                                  /{art.slug} {art.is_featured === 1 && '• ⭐ Hero'}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span style={{ fontSize: '11px', fontWeight: 700, background: '#f1f5f9', padding: '2px 8px', borderRadius: '12px' }}>
+                              {art.category}
+                            </span>
+                          </td>
+                          <td style={{ fontSize: '12px', color: '#475569' }}>{art.author_name}</td>
+                          <td style={{ fontSize: '12px', fontWeight: 700 }}>👁️ {art.views_count || 0}</td>
+                          <td>
+                            <form method="post" action={`/admin/articles/${art.id}/toggle`} style={{ display: 'inline' }}>
+                              <input type="hidden" name="is_published" value={art.is_published ? '0' : '1'} />
+                              <button
+                                type="submit"
+                                className={`badge ${art.is_published ? 'badge-active' : 'badge-inactive'}`}
+                                style={{ border: 0, cursor: 'pointer' }}
+                              >
+                                {art.is_published ? 'Published' : 'Draft'}
+                              </button>
+                            </form>
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                              <a
+                                href={`/blog/${art.slug}`}
+                                target="_blank"
+                                className="primary-action"
+                                style={{ padding: '4px 8px', fontSize: '11px', background: '#0f172a' }}
+                              >
+                                View ↗
+                              </a>
+                              <button
+                                type="button"
+                                className="btn-edit-article primary-action"
+                                style={{ padding: '4px 8px', fontSize: '11px', background: '#2563eb', border: 0, cursor: 'pointer' }}
+                                data-id={art.id}
+                                data-title={art.title}
+                                data-slug={art.slug}
+                                data-category={art.category}
+                                data-author={art.author_name}
+                                data-cover={art.cover_image}
+                                data-readtime={art.read_time_minutes || 5}
+                                data-featured={art.is_featured ? '1' : '0'}
+                                data-published={art.is_published ? '1' : '0'}
+                                data-tags={art.tags || ''}
+                                data-excerpt={art.excerpt}
+                                data-content={art.content}
+                              >
+                                ✏️ Edit
+                              </button>
+                              <form
+                                method="post"
+                                action={`/admin/articles/${art.id}/delete`}
+                                onsubmit="return confirm('Delete this article?');"
+                                style={{ display: 'inline' }}
+                              >
+                                <button
+                                  type="submit"
+                                  style={{ background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}
+                                >
+                                  Delete
+                                </button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
 
@@ -1383,6 +1609,158 @@ export const AdminDashboardView: FC<{
         </div>
       </div>
 
+      {/* Modal: Edit Product Evaluation Scores */}
+      <div id="editProductScoresModal" className="admin-modal-backdrop">
+        <div className="admin-modal-content" style={{ maxWidth: '600px' }}>
+          <div className="admin-modal-header">
+            <div>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
+                🔬 Evaluation Scores &amp; Ratings
+              </h3>
+              <small id="scoresProductName" style={{ color: 'var(--muted)' }}>Product</small>
+            </div>
+            <button type="button" className="close-admin-modal" style={{ background: 'transparent', border: 0, fontSize: '24px', cursor: 'pointer', color: 'var(--muted)', lineHeight: 1 }}>×</button>
+          </div>
+          <form id="editProductScoresForm" method="post" action="/admin/products/0/scores">
+            <div className="admin-modal-body">
+              <input type="hidden" id="scoresProductId" name="productId" />
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="form-group">
+                  <label>🖥️ Display Score (0 - 10)</label>
+                  <input id="scoreDisplay" name="displayScore" type="number" step="0.1" min="0" max="10" required />
+                </div>
+                <div className="form-group">
+                  <label>⚡ Performance &amp; Chipset (0 - 10)</label>
+                  <input id="scorePerformance" name="performanceScore" type="number" step="0.1" min="0" max="10" required />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="form-group">
+                  <label>📸 Camera &amp; Video (0 - 10)</label>
+                  <input id="scoreCamera" name="cameraScore" type="number" step="0.1" min="0" max="10" required />
+                </div>
+                <div className="form-group">
+                  <label>🔋 Battery Endurance (0 - 10)</label>
+                  <input id="scoreBattery" name="batteryScore" type="number" step="0.1" min="0" max="10" required />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="form-group">
+                  <label>💰 Nepal Value for Money (0 - 10)</label>
+                  <input id="scoreValue" name="valueScore" type="number" step="0.1" min="0" max="10" required />
+                </div>
+                <div className="form-group">
+                  <label>⭐ Overall Score (0 - 10)</label>
+                  <input id="scoreOverall" name="overallScore" type="number" step="0.1" min="0" max="10" required />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Editorial Bottom-Line Verdict</label>
+                <textarea id="scoreVerdict" name="verdict" rows={3} placeholder="Key buying verdict for Nepali consumers..."></textarea>
+              </div>
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+                Cancel
+              </button>
+              <button type="submit" className="primary-action" style={{ background: '#d97706' }}>
+                Save Scorecard
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Modal: Edit Tech Guide Article */}
+      <div id="editArticleModal" className="admin-modal-backdrop">
+        <div className="admin-modal-content" style={{ maxWidth: '720px' }}>
+          <div className="admin-modal-header">
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)' }}>✏️ Edit Tech Guide</h3>
+            <button type="button" className="close-admin-modal" style={{ background: 'transparent', border: 0, fontSize: '24px', cursor: 'pointer', color: 'var(--muted)', lineHeight: 1 }}>×</button>
+          </div>
+          <form id="editArticleForm" method="post" action="/admin/articles/0/edit">
+            <div className="admin-modal-body">
+              <input type="hidden" id="editArticleId" name="id" />
+
+              <div className="form-group">
+                <label>Article Title *</label>
+                <input id="editArticleTitle" name="title" type="text" required />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>URL Slug *</label>
+                  <input id="editArticleSlug" name="slug" type="text" required />
+                </div>
+                <div className="form-group">
+                  <label>Category *</label>
+                  <select id="editArticleCat" name="category" required>
+                    <option value="Buying Guides">Buying Guides</option>
+                    <option value="Smartphone Reviews">Smartphone Reviews</option>
+                    <option value="Laptop Guides">Laptop Guides</option>
+                    <option value="Nepal Tech">Nepal Tech</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label>Author Byline *</label>
+                  <input id="editArticleAuthor" name="author_name" type="text" required />
+                </div>
+                <div className="form-group">
+                  <label>Reading Time (Minutes)</label>
+                  <input id="editArticleReadTime" name="read_time_minutes" type="number" />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Cover Image URL *</label>
+                <input id="editArticleCover" name="cover_image" type="url" required />
+              </div>
+
+              <div className="form-group">
+                <label>Tags (Comma separated)</label>
+                <input id="editArticleTags" name="tags" type="text" />
+              </div>
+
+              <div className="form-group">
+                <label>Executive Excerpt *</label>
+                <textarea id="editArticleExcerpt" name="excerpt" rows={2} required></textarea>
+              </div>
+
+              <div className="form-group">
+                <label>Content (Markdown) *</label>
+                <textarea id="editArticleContent" name="content" rows={8} required></textarea>
+              </div>
+
+              <div style={{ display: 'flex', gap: '20px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: 700 }}>
+                  <input id="editArticleFeatured" type="checkbox" name="is_featured" value="1" />
+                  ⭐ Feature as Hero Story
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', fontWeight: 700 }}>
+                  <input id="editArticlePublished" type="checkbox" name="is_published" value="1" />
+                  🚀 Published
+                </label>
+              </div>
+            </div>
+            <div className="admin-modal-footer">
+              <button type="button" className="close-admin-modal primary-action" style={{ background: '#ffffff', color: 'var(--ink)', border: '1px solid var(--line)' }}>
+                Cancel
+              </button>
+              <button type="submit" className="primary-action">
+                Update Article
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       {/* Admin Interactive Script for Modals */}
       <script
         dangerouslySetInnerHTML={{
@@ -1458,6 +1836,60 @@ export const AdminDashboardView: FC<{
                   setVal('editCouponDesc', 'data-desc');
                   setVal('editCouponActive', 'data-active');
                   if (editCouponModal) editCouponModal.classList.add('open');
+                });
+              });
+
+              // 4. Edit Product Scores Modal Triggers
+              const scoresModal = document.getElementById('editProductScoresModal');
+              const scoresForm = document.getElementById('editProductScoresForm');
+              document.querySelectorAll('.btn-scores-product').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  const id = btn.getAttribute('data-id');
+                  if (scoresForm) scoresForm.action = '/admin/products/' + id + '/scores';
+                  const titleEl = document.getElementById('scoresProductName');
+                  if (titleEl) titleEl.textContent = btn.getAttribute('data-name') || ('Product #' + id);
+                  const setVal = (elId, attr) => {
+                    const el = document.getElementById(elId);
+                    if (el) el.value = btn.getAttribute(attr) || '';
+                  };
+                  setVal('scoresProductId', 'data-id');
+                  setVal('scoreDisplay', 'data-display');
+                  setVal('scorePerformance', 'data-performance');
+                  setVal('scoreCamera', 'data-camera');
+                  setVal('scoreBattery', 'data-battery');
+                  setVal('scoreValue', 'data-value');
+                  setVal('scoreOverall', 'data-overall');
+                  setVal('scoreVerdict', 'data-verdict');
+                  if (scoresModal) scoresModal.classList.add('open');
+                });
+              });
+
+              // 5. Edit Article Modal Triggers
+              const editArtModal = document.getElementById('editArticleModal');
+              const editArtForm = document.getElementById('editArticleForm');
+              document.querySelectorAll('.btn-edit-article').forEach(btn => {
+                btn.addEventListener('click', () => {
+                  const id = btn.getAttribute('data-id');
+                  if (editArtForm) editArtForm.action = '/admin/articles/' + id + '/edit';
+                  const setVal = (elId, attr) => {
+                    const el = document.getElementById(elId);
+                    if (el) el.value = btn.getAttribute(attr) || '';
+                  };
+                  setVal('editArticleId', 'data-id');
+                  setVal('editArticleTitle', 'data-title');
+                  setVal('editArticleSlug', 'data-slug');
+                  setVal('editArticleCat', 'data-category');
+                  setVal('editArticleAuthor', 'data-author');
+                  setVal('editArticleCover', 'data-cover');
+                  setVal('editArticleReadTime', 'data-readtime');
+                  setVal('editArticleTags', 'data-tags');
+                  setVal('editArticleExcerpt', 'data-excerpt');
+                  setVal('editArticleContent', 'data-content');
+                  const featEl = document.getElementById('editArticleFeatured');
+                  if (featEl) featEl.checked = btn.getAttribute('data-featured') === '1';
+                  const pubEl = document.getElementById('editArticlePublished');
+                  if (pubEl) pubEl.checked = btn.getAttribute('data-published') === '1';
+                  if (editArtModal) editArtModal.classList.add('open');
                 });
               });
 

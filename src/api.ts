@@ -14,7 +14,12 @@ import {
   deleteProduct,
   updateCoupon,
   getReviews,
-  getAdminStats
+  getAdminStats,
+  getArticles,
+  getArticleBySlug,
+  getProductScores,
+  getProductVariants,
+  getStoreOffers
 } from './db';
 import { getSession, createSession, clearSession, passwordHash, safeEqual, digest } from './auth';
 
@@ -51,6 +56,41 @@ api.get('/products/:id', async (c) => {
   if (!product) return c.json({ error: 'Product not found' }, 404);
   const reviews = await getReviews(c.env?.DB, id);
   return c.json({ product, reviews });
+});
+
+api.get('/products/:id/scores', async (c) => {
+  const id = Number(c.req.param('id'));
+  if (!id) return c.json({ error: 'Invalid product id' }, 400);
+  const scores = await getProductScores(c.env?.DB, id);
+  return c.json({ product_id: id, scores });
+});
+
+api.get('/products/:id/variants', async (c) => {
+  const id = Number(c.req.param('id'));
+  if (!id) return c.json({ error: 'Invalid product id' }, 400);
+  const variants = await getProductVariants(c.env?.DB, id);
+  return c.json({ product_id: id, variants });
+});
+
+api.get('/products/:id/offers', async (c) => {
+  const id = Number(c.req.param('id'));
+  if (!id) return c.json({ error: 'Invalid product id' }, 400);
+  const offers = await getStoreOffers(c.env?.DB, id);
+  return c.json({ product_id: id, offers });
+});
+
+// Articles & Guides Editorial APIs
+api.get('/articles', async (c) => {
+  const category = c.req.query('category') || undefined;
+  const articles = await getArticles(c.env?.DB, category ? { category } : undefined);
+  return c.json({ articles });
+});
+
+api.get('/articles/:slug', async (c) => {
+  const slug = c.req.param('slug');
+  const article = await getArticleBySlug(c.env?.DB, slug);
+  if (!article) return c.json({ error: 'Article not found' }, 404);
+  return c.json({ article });
 });
 
 // Live Forex Exchange Rates (from GrismaInfo API with NRB fallback)
