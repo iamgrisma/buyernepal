@@ -170,6 +170,10 @@ export const TopChartsPage: FC<{
                                 <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: rank === 1 ? '#fef3c7' : 'var(--bg)', color: rank === 1 ? '#b45309' : 'var(--muted)' }}>
                                   {rankBadge}
                                 </span>
+                                <div className={`deal-temperature-badge ${(p.temperature || 95) < 30 ? 'cold' : ''}`} style={{ fontSize: '10px', padding: '1px 6px' }}>
+                                  <span>🔥</span>
+                                  <span>+{p.temperature || 95}°</span>
+                                </div>
                                 {p.badge && (
                                   <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: 'rgba(225, 29, 72, 0.1)', color: '#e11d48' }}>
                                     {p.badge}

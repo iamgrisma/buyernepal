@@ -667,9 +667,13 @@ export const ProductCard: FC<{ product: Product }> = ({ product }) => {
           {product.name}
         </a>
 
-        {/* Row 3: Store verified tag */}
+        {/* Row 3: Store verified tag + Deal Heat */}
         <div className="pc-store-row">
           <span className="pc-store-chip">✓ {storeName}</span>
+          <div className={`deal-temperature-badge ${(product.temperature || 95) < 30 ? 'cold' : ''}`} title={`${product.votes_up || 18} upvotes`}>
+            <span>🔥</span>
+            <span>+{product.temperature || 95}°</span>
+          </div>
           {emiAvailable && <span className="pc-emi-chip">0% EMI</span>}
         </div>
 

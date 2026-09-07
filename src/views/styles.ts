@@ -5512,4 +5512,220 @@ input:checked + .slider:before { transform: translateX(20px); }
   max-height: 90vh;
   overflow-y: auto;
 }
+
+/* 8. REHub Deal Heat / Community Temperature Badges */
+.deal-temperature-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  padding: 2px 7px;
+  border-radius: 9999px;
+  line-height: 1.2;
+}
+.deal-temperature-badge.cold {
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.08);
+  border-color: rgba(2, 132, 199, 0.2);
+}
+
+.detail-voting-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--card-subtle, #f8fafc);
+  border: 1px solid var(--line);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 18px;
+}
+.heat-meter-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.heat-val {
+  font-size: 16px;
+  font-weight: 900;
+  color: #dc2626;
+}
+.heat-status {
+  font-size: 10.5px;
+  font-weight: 800;
+  background: #dc2626;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.vote-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vote-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--card-bg);
+  color: var(--ink);
+  transition: all 0.15s ease;
+}
+.vote-btn:hover {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+.vote-btn.voted-up {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+.vote-btn.voted-down {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+/* 9. Product Table of Contents / Quick Jump Nav */
+.product-quick-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 0 16px;
+  margin-top: 24px;
+  border-bottom: 1px solid var(--line);
+  scrollbar-width: none;
+}
+.product-quick-nav::-webkit-scrollbar { display: none; }
+.quick-nav-link {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  background: var(--card-subtle, #f1f5f9);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+.quick-nav-link:hover {
+  color: var(--accent);
+  background: rgba(225, 29, 72, 0.08);
+  border-color: rgba(225, 29, 72, 0.25);
+}
+
+/* 10. Sticky Bottom Floating Buy Bar */
+.sticky-product-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+  z-index: 85;
+  transform: translateY(110%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 10px 0;
+}
+.sticky-product-bar.visible {
+  transform: translateY(0);
+}
+.sticky-product-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.sticky-product-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+.sticky-product-thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.sticky-product-meta {
+  overflow: hidden;
+}
+.sticky-product-title {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 380px;
+}
+.sticky-product-pricing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+.sticky-price {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--accent);
+}
+.sticky-badge {
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.sticky-product-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* 11. Price Alert Modal */
+.price-alert-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.price-alert-modal-backdrop.show,
+.price-alert-modal-backdrop.open { display: flex; }
+.price-alert-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  max-width: 460px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+}
+
 `;

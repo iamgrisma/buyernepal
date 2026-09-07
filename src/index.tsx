@@ -33,6 +33,7 @@ import {
   seedCatalog,
   clearCatalog,
   savePriceAlert,
+  recordProductVote,
   getArticles,
   getAllArticlesAdmin,
   getArticleBySlug,
@@ -666,6 +667,31 @@ app.post('/api/reviews/:id/vote', async (c) => {
   const result = await voteReviewHelpful(c.env?.DB, id, type);
   return c.json(result);
 });
+
+// API: REHub Deal Heat / Temperature Voting (+15° Hot / -10° Cold)
+app.post('/api/products/:id/vote', async (c) => {
+  const id = Number(c.req.param('id'));
+  if (!id) return c.json({ success: false, error: 'Invalid product ID' }, 400);
+
+  let type: 'up' | 'down' = 'up';
+  try {
+    const jsonBody = await c.req.json().catch(() => null);
+    if (jsonBody && jsonBody.type === 'down') {
+      type = 'down';
+    } else {
+      const formBody: Record<string, any> = await c.req.parseBody().catch(() => ({}));
+      if (formBody['type'] === 'down') {
+        type = 'down';
+      }
+    }
+  } catch {
+    type = 'up';
+  }
+
+  const result = await recordProductVote(c.env?.DB, id, type);
+  return c.json(result);
+});
+app.post('/api/product/:id/vote', (c) => c.redirect(`/api/products/${c.req.param('id')}/vote`, 307));
 
 // API: Register Price Drop Alert
 app.post('/api/price-alert', async (c) => {

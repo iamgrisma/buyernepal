@@ -2669,34 +2669,3 @@ export async function getPriceAlerts(db: D1Database | undefined): Promise<any[]>
     return [];
   }
 }
-
-// Outbound Affiliate Click Analytics
-export async function recordOutboundClick(
-  db: D1Database | undefined,
-  data: {
-    productId?: number;
-    targetType?: string;
-    storeName?: string;
-    targetUrl: string;
-    referrer?: string;
-    userAgent?: string;
-  }
-): Promise<void> {
-  if (!db) return;
-  try {
-    await db
-      .prepare(
-        `INSERT INTO outbound_clicks (product_id, target_type, store_name, target_url, referrer, user_agent)
-         VALUES (?, ?, ?, ?, ?, ?)`
-      )
-      .bind(
-        data.productId || null,
-        data.targetType || 'product',
-        data.storeName || 'Affiliate Store',
-        data.targetUrl,
-        data.referrer || '',
-        data.userAgent || ''
-      )
-      .run();
-  } catch {}
-}

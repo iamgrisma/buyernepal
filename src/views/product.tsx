@@ -252,6 +252,35 @@ export const ProductPage: FC<{
                 </div>
               )}
 
+              {/* REHub Community Deal Heat & Voting Bar */}
+              <div className="detail-voting-bar">
+                <div className="heat-meter-pill">
+                  <span className="heat-icon">🔥</span>
+                  <span id="productTempDisplay" className="heat-val">+{product.temperature || 95}°</span>
+                  <span className="heat-status">{(product.temperature || 95) >= 80 ? 'HOT DEAL' : 'VERIFIED DEAL'}</span>
+                </div>
+                <div className="vote-actions-group">
+                  <button
+                    id="voteUpBtn"
+                    type="button"
+                    className="vote-btn"
+                    data-id={product.id}
+                    title="Vote Deal Up (+15°)"
+                  >
+                    ▲ <span id="voteUpCount">{product.votes_up || 18}</span>
+                  </button>
+                  <button
+                    id="voteDownBtn"
+                    type="button"
+                    className="vote-btn"
+                    data-id={product.id}
+                    title="Vote Deal Down (-10°)"
+                  >
+                    ▼ <span id="voteDownCount">{product.votes_down || 1}</span>
+                  </button>
+                </div>
+              </div>
+
               {/* Verified Price Box */}
               <div className="detail-price-box">
                 <div>
@@ -307,11 +336,21 @@ export const ProductPage: FC<{
 
               {/* 6-Month Historical Price Fluctuation Trend Card */}
               <div className="price-history-card" style={{ marginTop: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <strong style={{ fontSize: '13px' }}>📈 6-Month Price Movement in Nepal</strong>
-                  <span style={{ fontSize: '11px', color: 'var(--emerald)', fontWeight: 800, background: 'var(--emerald-soft)', padding: '2px 8px', borderRadius: '12px' }}>
-                    All-Time Low!
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--emerald)', fontWeight: 800, background: 'var(--emerald-soft)', padding: '2px 8px', borderRadius: '12px' }}>
+                      All-Time Low!
+                    </span>
+                    <button
+                      id="openPriceAlertBtn"
+                      type="button"
+                      className="filter-pill"
+                      style={{ padding: '3px 10px', fontSize: '11.5px', fontWeight: 700, borderColor: 'var(--accent)', color: 'var(--accent)' }}
+                    >
+                      🔔 Set Drop Alert
+                    </button>
+                  </div>
                 </div>
                 <div className="price-history-svg-wrap">
                   <svg viewBox="0 0 400 110" style={{ width: '100%', height: '100px' }} preserveAspectRatio="none">
@@ -349,8 +388,17 @@ export const ProductPage: FC<{
             </div>
           </div>
 
+          {/* Quick Jump Navigation / Table of Contents */}
+          <nav className="product-quick-nav" aria-label="Product Sections">
+            <a href="#sectionStores" className="quick-nav-link">🏪 Where to Buy ({product.store_offers?.length || 2} Stores)</a>
+            <a href="#sectionScorecard" className="quick-nav-link">🔬 Labs Scorecard ({product.scores ? `${product.scores.overall_score.toFixed(1)}/10` : '9.2/10'})</a>
+            <a href="#sectionSpecs" className="quick-nav-link">📋 Specs &amp; Warranty</a>
+            {emiAvailable && <a href="#sectionBanking" className="quick-nav-link">💳 0% EMI Terms</a>}
+            <a href="#sectionReviews" className="quick-nav-link">⭐ Reviews ({reviews.length})</a>
+          </nav>
+
           {/* SECTION 2: "WHERE TO BUY IN NEPAL" MULTI-STORE COMPARISON MATRIX (FULL WIDTH) */}
-          <section className="price-comparison-card" style={{ marginTop: '40px' }}>
+          <section id="sectionStores" className="price-comparison-card" style={{ marginTop: '32px' }}>
             <div className="price-comparison-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '20px' }}>🏪</span>
@@ -430,7 +478,7 @@ export const ProductPage: FC<{
           </section>
 
           {/* SECTION 3: TECH INTELLIGENCE & BANKING SUITE (2-COLUMN BALANCED GRID) */}
-          <div className="product-intelligence-grid" style={{ marginTop: '40px' }}>
+          <div id="sectionScorecard" className="product-intelligence-grid" style={{ marginTop: '40px' }}>
             {/* Left Column: 5-Point Scorecard & Verdict */}
             <div>
               {product.scores ? (
@@ -564,7 +612,7 @@ export const ProductPage: FC<{
             </div>
 
             {/* Right Column: 0% EMI Calculator & Delivery City Estimator */}
-            <div>
+            <div id="sectionBanking">
               {/* Interactive Nepal Bank 0% EMI Calculator Widget */}
               {emiAvailable && settings.emi_enabled !== '0' && (
                 <div className="emi-calculator-card">
@@ -648,7 +696,7 @@ export const ProductPage: FC<{
           </div>
 
           {/* SECTION 4: TECHNICAL SPECIFICATIONS & PACKAGING (FULL WIDTH) */}
-          <section className="specs-section-card" style={{ marginTop: '40px' }}>
+          <section id="sectionSpecs" className="specs-section-card" style={{ marginTop: '40px' }}>
             <div className="specs-section-header">
               <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>
                 📋 Detailed Technical Specifications &amp; Nepal Warranty Terms
@@ -708,7 +756,7 @@ export const ProductPage: FC<{
           )}
 
           {/* Customer Reviews & Interactive Submission Form */}
-          <section className="reviews-section" style={{ marginTop: '48px' }}>
+          <section id="sectionReviews" className="reviews-section" style={{ marginTop: '48px' }}>
             <div className="reviews-header">
               <div>
                 <span className="section-kicker">VERIFIED BUYER FEEDBACK</span>
@@ -1080,6 +1128,98 @@ export const ProductPage: FC<{
           </div>
         </div>
 
+        {/* REHub Price Drop Alert Modal */}
+        <div id="priceAlertModalBackdrop" className="price-alert-modal-backdrop">
+          <div className="price-alert-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div>
+                <span style={{ fontSize: '24px' }}>🔔</span>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, margin: '4px 0 0' }}>Set Nepal Price Drop Alert</h3>
+                <span style={{ fontSize: '12px', color: 'var(--muted)' }}>We will notify you immediately when verified Nepal sellers drop the price!</span>
+              </div>
+              <button id="closePriceAlertModalBtn" type="button" className="mobile-drawer-close" aria-label="Close modal">×</button>
+            </div>
+
+            <form id="priceAlertForm">
+              <input type="hidden" name="product_id" value={product.id} />
+              <input type="hidden" name="product_name" value={product.name} />
+              <input type="hidden" name="current_price" value={price} />
+
+              <div className="form-group" style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700 }}>Target Price (NPR)</label>
+                <input
+                  type="number"
+                  name="target_price"
+                  defaultValue={Math.round(price * 0.95)}
+                  min="100"
+                  max={price}
+                  required
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)' }}
+                />
+                <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Current verified rate: Rs. {formattedPrice}. Default set to 5% drop.</span>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700 }}>Your Email Address</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="e.g. yourname@gmail.com"
+                  required
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)' }}
+                />
+              </div>
+
+              <button type="submit" className="primary-action" style={{ width: '100%', padding: '12px' }}>
+                Activate Price Drop Alert 🚀
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* REHub Sticky Bottom Action Bar */}
+        <div id="stickyProductBar" className="sticky-product-bar">
+          <div className="store-shell sticky-product-inner">
+            <div className="sticky-product-info">
+              {product.image_url && (
+                <img src={product.image_url} alt={product.name} className="sticky-product-thumb" />
+              )}
+              <div className="sticky-product-meta">
+                <strong className="sticky-product-title">{product.name}</strong>
+                <div className="sticky-product-pricing">
+                  <span className="sticky-price" data-base-npr={price}>Rs. {formattedPrice}</span>
+                  <span className="sticky-badge">Verified Nepal Price</span>
+                </div>
+              </div>
+            </div>
+            <div className="sticky-product-actions">
+              <button
+                type="button"
+                className="filter-pill btn-compare-add"
+                data-id={product.id}
+                data-name={product.name}
+                data-price={price}
+                data-image={product.image_url}
+                data-store={storeName}
+                data-warranty={product.specs?.['Official Warranty'] || '1 Year Official'}
+                style={{ padding: '8px 14px', fontSize: '12px' }}
+                title="Add to Compare Dock"
+              >
+                ⇌ Compare
+              </button>
+              <a
+                href={`/go/product/${product.id}`}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="product-buy"
+                style={{ padding: '8px 18px', fontSize: '13px', fontWeight: 800 }}
+              >
+                View Deal on {storeName} ↗
+              </a>
+            </div>
+          </div>
+        </div>
+
         <Footer settings={settings} categories={categories} />
         <MobileBottomBar activeTab="home" />
       </div>
@@ -1210,6 +1350,61 @@ export const ProductPage: FC<{
     directOrderBackdrop.addEventListener('click', (e) => {
       if (e.target === directOrderBackdrop) directOrderBackdrop.classList.remove('open');
     });
+  }
+
+  // 2.2 REHub Deal Temperature & Community Voting
+  const voteUpBtn = document.getElementById('voteUpBtn');
+  const voteDownBtn = document.getElementById('voteDownBtn');
+  const tempDisplay = document.getElementById('productTempDisplay');
+  const voteUpCount = document.getElementById('voteUpCount');
+  const voteDownCount = document.getElementById('voteDownCount');
+  const votedKey = 'bn_voted_' + ${product.id};
+
+  try {
+    const prevVote = localStorage.getItem(votedKey);
+    if (prevVote === 'up' && voteUpBtn) voteUpBtn.classList.add('voted-up');
+    if (prevVote === 'down' && voteDownBtn) voteDownBtn.classList.add('voted-down');
+  } catch {}
+
+  async function handleVote(type) {
+    try {
+      if (localStorage.getItem(votedKey)) {
+        if (window.bnShowToast) window.bnShowToast('You already voted on this deal! 🔥');
+        return;
+      }
+      const res = await fetch('/api/products/' + ${product.id} + '/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type })
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem(votedKey, type);
+        if (type === 'up' && voteUpBtn) voteUpBtn.classList.add('voted-up');
+        if (type === 'down' && voteDownBtn) voteDownBtn.classList.add('voted-down');
+        if (tempDisplay) tempDisplay.textContent = '+' + data.temperature + '°';
+        if (voteUpCount) voteUpCount.textContent = data.votes_up;
+        if (voteDownCount) voteDownCount.textContent = data.votes_down;
+        if (window.bnShowToast) window.bnShowToast(type === 'up' ? 'Hot deal upvoted! 🔥 (+15°)' : 'Vote recorded!');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  if (voteUpBtn) voteUpBtn.addEventListener('click', () => handleVote('up'));
+  if (voteDownBtn) voteDownBtn.addEventListener('click', () => handleVote('down'));
+
+  // 2.3 REHub Sticky Bottom Action Bar Scroll Observer
+  const stickyBar = document.getElementById('stickyProductBar');
+  if (stickyBar) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 420) {
+        stickyBar.classList.add('visible');
+      } else {
+        stickyBar.classList.remove('visible');
+      }
+    }, { passive: true });
   }
 
   // 3. Review Submission Form
