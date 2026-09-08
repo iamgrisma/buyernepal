@@ -1,5 +1,5 @@
 import { FC } from 'hono/jsx';
-import { Category, Product, Review, SiteSettings } from '../types';
+import { Category, Product, Review, SiteSettings, StoreOffer } from '../types';
 import { Layout } from './layout';
 import { Header, ProductCard, MobileBottomBar, Footer } from './components';
 
@@ -29,14 +29,57 @@ export const ProductPage: FC<{
   const emiAvailable = Number(product.emi_available) === 1;
   const baseMonthlyEmi = Math.round(price / 18);
 
-  const priceHistory = product.price_history || [
-    { month: 'Apr 2026', price: Math.round(price * 1.18) },
-    { month: 'May 2026', price: Math.round(price * 1.14) },
-    { month: 'Jun 2026', price: Math.round(price * 1.10) },
-    { month: 'Jul 2026', price: Math.round(price * 1.07) },
-    { month: 'Aug 2026', price: Math.round(price * 1.03) },
-    { month: 'Sep 2026', price: price }
-  ];
+  const isDirectSell = Number(product.direct_sell) === 1;
+
+  // Real price history from database/logs ONLY (minimum 2 historical points required to plot trend)
+  const priceHistory = (product.price_history && product.price_history.length >= 2) ? product.price_history : null;
+
+  // Filter store offers: ONLY include stores that have valid affiliate URLs configured
+  const validUrl = (url?: string) => Boolean(url && url.trim() !== '' && url.trim() !== '#' && (url.startsWith('http://') || url.startsWith('https://')));
+  const validStoreOffers: StoreOffer[] = [];
+  if (validUrl(product.affiliate_url)) {
+    validStoreOffers.push({
+      id: 1,
+      product_id: product.id,
+      store_name: storeName,
+      price: price,
+      store_url: product.affiliate_url!,
+      badge: 'Featured Merchant',
+      in_stock: 1,
+      warranty_info: 'Official Nepal Warranty'
+    });
+  }
+  if (product.store_offers && product.store_offers.length > 0) {
+    for (const o of product.store_offers) {
+      if (validUrl(o.store_url)) {
+        if (!validStoreOffers.some(v => v.store_name.trim().toLowerCase() === o.store_name.trim().toLowerCase())) {
+          validStoreOffers.push(o);
+        }
+      }
+    }
+  }
+
+  // Dynamic SVG calculation for verified price history
+  let minHPrice = price;
+  let maxHPrice = price;
+  let polylinePoints = '';
+  let polygonPoints = '';
+  let svgCircles: { cx: number; cy: number; price: number; month: string }[] = [];
+  if (priceHistory && priceHistory.length >= 2) {
+    const prices = priceHistory.map(p => p.price);
+    minHPrice = Math.min(...prices);
+    maxHPrice = Math.max(...prices);
+    const range = maxHPrice - minHPrice || 1;
+    const count = priceHistory.length;
+    const stepX = 350 / (count - 1);
+    svgCircles = priceHistory.map((item, i) => {
+      const cx = 25 + i * stepX;
+      const cy = 85 - ((item.price - minHPrice) / range) * 65;
+      return { cx, cy, price: item.price, month: item.month };
+    });
+    polylinePoints = svgCircles.map(c => `${c.cx},${c.cy}`).join(' ');
+    polygonPoints = `25,100 ${polylinePoints} ${svgCircles[svgCircles.length - 1].cx},100`;
+  }
 
   // Schema.org Product markup for Google Rich Snippets
   const jsonLd = {
@@ -292,7 +335,7 @@ export const ProductPage: FC<{
               {/* Primary Outbound Deal & Direct Order Dual CTA */}
               <div className="affiliate-deal-box">
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  {product.affiliate_url ? (
+                  {validUrl(product.affiliate_url) ? (
                     <a
                       href={`/go/product/${product.id}`}
                       target="_blank"
@@ -304,15 +347,17 @@ export const ProductPage: FC<{
                     </a>
                   ) : null}
 
-                  {/* Direct Buy / Cash on Delivery Button */}
-                  <button
-                    id="openDirectOrderBtn"
-                    type="button"
-                    className="detail-buy-btn"
-                    style={{ flex: 1, minWidth: '160px', background: '#0f172a', marginBottom: 0 }}
-                  >
-                    <span>⚡ Buy Direct / COD</span>
-                  </button>
+                  {/* Direct Buy / Cash on Delivery Button - ONLY if product is set to be sold directly by BuyerNepal */}
+                  {isDirectSell && (
+                    <button
+                      id="openDirectOrderBtn"
+                      type="button"
+                      className="detail-buy-btn"
+                      style={{ flex: 1, minWidth: '160px', background: '#0f172a', marginBottom: 0 }}
+                    >
+                      <span>⚡ Buy Direct / COD</span>
+                    </button>
+                  )}
                 </div>
 
                 <div className="affiliate-redirect-notice" style={{ marginTop: '10px' }}>
@@ -321,148 +366,114 @@ export const ProductPage: FC<{
                 </div>
               </div>
 
-              {/* 6-Month Historical Price Fluctuation Trend Card */}
-              <div className="price-history-card" style={{ marginTop: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                  <strong style={{ fontSize: '13px' }}>📈 6-Month Price Movement in Nepal</strong>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '11px', color: 'var(--emerald)', fontWeight: 800, background: 'var(--emerald-soft)', padding: '2px 8px', borderRadius: '12px' }}>
-                      All-Time Low!
-                    </span>
-                    <button
-                      id="openPriceAlertBtn"
-                      type="button"
-                      className="filter-pill"
-                      style={{ padding: '3px 10px', fontSize: '11.5px', fontWeight: 700, borderColor: 'var(--accent)', color: 'var(--accent)' }}
-                    >
-                      🔔 Set Drop Alert
-                    </button>
+              {/* Historical Price Fluctuation Trend Card - ONLY shown if real historical data exists */}
+              {priceHistory && priceHistory.length >= 2 && (
+                <div className="price-history-card" style={{ marginTop: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <strong style={{ fontSize: '13px' }}>📈 Tracked Price Movement ({priceHistory.length} Verified Records)</strong>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--emerald)', fontWeight: 800, background: 'var(--emerald-soft)', padding: '2px 8px', borderRadius: '12px' }}>
+                        Low: Rs. {minHPrice.toLocaleString()}
+                      </span>
+                      <button
+                        id="openPriceAlertBtn"
+                        type="button"
+                        className="filter-pill"
+                        style={{ padding: '3px 10px', fontSize: '11.5px', fontWeight: 700, borderColor: 'var(--accent)', color: 'var(--accent)' }}
+                      >
+                        🔔 Set Drop Alert
+                      </button>
+                    </div>
+                  </div>
+                  <div className="price-history-svg-wrap">
+                    <svg viewBox="0 0 400 110" style={{ width: '100%', height: '100px' }} preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#2563eb" stopOpacity="0.2" />
+                          <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                      <polygon points={polygonPoints} fill="url(#priceGrad)" />
+                      <polyline points={polylinePoints} fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      {svgCircles.map((c, i) => (
+                        <circle key={i} cx={c.cx} cy={c.cy} r={i === svgCircles.length - 1 ? 4.5 : 3.5} fill={i === svgCircles.length - 1 ? '#ffffff' : '#2563eb'} stroke="#2563eb" strokeWidth={i === svgCircles.length - 1 ? 2.5 : 1} />
+                      ))}
+                    </svg>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--muted)', fontWeight: 700, padding: '0 10px' }}>
+                      {priceHistory.map((item, idx) => (
+                        <span key={idx}>{item.month.split(' ')[0]}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="price-history-svg-wrap">
-                  <svg viewBox="0 0 400 110" style={{ width: '100%', height: '100px' }} preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#e11d48" stopOpacity="0.25" />
-                        <stop offset="100%" stopColor="#e11d48" stopOpacity="0.0" />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M 20,25 L 90,40 L 160,55 L 230,70 L 300,85 L 370,95 L 370,110 L 20,110 Z"
-                      fill="url(#priceGrad)"
-                    />
-                    <path
-                      d="M 20,25 L 90,40 L 160,55 L 230,70 L 300,85 L 370,95"
-                      fill="none"
-                      stroke="#e11d48"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                    />
-                    <circle cx="20" cy="25" r="3.5" fill="#e11d48" />
-                    <circle cx="90" cy="40" r="3.5" fill="#e11d48" />
-                    <circle cx="160" cy="55" r="3.5" fill="#e11d48" />
-                    <circle cx="230" cy="70" r="3.5" fill="#e11d48" />
-                    <circle cx="300" cy="85" r="3.5" fill="#e11d48" />
-                    <circle cx="370" cy="95" r="4.5" fill="#ffffff" stroke="#e11d48" strokeWidth="2.5" />
-                  </svg>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--muted)', fontWeight: 700, padding: '0 10px' }}>
-                    {priceHistory.map((item, idx) => (
-                      <span key={idx}>{item.month.split(' ')[0]}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
           {/* Quick Jump Navigation / Table of Contents */}
           <nav className="product-quick-nav" aria-label="Product Sections">
-            <a href="#sectionStores" className="quick-nav-link">🏪 Where to Buy ({product.store_offers?.length || 2} Stores)</a>
+            {validStoreOffers.length > 0 && (
+              <a href="#sectionStores" className="quick-nav-link">🏪 Where to Buy ({validStoreOffers.length} {validStoreOffers.length === 1 ? 'Store' : 'Stores'})</a>
+            )}
             <a href="#sectionScorecard" className="quick-nav-link">🔬 Labs Scorecard ({product.scores ? `${product.scores.overall_score.toFixed(1)}/10` : '9.2/10'})</a>
             <a href="#sectionSpecs" className="quick-nav-link">📋 Specs &amp; Warranty</a>
             {emiAvailable && <a href="#sectionBanking" className="quick-nav-link">💳 0% EMI Terms</a>}
             <a href="#sectionReviews" className="quick-nav-link">⭐ Reviews ({reviews.length})</a>
           </nav>
 
-          {/* SECTION 2: "WHERE TO BUY IN NEPAL" MULTI-STORE COMPARISON MATRIX (FULL WIDTH) */}
-          <section id="sectionStores" className="price-comparison-card" style={{ marginTop: '32px' }}>
-            <div className="price-comparison-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '20px' }}>🏪</span>
-                <div>
-                  <strong>Where to Buy in Nepal (Authorized Stores &amp; Marketplaces)</strong>
-                  <div style={{ fontSize: '11.5px', color: 'var(--muted)', fontWeight: 500, marginTop: '2px' }}>
-                    Compare verified prices, physical pickup vs online delivery, and official importer warranty coverage
+          {/* SECTION 2: "WHERE TO BUY IN NEPAL" MULTI-STORE COMPARISON MATRIX (FULL WIDTH) - ONLY SHOWN IF VALID STORES EXIST */}
+          {validStoreOffers.length > 0 && (
+            <section id="sectionStores" className="price-comparison-card" style={{ marginTop: '32px' }}>
+              <div className="price-comparison-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '20px' }}>🏪</span>
+                  <div>
+                    <strong>Where to Buy in Nepal ({validStoreOffers.length} Verified {validStoreOffers.length === 1 ? 'Store' : 'Stores'})</strong>
+                    <div style={{ fontSize: '11.5px', color: 'var(--muted)', fontWeight: 500, marginTop: '2px' }}>
+                      Compare verified prices and official warranty coverage across authentic sellers
+                    </div>
                   </div>
                 </div>
+                <span className="price-match-guarantee">🔍 Real-Time Price Comparison</span>
               </div>
-              <span className="price-match-guarantee">🔍 Real-Time Price Comparison</span>
-            </div>
 
-            <div className="stores-matrix-table">
-              {(product.store_offers && product.store_offers.length > 0
-                ? product.store_offers
-                : [
-                    {
-                      id: 1,
-                      product_id: product.id,
-                      store_name: storeName,
-                      price: price,
-                      store_url: product.affiliate_url || '#',
-                      badge: 'Official Distributor',
-                      in_stock: 1,
-                      delivery_time: '24h Kathmandu Express',
-                      warranty_info: 'Official Nepal Warranty'
-                    },
-                    {
-                      id: 2,
-                      product_id: product.id,
-                      store_name: 'New Road Offline Outlets',
-                      price: Math.round(price * 1.03),
-                      store_url: product.affiliate_url || '#',
-                      badge: 'Authorized Retailer',
-                      in_stock: 1,
-                      delivery_time: 'Immediate Walk-in Pickup',
-                      warranty_info: 'Official Distributor Bill'
-                    }
-                  ]
-              ).map((offer, idx) => (
-                <div key={offer.id || idx} className="store-matrix-row">
-                  <div className="store-identity">
-                    <div className="store-title-row">
-                      <span className="store-icon">🏬</span>
-                      <strong>{offer.store_name}</strong>
-                      {offer.badge && <span className="store-pill-badge">{offer.badge}</span>}
+              <div className="stores-matrix-table">
+                {validStoreOffers.map((offer, idx) => (
+                  <div key={offer.id || idx} className="store-matrix-row">
+                    <div className="store-identity">
+                      <div className="store-title-row">
+                        <span className="store-icon">🏬</span>
+                        <strong>{offer.store_name}</strong>
+                        {offer.badge && <span className="store-pill-badge">{offer.badge}</span>}
+                      </div>
+                      <div className="store-subtext">
+                        <span>🛡️ {offer.warranty_info || 'Official Importer Warranty'}</span>
+                      </div>
                     </div>
-                    <div className="store-subtext">
-                      <span>🚚 {offer.delivery_time || 'Express Delivery'}</span>
-                      <span>•</span>
-                      <span>🛡️ {offer.warranty_info || '1 Year Official Warranty'}</span>
+
+                    <div className="store-pricing-action">
+                      <div className="store-price-display">
+                        <span className="store-price-val" data-base-npr={offer.price}>
+                          Rs. {offer.price.toLocaleString()}
+                        </span>
+                        <span className="store-stock-indicator">
+                          {offer.in_stock ? '🟢 In Stock' : '🔴 Check Stock'}
+                        </span>
+                      </div>
+                      <a
+                        href={offer.store_url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="store-visit-btn"
+                      >
+                        View Store Deal ↗
+                      </a>
                     </div>
                   </div>
-
-                  <div className="store-pricing-action">
-                    <div className="store-price-display">
-                      <span className="store-price-val" data-base-npr={offer.price}>
-                        Rs. {offer.price.toLocaleString()}
-                      </span>
-                      <span className="store-stock-indicator">
-                        {offer.in_stock ? '🟢 In Stock' : '🔴 Pre-Order'}
-                      </span>
-                    </div>
-                    <a
-                      href={offer.store_url}
-                      target="_blank"
-                      rel="noopener noreferrer nofollow"
-                      className="store-visit-btn"
-                    >
-                      View Store Deal ↗
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* SECTION 3: TECH INTELLIGENCE & BANKING SUITE (2-COLUMN BALANCED GRID) */}
           <div id="sectionScorecard" className="product-intelligence-grid" style={{ marginTop: '40px' }}>
@@ -572,24 +583,34 @@ export const ProductPage: FC<{
               )}
 
               {/* Pros and Cons Grid */}
-              {(product.pros || product.cons) && (
+              {((product.pros && product.pros.length > 0) || (product.cons && product.cons.length > 0)) && (
                 <div className="pros-cons-grid" style={{ marginTop: '20px' }}>
                   {product.pros && product.pros.length > 0 && (
                     <div className="pros-card">
-                      <strong style={{ color: '#065f46', fontSize: '13px' }}>👍 Reasons to Buy</strong>
+                      <strong className="pros-title" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13.5px', fontWeight: 800 }}>
+                        <span>👍</span> Reasons to Buy
+                      </strong>
                       <ul className="pros-list">
                         {product.pros.map((p, idx) => (
-                          <li key={idx}>✓ {p}</li>
+                          <li key={idx}>
+                            <span style={{ fontWeight: 800, marginRight: '6px' }}>✓</span>
+                            <span>{p}</span>
+                          </li>
                         ))}
                       </ul>
                     </div>
                   )}
                   {product.cons && product.cons.length > 0 && (
                     <div className="cons-card">
-                      <strong style={{ color: '#9f1239', fontSize: '13px' }}>⚠️ Things to Consider</strong>
+                      <strong className="cons-title" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13.5px', fontWeight: 800 }}>
+                        <span>⚠️</span> Things to Consider
+                      </strong>
                       <ul className="cons-list">
                         {product.cons.map((c, idx) => (
-                          <li key={idx}>• {c}</li>
+                          <li key={idx}>
+                            <span style={{ fontWeight: 800, marginRight: '6px' }}>•</span>
+                            <span>{c}</span>
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -657,12 +678,20 @@ export const ProductPage: FC<{
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                     <span style={{ fontSize: '20px' }}>🚚</span>
                     <div>
-                      <strong style={{ fontSize: '14px' }}>Nepal Seller Dispatch &amp; Transit Guide</strong>
-                      <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>Typical seller transit times &amp; rates across Nepal</div>
+                      <strong style={{ fontSize: '14px' }}>
+                        {isDirectSell ? 'BuyerNepal Direct Dispatch & Delivery' : 'Nepal Merchant Dispatch Guide'}
+                      </strong>
+                      <div style={{ fontSize: '11.5px', color: 'var(--muted)' }}>
+                        {isDirectSell ? 'Direct order fulfillment with verified Cash on Delivery' : 'Estimated merchant transit times & rates across Nepal'}
+                      </div>
                     </div>
                   </div>
                   <div className="form-group" style={{ marginBottom: '10px' }}>
-                    <select id="detailCitySelect" style={{ padding: '9px 12px', borderRadius: '8px', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)', width: '100%', fontSize: '13px' }}>
+                    <select
+                      id="detailCitySelect"
+                      data-direct-sell={isDirectSell ? '1' : '0'}
+                      style={{ padding: '9px 12px', borderRadius: '8px', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)', width: '100%', fontSize: '13px' }}
+                    >
                       <option value="ktm">Kathmandu Valley (Kathmandu, Lalitpur, Bhaktapur)</option>
                       <option value="pkr">Pokhara (Kaski District)</option>
                       <option value="ctw">Chitwan (Bharatpur &amp; Narayangarh)</option>
@@ -672,10 +701,20 @@ export const ProductPage: FC<{
                       <option value="all">All Other 71 Districts (Courier Door Delivery)</option>
                     </select>
                   </div>
-                  <div id="detailCityResult" style={{ background: 'var(--card-subtle, #f8fafc)', padding: '12px 14px', borderRadius: '8px', fontSize: '12.5px', border: '1px solid var(--line)' }}>
-                    <div>⏱️ <strong>Estimated Transit:</strong> <span id="detailTransitTime">Same-Day / 24 Hours Express</span></div>
-                    <div style={{ marginTop: '4px' }}>💰 <strong>Store Shipping:</strong> <span id="detailCourierFee" style={{ color: 'var(--emerald)', fontWeight: 700 }}>FREE (Kathmandu Valley Order)</span></div>
-                    <div style={{ marginTop: '4px' }}>💵 <strong>Payment Options:</strong> <span>Cash on Delivery (COD) &amp; Fonepay Accepted by Stores</span></div>
+                  <div id="detailCityResult">
+                    {isDirectSell ? (
+                      <>
+                        <div>⏱️ <strong>Estimated Transit:</strong> <span id="detailTransitTime">1-2 Business Days Dispatch</span></div>
+                        <div style={{ marginTop: '5px' }}>💰 <strong>Direct Delivery Fee:</strong> <span id="detailCourierFee" style={{ color: '#047857', fontWeight: 800 }}>FREE (Kathmandu Valley Order)</span></div>
+                        <div style={{ marginTop: '5px' }}>💵 <strong>Payment Options:</strong> <span>Cash on Delivery (COD) &amp; Fonepay Accepted</span></div>
+                      </>
+                    ) : (
+                      <>
+                        <div>⏱️ <strong>Estimated Transit:</strong> <span id="detailTransitTime">Standard Merchant Courier (2-4 Days)</span></div>
+                        <div style={{ marginTop: '5px' }}>💰 <strong>Merchant Shipping:</strong> <span id="detailCourierFee" style={{ color: 'var(--ink)', fontWeight: 700 }}>Determined by Seller Checkout</span></div>
+                        <div style={{ marginTop: '5px' }}>💵 <strong>Payment Options:</strong> <span>Varies by Store (Card / Fonepay / COD where supported)</span></div>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -710,10 +749,17 @@ export const ProductPage: FC<{
                       <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Manufacturer Warranty via Authorized Importer</td>
                     </tr>
 
-                    <tr>
-                      <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Delivery Window</td>
-                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Kathmandu Valley: 24h Express • Nationwide: 2-3 Days</td>
-                    </tr>
+                    {isDirectSell ? (
+                      <tr>
+                        <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Direct Delivery Window</td>
+                        <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Kathmandu Valley: 24h Express • Nationwide: 2-3 Days</td>
+                      </tr>
+                    ) : (
+                      <tr>
+                        <td style={{ width: '35%', fontWeight: 700, color: 'var(--ink-secondary)' }}>Merchant Shipping</td>
+                        <td style={{ fontWeight: 600, color: 'var(--ink)' }}>Dispatched directly by verified retailer ({storeName})</td>
+                      </tr>
+                    )}
                   </>
                 )}
               </tbody>
@@ -983,132 +1029,134 @@ export const ProductPage: FC<{
           </div>
         </div>
 
-        {/* Direct Express Checkout Modal (COD / Digital Goods) */}
-        <div id="directOrderModalBackdrop" className="direct-order-modal-backdrop">
-          <div className="direct-order-modal-box">
-            <button
-              id="closeDirectOrderModalBtn"
-              type="button"
-              className="mobile-drawer-close"
-              style={{ position: 'absolute', top: '14px', right: '14px' }}
-            >
-              ×
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span style={{ fontSize: '20px' }}>⚡</span>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>
-                {product.product_type === 'digital' ? 'Instant Digital Purchase' : 'Direct Order / Cash on Delivery'}
-              </h3>
-            </div>
-            <p style={{ fontSize: '12.5px', color: 'var(--muted)', marginBottom: '16px', lineHeight: '1.4' }}>
-              {product.product_type === 'digital'
-                ? 'Get your instant license key and download link sent immediately to your email & SMS.'
-                : 'Order directly from BuyerNepal partner fulfillment. Pay cash upon delivery or via Fonepay / eSewa.'}
-            </p>
-
-            {/* Product Quick Recap Card */}
-            <div style={{ display: 'flex', gap: '14px', alignItems: 'center', background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', padding: '12px', marginBottom: '16px' }}>
-              <img
-                src={product.image_url}
-                alt={product.name}
-                style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--line)' }}
-              />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {product.name}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-                  <strong style={{ fontSize: '14.5px', color: 'var(--primary)' }}>Rs. {formattedPrice}</strong>
-                  <span style={{ fontSize: '10.5px', color: 'var(--emerald)', background: 'var(--emerald-soft)', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                    {product.product_type === 'digital' ? 'Instant Access' : 'In Stock'}
-                  </span>
-                </div>
+        {/* Direct Express Checkout Modal (COD / Digital Goods) - Only rendered when direct sell is enabled */}
+        {isDirectSell && (
+          <div id="directOrderModalBackdrop" className="direct-order-modal-backdrop">
+            <div className="direct-order-modal-box">
+              <button
+                id="closeDirectOrderModalBtn"
+                type="button"
+                className="mobile-drawer-close"
+                style={{ position: 'absolute', top: '14px', right: '14px' }}
+              >
+                ×
+              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <span style={{ fontSize: '20px' }}>⚡</span>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0 }}>
+                  {product.product_type === 'digital' ? 'Instant Digital Purchase' : 'Direct Order / Cash on Delivery'}
+                </h3>
               </div>
-            </div>
+              <p style={{ fontSize: '12.5px', color: 'var(--muted)', marginBottom: '16px', lineHeight: '1.4' }}>
+                {product.product_type === 'digital'
+                  ? 'Get your instant license key and download link sent immediately to your email & SMS.'
+                  : 'Order directly from BuyerNepal partner fulfillment. Pay cash upon delivery or via Fonepay / eSewa.'}
+              </p>
 
-            <form id="directOrderForm" method="post" action="/api/orders/create">
-              <input type="hidden" name="product_id" value={product.id} />
-              <input type="hidden" name="product_name" value={product.name} />
-              <input type="hidden" name="product_price" value={price} />
-              <input type="hidden" name="product_type" value={product.product_type || 'physical'} />
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-                <div className="form-group" style={{ marginBottom: '12px' }}>
-                  <label>Full Name *</label>
-                  <input type="text" name="customer_name" placeholder="e.g. Ramesh Shrestha" required />
-                </div>
-                <div className="form-group" style={{ marginBottom: '12px' }}>
-                  <label>Mobile Number (SMS Updates) *</label>
-                  <input type="tel" name="customer_phone" placeholder="98XXXXXXXX" pattern="[0-9]{10}" required />
+              {/* Product Quick Recap Card */}
+              <div style={{ display: 'flex', gap: '14px', alignItems: 'center', background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', padding: '12px', marginBottom: '16px' }}>
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--line)' }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {product.name}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                    <strong style={{ fontSize: '14.5px', color: 'var(--primary)' }}>Rs. {formattedPrice}</strong>
+                    <span style={{ fontSize: '10.5px', color: 'var(--emerald)', background: 'var(--emerald-soft)', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                      {product.product_type === 'digital' ? 'Instant Access' : 'In Stock'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="form-group" style={{ marginBottom: '12px' }}>
-                <label>Email Address (Order Confirmation) *</label>
-                <input type="email" name="customer_email" placeholder="ramesh@example.com" required />
-              </div>
+              <form id="directOrderForm" method="post" action="/api/orders/create">
+                <input type="hidden" name="product_id" value={product.id} />
+                <input type="hidden" name="product_name" value={product.name} />
+                <input type="hidden" name="product_price" value={price} />
+                <input type="hidden" name="product_type" value={product.product_type || 'physical'} />
 
-              {product.product_type !== 'digital' && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
                   <div className="form-group" style={{ marginBottom: '12px' }}>
-                    <label>City / District *</label>
-                    <select name="city" required style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)' }}>
-                      <option value="Kathmandu">Kathmandu (Same Day / 24h)</option>
-                      <option value="Lalitpur">Lalitpur (24 Hours)</option>
-                      <option value="Bhaktapur">Bhaktapur (24 Hours)</option>
-                      <option value="Pokhara">Pokhara (1-2 Days)</option>
-                      <option value="Chitwan">Chitwan (1-2 Days)</option>
-                      <option value="Butwal">Butwal (2 Days)</option>
-                      <option value="Biratnagar">Biratnagar (2 Days)</option>
-                      <option value="Dharan">Dharan (2 Days)</option>
-                      <option value="Nepalgunj">Nepalgunj (2-3 Days)</option>
-                      <option value="Other District">Other (Courier across 77 Districts)</option>
-                    </select>
+                    <label>Full Name *</label>
+                    <input type="text" name="customer_name" placeholder="e.g. Ramesh Shrestha" required />
                   </div>
                   <div className="form-group" style={{ marginBottom: '12px' }}>
-                    <label>Street / Tole / House No. *</label>
-                    <input type="text" name="delivery_address" placeholder="e.g. Baneshwor, near Eye Hospital" required />
+                    <label>Mobile Number (SMS Updates) *</label>
+                    <input type="tel" name="customer_phone" placeholder="98XXXXXXXX" pattern="[0-9]{10}" required />
                   </div>
                 </div>
-              )}
 
-              <div className="form-group" style={{ marginBottom: '14px' }}>
-                <label>Payment Method *</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px', marginTop: '4px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', padding: '8px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
-                    <input type="radio" name="payment_method" value="cod" defaultChecked />
-                    <span>💵 Cash on Delivery</span>
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', padding: '8px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
-                    <input type="radio" name="payment_method" value="fonepay" />
-                    <span>📱 eSewa / Fonepay</span>
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', padding: '8px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
-                    <input type="radio" name="payment_method" value="bank" />
-                    <span>🏦 Bank Transfer</span>
-                  </label>
+                <div className="form-group" style={{ marginBottom: '12px' }}>
+                  <label>Email Address (Order Confirmation) *</label>
+                  <input type="email" name="customer_email" placeholder="ramesh@example.com" required />
                 </div>
-              </div>
 
-              <div className="form-group" style={{ marginBottom: '16px' }}>
-                <label>Special Instructions / Delivery Landmark (Optional)</label>
-                <input type="text" name="notes" placeholder="e.g. Call before coming, deliver after 2 PM" />
-              </div>
+                {product.product_type !== 'digital' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                    <div className="form-group" style={{ marginBottom: '12px' }}>
+                      <label>City / District *</label>
+                      <select name="city" required style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--line)', background: 'var(--card-bg)', color: 'var(--ink)' }}>
+                        <option value="Kathmandu">Kathmandu (Same Day / 24h)</option>
+                        <option value="Lalitpur">Lalitpur (24 Hours)</option>
+                        <option value="Bhaktapur">Bhaktapur (24 Hours)</option>
+                        <option value="Pokhara">Pokhara (1-2 Days)</option>
+                        <option value="Chitwan">Chitwan (1-2 Days)</option>
+                        <option value="Butwal">Butwal (2 Days)</option>
+                        <option value="Biratnagar">Biratnagar (2 Days)</option>
+                        <option value="Dharan">Dharan (2 Days)</option>
+                        <option value="Nepalgunj">Nepalgunj (2-3 Days)</option>
+                        <option value="Other District">Other (Courier across 77 Districts)</option>
+                      </select>
+                    </div>
+                    <div className="form-group" style={{ marginBottom: '12px' }}>
+                      <label>Street / Tole / House No. *</label>
+                      <input type="text" name="delivery_address" placeholder="e.g. Baneshwor, near Eye Hospital" required />
+                    </div>
+                  </div>
+                )}
 
-              <button type="submit" className="primary-action" style={{ width: '100%', padding: '14px', fontSize: '15px', fontWeight: 800 }}>
-                Confirm &amp; Place Order (Rs. {formattedPrice}) 🛍️
-              </button>
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <label>Payment Method *</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px', marginTop: '4px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', padding: '8px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
+                      <input type="radio" name="payment_method" value="cod" defaultChecked />
+                      <span>💵 Cash on Delivery</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', padding: '8px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
+                      <input type="radio" name="payment_method" value="fonepay" />
+                      <span>📱 eSewa / Fonepay</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', padding: '8px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
+                      <input type="radio" name="payment_method" value="bank" />
+                      <span>🏦 Bank Transfer</span>
+                    </label>
+                  </div>
+                </div>
 
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '12px', fontSize: '11px', color: 'var(--muted)' }}>
-                <span>🔒 Secure Checkout</span>
-                <span>•</span>
-                <span>🛡️ 100% Tax-Paid Warranty</span>
-                <span>•</span>
-                <span>📦 Free 7-Day Returns</span>
-              </div>
-            </form>
+                <div className="form-group" style={{ marginBottom: '16px' }}>
+                  <label>Special Instructions / Delivery Landmark (Optional)</label>
+                  <input type="text" name="notes" placeholder="e.g. Call before coming, deliver after 2 PM" />
+                </div>
+
+                <button type="submit" className="primary-action" style={{ width: '100%', padding: '14px', fontSize: '15px', fontWeight: 800 }}>
+                  Confirm &amp; Place Order (Rs. {formattedPrice}) 🛍️
+                </button>
+
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '12px', fontSize: '11px', color: 'var(--muted)' }}>
+                  <span>🔒 Secure Checkout</span>
+                  <span>•</span>
+                  <span>🛡️ 100% Tax-Paid Warranty</span>
+                  <span>•</span>
+                  <span>📦 Free 7-Day Returns</span>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* REHub Price Drop Alert Modal */}
         <div id="priceAlertModalBackdrop" className="price-alert-modal-backdrop">
@@ -1430,20 +1478,33 @@ export const ProductPage: FC<{
   const transitEl = document.getElementById('detailTransitTime');
   const feeEl = document.getElementById('detailCourierFee');
   if (citySelect && transitEl && feeEl) {
+    const isDirect = citySelect.getAttribute('data-direct-sell') === '1';
     citySelect.addEventListener('change', () => {
       const v = citySelect.value;
-      if (v === 'ktm') {
-        transitEl.textContent = 'Same-Day / 24 Hours Express';
-        feeEl.textContent = 'FREE (Kathmandu Valley Order)';
-        feeEl.style.color = 'var(--emerald)';
-      } else if (v === 'pkr' || v === 'ctw') {
-        transitEl.textContent = '1-2 Business Days';
-        feeEl.textContent = 'Rs. 100 (Subsidized Courier)';
-        feeEl.style.color = 'var(--ink)';
+      if (isDirect) {
+        if (v === 'ktm') {
+          transitEl.textContent = '1-2 Business Days Dispatch';
+          feeEl.textContent = 'FREE (Kathmandu Valley Order)';
+          feeEl.style.color = '#047857';
+        } else if (v === 'pkr' || v === 'ctw') {
+          transitEl.textContent = '2-3 Business Days';
+          feeEl.textContent = 'Rs. 100 (Subsidized Courier)';
+          feeEl.style.color = 'var(--ink)';
+        } else {
+          transitEl.textContent = '3-5 Business Days';
+          feeEl.textContent = 'Rs. 150 (Nationwide Courier)';
+          feeEl.style.color = 'var(--ink)';
+        }
       } else {
-        transitEl.textContent = '2-3 Business Days';
-        feeEl.textContent = 'Rs. 150 (Air / Surface Cargo)';
-        feeEl.style.color = 'var(--ink)';
+        if (v === 'ktm') {
+          transitEl.textContent = 'Standard Merchant Dispatch (1-3 Days)';
+          feeEl.textContent = 'Determined by Seller Checkout';
+          feeEl.style.color = 'var(--ink)';
+        } else {
+          transitEl.textContent = 'Nationwide Courier (3-5 Days)';
+          feeEl.textContent = 'Determined by Seller Checkout';
+          feeEl.style.color = 'var(--ink)';
+        }
       }
     });
   }

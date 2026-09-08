@@ -1,7 +1,7 @@
 import { FC } from 'hono/jsx';
 import { Category, Product, SiteSettings } from '../types';
 import { Layout } from './layout';
-import { Header, ProductCard, MobileBottomBar, Footer } from './components';
+import { Header, ProductCard, ProductGridSkeleton, MobileBottomBar, Footer } from './components';
 
 export const CategoryPage: FC<{
   settings: SiteSettings;
@@ -97,6 +97,9 @@ export const CategoryPage: FC<{
                 {products.length} {products.length === 1 ? 'item' : 'items'}
               </span>
             </div>
+
+            {/* Skeleton Loading Screen for Category Grid */}
+            <ProductGridSkeleton count={8} id="categoryGridSkeleton" hidden={true} />
 
             {products.length > 0 ? (
               <div className="product-grid">

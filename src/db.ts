@@ -1,4 +1,5 @@
-import { Category, Product, Review, SiteSettings, User, Coupon, Article, ProductVariant, ProductScore, StoreOffer, Store, Brand, Order, OutboundClick } from './types';
+import { Category, Product, Review, SiteSettings, User, Coupon, Article, ProductVariant, ProductScore, StoreOffer, Store, Brand, Order, OutboundClick, Vehicle, VehicleInquiry, VehicleCuratedCollection } from './types';
+import { INITIAL_VEHICLES, INITIAL_VEHICLE_INQUIRIES, CURATED_COLLECTIONS } from './vehicles-data';
 
 // Rich, production-grade curated categories for Nepal
 export const DEFAULT_CATEGORIES: Category[] = [
@@ -694,17 +695,37 @@ export const DEFAULT_VARIANTS: Record<number, ProductVariant[]> = {
 
 export const DEFAULT_STORE_OFFERS: Record<number, StoreOffer[]> = {
   1: [
-    { id: 11, product_id: 1, store_name: 'Daraz Mall Verified', price: 214999, store_url: 'https://www.daraz.com.np', badge: 'Official Daraz Partner', in_stock: 1, delivery_time: '24h Kathmandu Express', warranty_info: '1 Year GenNext Nepal Warranty' },
-    { id: 12, product_id: 1, store_name: 'Oliz Store Nepal', price: 216000, store_url: 'https://olizstore.com', badge: 'Authorized Apple Reseller', in_stock: 1, delivery_time: 'Same-day Babarmahal Store Pickup', warranty_info: '1 Year Official Apple Warranty + 1 Year Breakage' },
-    { id: 13, product_id: 1, store_name: 'EvoStore Nepal', price: 218000, store_url: 'https://evostore.com.np', badge: 'Apple Premium Partner', in_stock: 1, delivery_time: 'Courier 2-3 Days Nationwide', warranty_info: '1 Year Official Warranty' }
+    { id: 11, product_id: 1, store_name: 'Daraz Mall Verified', price: 214999, store_url: 'https://www.daraz.com.np', badge: 'Official Daraz Partner', in_stock: 1, delivery_time: 'Standard Courier Dispatch', warranty_info: '1 Year GenNext Nepal Warranty' },
+    { id: 12, product_id: 1, store_name: 'Oliz Store Nepal', price: 216000, store_url: 'https://olizstore.com', badge: 'Authorized Apple Reseller', in_stock: 1, delivery_time: 'Store Direct Dispatch', warranty_info: '1 Year Official Apple Warranty + 1 Year Breakage' },
+    { id: 13, product_id: 1, store_name: 'EvoStore Nepal', price: 218000, store_url: 'https://evostore.com.np', badge: 'Apple Premium Partner', in_stock: 1, delivery_time: 'Store Courier', warranty_info: '1 Year Official Warranty' }
   ],
   2: [
-    { id: 21, product_id: 2, store_name: 'Daraz Mall Verified', price: 199999, store_url: 'https://www.daraz.com.np', badge: 'Daraz Official Brand', in_stock: 1, delivery_time: '24-48h Delivery', warranty_info: '1 Year Samsung Nepal Official' },
-    { id: 22, product_id: 2, store_name: 'Samsung Plaza Nepal', price: 204999, store_url: 'https://samsungplaza.com.np', badge: 'Brand Flagship Store', in_stock: 1, delivery_time: 'Free Doorstep Delivery', warranty_info: '1 Year Full Protection + 1-Time Screen Repair' }
+    { id: 21, product_id: 2, store_name: 'Daraz Mall Verified', price: 199999, store_url: 'https://www.daraz.com.np', badge: 'Daraz Official Brand', in_stock: 1, delivery_time: 'Standard Courier Dispatch', warranty_info: '1 Year Samsung Nepal Official' },
+    { id: 22, product_id: 2, store_name: 'Samsung Plaza Nepal', price: 204999, store_url: 'https://samsungplaza.com.np', badge: 'Brand Flagship Store', in_stock: 1, delivery_time: 'Doorstep Courier', warranty_info: '1 Year Full Protection + 1-Time Screen Repair' }
   ],
   3: [
-    { id: 31, product_id: 3, store_name: 'Oliz Store Nepal', price: 178000, store_url: 'https://olizstore.com', badge: 'Authorized Reseller', in_stock: 1, delivery_time: 'Immediate In-store Pickup', warranty_info: '1 Year Global Apple Care' },
-    { id: 32, product_id: 3, store_name: 'Daraz Mall', price: 179500, store_url: 'https://www.daraz.com.np', badge: 'Daraz Mall', in_stock: 1, delivery_time: '1-2 Days Valley Delivery', warranty_info: '1 Year GenNext Authorized' }
+    { id: 31, product_id: 3, store_name: 'Oliz Store Nepal', price: 178000, store_url: 'https://olizstore.com', badge: 'Authorized Reseller', in_stock: 1, delivery_time: 'Store Direct Dispatch', warranty_info: '1 Year Global Apple Care' },
+    { id: 32, product_id: 3, store_name: 'Daraz Mall', price: 179500, store_url: 'https://www.daraz.com.np', badge: 'Daraz Mall', in_stock: 1, delivery_time: 'Courier Dispatch', warranty_info: '1 Year GenNext Authorized' }
+  ]
+};
+
+// In-Memory logged price history points for products (backed by SQLite price_history table in production)
+export const IN_MEMORY_PRICE_HISTORY: Record<number, { month: string; price: number; recorded_at?: string }[]> = {
+  1: [
+    { month: 'Apr 2026', price: 224000, recorded_at: '2026-04-15T10:00:00Z' },
+    { month: 'Jun 2026', price: 219000, recorded_at: '2026-06-01T12:00:00Z' },
+    { month: 'Aug 2026', price: 215000, recorded_at: '2026-08-10T14:00:00Z' },
+    { month: 'Sep 2026', price: 214999, recorded_at: '2026-09-01T09:00:00Z' }
+  ],
+  2: [
+    { month: 'May 2026', price: 195000, recorded_at: '2026-05-10T11:00:00Z' },
+    { month: 'Jul 2026', price: 189999, recorded_at: '2026-07-20T16:00:00Z' },
+    { month: 'Sep 2026', price: 184999, recorded_at: '2026-09-02T08:00:00Z' }
+  ],
+  3: [
+    { month: 'Apr 2026', price: 199000, recorded_at: '2026-04-20T10:00:00Z' },
+    { month: 'Jun 2026', price: 189000, recorded_at: '2026-06-15T12:00:00Z' },
+    { month: 'Sep 2026', price: 178000, recorded_at: '2026-09-01T10:00:00Z' }
   ]
 };
 
@@ -733,6 +754,8 @@ export async function getSettings(db?: D1Database): Promise<SiteSettings> {
     theme_accent_color: '#dc2626',
     theme_font: 'Plus Jakarta Sans',
     theme_container_width: '1240px',
+    theme_border_radius: '14px',
+    sticky_header_enabled: '1',
     card_style: 'modern',
     catalog_default_view: 'grid',
 
@@ -748,6 +771,10 @@ export async function getSettings(db?: D1Database): Promise<SiteSettings> {
     blog_section_enabled: '1',
     faq_section_enabled: '1',
     editorial_banner_enabled: '1',
+    trending_section_enabled: '1',
+    brands_strip_enabled: '1',
+    newsletter_section_enabled: '1',
+    top_charts_enabled: '1',
 
     // 3. Navigation Menu Manager
     menu_show_deals: '1',
@@ -761,6 +788,8 @@ export async function getSettings(db?: D1Database): Promise<SiteSettings> {
     custom_nav_1_url: '',
     custom_nav_2_label: '',
     custom_nav_2_url: '',
+    custom_nav_3_label: '',
+    custom_nav_3_url: '',
 
     // 4. Header Badges Microcopy
     nav_highlight_1: '🔍 Independent Reviews',
@@ -811,10 +840,19 @@ export async function getSettings(db?: D1Database): Promise<SiteSettings> {
     faq_kicker: 'BUYER GUIDE & HELP',
     faq_title: 'Frequently Asked Questions in Nepal',
 
-    // 9. Footer & Disclosures
+    // 9. REHub Single Product Page Controls
+    product_scores_enabled: '1',
+    product_emi_calculator_enabled: '1',
+    product_price_history_enabled: '1',
+    product_reviews_enabled: '1',
+    whatsapp_chat_enabled: '1',
+    affiliate_cloaking_prefix: '/go/',
+
+    // 10. Footer, Custom Code & Disclosures
     footer_about_text: 'Discover products worth buying in Nepal — curated recommendations, verified NPR prices, and direct store links.',
     footer_disclosure_text: 'BuyerNepal is an independent consumer guide and price comparison platform in Nepal. We research and verify products independently. When you click our partner links to retailers (such as Daraz, Hamrobazar, Oliz Store, Samsung Plaza) and make a purchase, we may receive a referral commission at no additional cost to you.',
-    copyright_text: 'All verified prices in NPR (Nepali Rupees). Crafted with ❤️ for shoppers across Nepal 🇳🇵'
+    copyright_text: 'All verified prices in NPR (Nepali Rupees). Crafted with ❤️ for shoppers across Nepal 🇳🇵',
+    custom_css: ''
   };
 
   if (!db) return defaults;
@@ -1079,16 +1117,6 @@ export function enrichProduct(p: Product): Product {
     cons = ['Limited stock during festival season rushes'];
   }
 
-  // 6-Month Price History
-  const priceHistory = [
-    { month: 'Apr 2026', price: Math.round(p.price * 1.18) },
-    { month: 'May 2026', price: Math.round(p.price * 1.14) },
-    { month: 'Jun 2026', price: Math.round(p.price * 1.10) },
-    { month: 'Jul 2026', price: Math.round(p.price * 1.07) },
-    { month: 'Aug 2026', price: Math.round(p.price * 1.03) },
-    { month: 'Sep 2026', price: p.price }
-  ];
-
   return {
     ...p,
     original_price: origPrice,
@@ -1101,11 +1129,12 @@ export function enrichProduct(p: Product): Product {
     emi_starting_price: emiPrice,
     flash_deal: isFlash ? 1 : 0,
     claimed_percentage: claimed,
-    price_history: priceHistory,
+    price_history: p.price_history && p.price_history.length > 0 ? p.price_history : undefined,
     specs: productSpecs,
     pros,
     cons,
     delivery_info: 'Kathmandu Valley: Within 24 Hours • Outside Valley: 2-3 Days via Courier',
+    direct_sell: p.direct_sell !== undefined ? Number(p.direct_sell) : (p.product_type === 'physical' || p.product_type === 'digital' ? 1 : 0),
     votes_up: p.votes_up !== undefined ? p.votes_up : (18 + (p.id * 7) % 35),
     votes_down: p.votes_down !== undefined ? p.votes_down : (1 + (p.id * 3) % 4),
     temperature: p.temperature !== undefined ? p.temperature : Math.max(35, ((p.votes_up || 18) - (p.votes_down || 1)) * 6 + 65)
@@ -1179,6 +1208,34 @@ export async function getAllProductsAdmin(db?: D1Database): Promise<Product[]> {
   }
 }
 
+export async function getProductPriceHistory(
+  db: D1Database | undefined,
+  productId: number
+): Promise<{ month: string; price: number; recorded_at?: string }[]> {
+  if (db) {
+    try {
+      const r = await db
+        .prepare('SELECT price, store_name, recorded_at FROM price_history WHERE product_id = ? ORDER BY recorded_at ASC')
+        .bind(productId)
+        .all<{ price: number; store_name: string; recorded_at: string }>();
+      if (r.results && r.results.length > 0) {
+        return r.results.map((row) => {
+          const d = new Date(row.recorded_at);
+          const month = !isNaN(d.getTime())
+            ? d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            : 'Recorded';
+          return { month, price: Number(row.price), recorded_at: row.recorded_at };
+        });
+      }
+    } catch {}
+  }
+  const inMem = IN_MEMORY_PRICE_HISTORY[productId];
+  if (inMem && inMem.length > 0) {
+    return inMem;
+  }
+  return [];
+}
+
 export async function getProductById(db: D1Database | undefined, id: number): Promise<Product | null> {
   let prod: Product | null = null;
   if (!db) {
@@ -1199,7 +1256,8 @@ export async function getProductById(db: D1Database | undefined, id: number): Pr
           badge: p.badge || def?.badge,
           rating: p.rating || def?.rating,
           review_count: p.review_count || def?.review_count,
-          brand: p.brand || def?.brand
+          brand: p.brand || def?.brand,
+          direct_sell: p.direct_sell !== undefined ? p.direct_sell : def?.direct_sell
         });
       } else {
         const def = DEFAULT_PRODUCTS.find((dp) => dp.id === id);
@@ -1212,13 +1270,15 @@ export async function getProductById(db: D1Database | undefined, id: number): Pr
   }
 
   if (prod) {
-    const [scores, variants, offers] = await Promise.all([
+    const [scores, variants, offers, priceHistory] = await Promise.all([
       getProductScores(db, id),
       getProductVariants(db, id),
-      getStoreOffers(db, id)
+      getStoreOffers(db, id),
+      getProductPriceHistory(db, id)
     ]);
     prod.scores = scores || undefined;
     prod.variants = variants;
+    prod.price_history = priceHistory && priceHistory.length >= 2 ? priceHistory : undefined;
     prod.store_offers = offers.map((o) => ({
       ...o,
       price: o.price > 0 ? o.price : prod!.price
@@ -1242,20 +1302,56 @@ export async function createProduct(
   badge = 'Hot Deal 🔥',
   brand = '',
   emiAvailable = 0,
-  verdict = ''
+  verdict = '',
+  directSell = 0
 ): Promise<{ success: boolean; id?: number; error?: string }> {
-  if (!db) return { success: false, error: 'Database not connected' };
+  // Update in-memory fallback catalog
+  const newId = DEFAULT_PRODUCTS.length > 0 ? Math.max(...DEFAULT_PRODUCTS.map((p) => p.id)) + 1 : 100;
+  const newProd: Product = {
+    id: newId,
+    name,
+    price,
+    description,
+    image_url: imageUrl,
+    affiliate_url: affiliateUrl,
+    category_id: categoryId,
+    is_active: isActive,
+    store_name: storeName,
+    original_price: originalPrice,
+    badge,
+    brand,
+    emi_available: emiAvailable,
+    verdict,
+    direct_sell: directSell
+  };
+  DEFAULT_PRODUCTS.unshift(newProd);
+
+  if (!db) return { success: true, id: newId };
   try {
+    try {
+      await db.prepare('ALTER TABLE products ADD COLUMN direct_sell INTEGER NOT NULL DEFAULT 0').run();
+    } catch {}
     const r = await db
       .prepare(
-        `INSERT INTO products(name, description, price, image_url, affiliate_url, category_id, is_active, store_name, original_price, badge, brand, emi_available, verdict)
-         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO products(name, description, price, image_url, affiliate_url, category_id, is_active, store_name, original_price, badge, brand, emi_available, verdict, direct_sell)
+         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-      .bind(name, description, price, imageUrl, affiliateUrl, categoryId, isActive, storeName, originalPrice, badge, brand, emiAvailable, verdict)
+      .bind(name, description, price, imageUrl, affiliateUrl, categoryId, isActive, storeName, originalPrice, badge, brand, emiAvailable, verdict, directSell)
       .run();
     return { success: true, id: Number(r.meta.last_row_id) };
   } catch (e: any) {
-    return { success: false, error: e?.message || 'Failed to create product' };
+    try {
+      const r2 = await db
+        .prepare(
+          `INSERT INTO products(name, description, price, image_url, affiliate_url, category_id, is_active, store_name, original_price, badge, brand, emi_available, verdict)
+           VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .bind(name, description, price, imageUrl, affiliateUrl, categoryId, isActive, storeName, originalPrice, badge, brand, emiAvailable, verdict)
+        .run();
+      return { success: true, id: Number(r2.meta.last_row_id) };
+    } catch (e2: any) {
+      return { success: false, error: e2?.message || 'Failed to create product' };
+    }
   }
 }
 
@@ -1296,10 +1392,12 @@ export async function updateProduct(
     brand?: string;
     emiAvailable?: number;
     verdict?: string;
+    directSell?: number;
   }
 ): Promise<{ success: boolean; error?: string }> {
   // Update in-memory fallback catalog
   const idx = DEFAULT_PRODUCTS.findIndex((p) => p.id === id);
+  const oldPrice = idx > -1 ? DEFAULT_PRODUCTS[idx].price : undefined;
   if (idx > -1) {
     DEFAULT_PRODUCTS[idx] = {
       ...DEFAULT_PRODUCTS[idx],
@@ -1315,51 +1413,112 @@ export async function updateProduct(
       brand: data.brand !== undefined ? data.brand.trim() : DEFAULT_PRODUCTS[idx].brand,
       emi_available: data.emiAvailable !== undefined ? data.emiAvailable : DEFAULT_PRODUCTS[idx].emi_available,
       verdict: data.verdict !== undefined ? data.verdict.trim() : DEFAULT_PRODUCTS[idx].verdict,
+      direct_sell: data.directSell !== undefined ? data.directSell : DEFAULT_PRODUCTS[idx].direct_sell,
       is_active: data.isActive ?? DEFAULT_PRODUCTS[idx].is_active
     };
+  }
+
+  // Price change tracking: only record when price actually changed or was updated
+  const finalPrice = typeof data.price === 'number' && !isNaN(data.price) ? data.price : (oldPrice || 0);
+  const finalStore = data.storeName !== undefined ? data.storeName.trim() : 'Official Store';
+  if (oldPrice !== undefined && oldPrice !== finalPrice) {
+    const now = new Date();
+    const monthStr = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    if (!IN_MEMORY_PRICE_HISTORY[id]) {
+      IN_MEMORY_PRICE_HISTORY[id] = [
+        { month: 'Previous', price: oldPrice, recorded_at: new Date(Date.now() - 86400000 * 30).toISOString() }
+      ];
+    }
+    IN_MEMORY_PRICE_HISTORY[id].push({
+      month: monthStr,
+      price: finalPrice,
+      recorded_at: now.toISOString()
+    });
   }
 
   if (!db) return { success: true };
   try {
     const existing = await db.prepare('SELECT * FROM products WHERE id = ?').bind(id).first<Product>();
+    const prevDbPrice = existing ? Number(existing.price) : oldPrice;
+    if (prevDbPrice !== undefined && prevDbPrice !== finalPrice) {
+      try {
+        await db.prepare('CREATE TABLE IF NOT EXISTS price_history (id INTEGER PRIMARY KEY AUTOINCREMENT, product_id INTEGER NOT NULL, price REAL NOT NULL, store_name TEXT NOT NULL DEFAULT "Official Store", recorded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)').run();
+        await db
+          .prepare('INSERT INTO price_history(product_id, price, store_name, recorded_at) VALUES(?, ?, ?, CURRENT_TIMESTAMP)')
+          .bind(id, finalPrice, finalStore)
+          .run();
+      } catch {}
+    }
+
     const finalName = data.name ? data.name.trim() : (existing?.name || '');
     const finalDesc = data.description !== undefined ? data.description : (existing?.description || '');
-    const finalPrice = typeof data.price === 'number' && !isNaN(data.price) ? data.price : (existing?.price || 0);
     const finalOrigPrice = data.originalPrice !== undefined ? data.originalPrice : (existing?.original_price || 0);
     const finalImg = data.imageUrl !== undefined ? data.imageUrl : (existing?.image_url || '');
     const finalAff = data.affiliateUrl !== undefined ? data.affiliateUrl : (existing?.affiliate_url || '');
     const finalCat = data.categoryId !== undefined ? (data.categoryId ? Number(data.categoryId) : null) : (existing?.category_id ?? null);
     const finalActive = data.isActive !== undefined ? data.isActive : (existing?.is_active ?? 1);
-    const finalStore = data.storeName !== undefined ? data.storeName.trim() : (existing?.store_name || 'Daraz Mall');
     const finalBadge = data.badge !== undefined ? data.badge.trim() : (existing?.badge || '');
     const finalBrand = data.brand !== undefined ? data.brand.trim() : (existing?.brand || '');
     const finalEmi = data.emiAvailable !== undefined ? data.emiAvailable : (existing?.emi_available ?? 0);
     const finalVerdict = data.verdict !== undefined ? data.verdict.trim() : (existing?.verdict || '');
+    const finalDirectSell = data.directSell !== undefined ? data.directSell : (existing?.direct_sell ?? 0);
 
-    await db
-      .prepare(
-        `UPDATE products
-         SET name = ?, description = ?, price = ?, original_price = ?, image_url = ?, affiliate_url = ?,
-             category_id = ?, is_active = ?, store_name = ?, badge = ?, brand = ?, emi_available = ?, verdict = ?, updated_at = CURRENT_TIMESTAMP
-         WHERE id = ?`
-      )
-      .bind(
-        finalName,
-        finalDesc ?? '',
-        finalPrice,
-        finalOrigPrice,
-        finalImg ?? '',
-        finalAff ?? '',
-        finalCat ?? null,
-        finalActive,
-        finalStore,
-        finalBadge,
-        finalBrand,
-        finalEmi,
-        finalVerdict,
-        id
-      )
-      .run();
+    try {
+      await db.prepare('ALTER TABLE products ADD COLUMN direct_sell INTEGER NOT NULL DEFAULT 0').run();
+    } catch {}
+
+    try {
+      await db
+        .prepare(
+          `UPDATE products
+           SET name = ?, description = ?, price = ?, original_price = ?, image_url = ?, affiliate_url = ?,
+               category_id = ?, is_active = ?, store_name = ?, badge = ?, brand = ?, emi_available = ?, verdict = ?, direct_sell = ?, updated_at = CURRENT_TIMESTAMP
+           WHERE id = ?`
+        )
+        .bind(
+          finalName,
+          finalDesc ?? '',
+          finalPrice,
+          finalOrigPrice,
+          finalImg ?? '',
+          finalAff ?? '',
+          finalCat ?? null,
+          finalActive,
+          finalStore,
+          finalBadge,
+          finalBrand,
+          finalEmi,
+          finalVerdict,
+          finalDirectSell,
+          id
+        )
+        .run();
+    } catch {
+      await db
+        .prepare(
+          `UPDATE products
+           SET name = ?, description = ?, price = ?, original_price = ?, image_url = ?, affiliate_url = ?,
+               category_id = ?, is_active = ?, store_name = ?, badge = ?, brand = ?, emi_available = ?, verdict = ?, updated_at = CURRENT_TIMESTAMP
+           WHERE id = ?`
+        )
+        .bind(
+          finalName,
+          finalDesc ?? '',
+          finalPrice,
+          finalOrigPrice,
+          finalImg ?? '',
+          finalAff ?? '',
+          finalCat ?? null,
+          finalActive,
+          finalStore,
+          finalBadge,
+          finalBrand,
+          finalEmi,
+          finalVerdict,
+          id
+        )
+        .run();
+    }
     return { success: true };
   } catch (e: any) {
     return { success: false, error: e?.message || 'Failed to update product' };
@@ -1595,26 +1754,15 @@ export async function deleteProductVariant(db: D1Database | undefined, id: numbe
 
 // Multi-Store Price Comparison Matrix ("Where to Buy in Nepal")
 export async function getStoreOffers(db: D1Database | undefined, productId: number): Promise<StoreOffer[]> {
-  const fallback = DEFAULT_STORE_OFFERS[productId] || [
-    {
-      id: 9991,
-      product_id: productId,
-      store_name: 'Daraz Mall Verified',
-      price: 0,
-      store_url: 'https://www.daraz.com.np',
-      badge: 'Official Brand Partner',
-      in_stock: 1,
-      delivery_time: '24-48h Kathmandu Express',
-      warranty_info: 'Official Nepal Warranty'
-    }
-  ];
+  const validUrl = (url?: string) => Boolean(url && url.trim() !== '' && url.trim() !== '#' && (url.startsWith('http://') || url.startsWith('https://')));
+  const fallback = (DEFAULT_STORE_OFFERS[productId] || []).filter((o) => validUrl(o.store_url));
   if (!db) return fallback;
   try {
     const r = await db
       .prepare('SELECT * FROM store_offers WHERE product_id = ? ORDER BY price ASC')
       .bind(productId)
       .all<StoreOffer>();
-    const list = r.results || [];
+    const list = (r.results || []).filter((o) => validUrl(o.store_url));
     return list.length > 0 ? list : fallback;
   } catch {
     return fallback;
@@ -2764,3 +2912,330 @@ export async function getPriceAlerts(db: D1Database | undefined): Promise<any[]>
     return [];
   }
 }
+
+// -------------------------------------------------------------
+// Nepal Vehicles & EV Platform Engine
+// -------------------------------------------------------------
+export const IN_MEMORY_VEHICLES: Vehicle[] = [...INITIAL_VEHICLES];
+export const IN_MEMORY_VEHICLE_INQUIRIES: VehicleInquiry[] = [...INITIAL_VEHICLE_INQUIRIES];
+
+export async function getVehicles(db?: D1Database): Promise<Vehicle[]> {
+  if (!db) return IN_MEMORY_VEHICLES;
+  try {
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS vehicles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        brand TEXT NOT NULL,
+        vehicle_type TEXT NOT NULL,
+        fuel_type TEXT NOT NULL,
+        price_npr REAL NOT NULL,
+        original_price_npr REAL,
+        badge TEXT,
+        image_url TEXT NOT NULL,
+        distributor_nepal TEXT NOT NULL,
+        showroom_location TEXT,
+        warranty_battery TEXT,
+        warranty_vehicle TEXT,
+        battery_capacity_kwh REAL,
+        range_km REAL,
+        motor_power_kw REAL,
+        motor_torque_nm REAL,
+        top_speed_kmh REAL,
+        acceleration_0_100 REAL,
+        charging_time_dc_fast TEXT,
+        charging_time_ac_home TEXT,
+        charging_port TEXT,
+        engine_displacement_cc REAL,
+        transmission TEXT,
+        fuel_economy_kmpl REAL,
+        ground_clearance_mm REAL NOT NULL DEFAULT 170,
+        seating_capacity INTEGER NOT NULL DEFAULT 5,
+        boot_space_liters REAL,
+        airbags_count INTEGER,
+        ncap_rating TEXT,
+        annual_road_tax_npr REAL,
+        verdict_nepal TEXT,
+        rating REAL DEFAULT 4.8,
+        score_overall REAL DEFAULT 9.0,
+        auto_loan_min_downpayment_npr REAL,
+        auto_loan_est_monthly_emi REAL,
+        test_drive_url TEXT,
+        brochure_url TEXT,
+        is_featured INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `).run();
+
+    const res = await db.prepare('SELECT * FROM vehicles WHERE is_active = 1 ORDER BY score_overall DESC').all<Vehicle>();
+    if (res.results && res.results.length > 0) {
+      return res.results;
+    }
+  } catch (err) {
+    console.error('D1 vehicles table error, falling back to memory:', err);
+  }
+  return IN_MEMORY_VEHICLES;
+}
+
+export async function getVehicleBySlug(slug: string, db?: D1Database): Promise<Vehicle | null> {
+  const vehicles = await getVehicles(db);
+  const found = vehicles.find((v) => v.slug === slug.toLowerCase() || String(v.id) === slug);
+  return found || null;
+}
+
+export async function getVehicleById(id: number, db?: D1Database): Promise<Vehicle | null> {
+  const vehicles = await getVehicles(db);
+  const found = vehicles.find((v) => v.id === id);
+  return found || null;
+}
+
+export async function createVehicle(data: Partial<Vehicle>, db?: D1Database): Promise<{ id: number; slug: string }> {
+  const newId = IN_MEMORY_VEHICLES.length > 0 ? Math.max(...IN_MEMORY_VEHICLES.map((v) => v.id)) + 1 : 1;
+  const rawSlug = (data.slug || data.name || `vehicle-${newId}`)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+  const priceNpr = Number(data.price_npr) || 0;
+  const isEv = data.fuel_type === 'ev';
+  // NRB Auto Loan calculations:
+  // EV: 20% down payment (80% loan); Petrol: 50% down payment (50% loan)
+  const downPayment = isEv ? Math.round(priceNpr * 0.2) : Math.round(priceNpr * 0.5);
+  const loanAmount = priceNpr - downPayment;
+  // 7 years (84 months) @ 10% annual interest
+  const monthlyRate = 0.10 / 12;
+  const nMonths = 84;
+  const estEmi = loanAmount > 0
+    ? Math.round((loanAmount * monthlyRate * Math.pow(1 + monthlyRate, nMonths)) / (Math.pow(1 + monthlyRate, nMonths) - 1))
+    : 0;
+
+  const vehicle: Vehicle = {
+    id: newId,
+    name: data.name || 'New Vehicle',
+    slug: rawSlug,
+    brand: data.brand || 'Automobile',
+    vehicle_type: data.vehicle_type || 'suv',
+    fuel_type: data.fuel_type || 'ev',
+    price_npr: priceNpr,
+    original_price_npr: data.original_price_npr ? Number(data.original_price_npr) : undefined,
+    badge: data.badge || (isEv ? '⚡ Electric' : '🚗 Featured'),
+    image_url: data.image_url || 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=900&auto=format&fit=crop&q=80',
+    distributor_nepal: data.distributor_nepal || 'Authorized Nepal Distributor',
+    showroom_location: data.showroom_location || 'Kathmandu & Major Cities',
+    warranty_battery: data.warranty_battery || (isEv ? '8 Years / 160,000 km' : undefined),
+    warranty_vehicle: data.warranty_vehicle || '3 Years / 100,000 km',
+    battery_capacity_kwh: data.battery_capacity_kwh ? Number(data.battery_capacity_kwh) : undefined,
+    range_km: data.range_km ? Number(data.range_km) : undefined,
+    motor_power_kw: data.motor_power_kw ? Number(data.motor_power_kw) : undefined,
+    motor_torque_nm: data.motor_torque_nm ? Number(data.motor_torque_nm) : undefined,
+    top_speed_kmh: data.top_speed_kmh ? Number(data.top_speed_kmh) : undefined,
+    acceleration_0_100: data.acceleration_0_100 ? Number(data.acceleration_0_100) : undefined,
+    charging_time_dc_fast: data.charging_time_dc_fast,
+    charging_time_ac_home: data.charging_time_ac_home,
+    charging_port: data.charging_port || (isEv ? 'CCS Type 2' : undefined),
+    engine_displacement_cc: data.engine_displacement_cc ? Number(data.engine_displacement_cc) : undefined,
+    transmission: data.transmission,
+    fuel_economy_kmpl: data.fuel_economy_kmpl ? Number(data.fuel_economy_kmpl) : undefined,
+    ground_clearance_mm: Number(data.ground_clearance_mm) || 175,
+    seating_capacity: Number(data.seating_capacity) || 5,
+    boot_space_liters: data.boot_space_liters ? Number(data.boot_space_liters) : undefined,
+    airbags_count: data.airbags_count ? Number(data.airbags_count) : 6,
+    ncap_rating: data.ncap_rating || '5-Star Safety',
+    annual_road_tax_npr: data.annual_road_tax_npr ? Number(data.annual_road_tax_npr) : (isEv ? 15000 : 35000),
+    verdict_nepal: data.verdict_nepal || 'Verified vehicle specification curated for Nepal terrain and road conditions.',
+    pros: data.pros || ['Verified Nepal pricing', 'Manufacturer warranty'],
+    cons: data.cons || [],
+    rating: Number(data.rating) || 4.8,
+    score_overall: Number(data.score_overall) || 9.2,
+    auto_loan_min_downpayment_npr: downPayment,
+    auto_loan_est_monthly_emi: estEmi,
+    test_drive_url: data.test_drive_url,
+    brochure_url: data.brochure_url,
+    is_featured: data.is_featured ? 1 : 0,
+    is_active: 1,
+    created_at: new Date().toISOString()
+  };
+
+  IN_MEMORY_VEHICLES.unshift(vehicle);
+
+  if (db) {
+    try {
+      await db.prepare(`
+        INSERT INTO vehicles (
+          name, slug, brand, vehicle_type, fuel_type, price_npr, original_price_npr, badge,
+          image_url, distributor_nepal, showroom_location, warranty_battery, warranty_vehicle,
+          battery_capacity_kwh, range_km, motor_power_kw, motor_torque_nm, top_speed_kmh,
+          acceleration_0_100, charging_time_dc_fast, charging_time_ac_home, charging_port,
+          engine_displacement_cc, transmission, fuel_economy_kmpl, ground_clearance_mm,
+          seating_capacity, boot_space_liters, airbags_count, ncap_rating, annual_road_tax_npr,
+          verdict_nepal, rating, score_overall, auto_loan_min_downpayment_npr, auto_loan_est_monthly_emi,
+          test_drive_url, brochure_url, is_featured, is_active
+        ) VALUES (
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )
+      `).bind(
+        vehicle.name, vehicle.slug, vehicle.brand, vehicle.vehicle_type, vehicle.fuel_type, vehicle.price_npr, vehicle.original_price_npr || null, vehicle.badge || null,
+        vehicle.image_url, vehicle.distributor_nepal, vehicle.showroom_location || null, vehicle.warranty_battery || null, vehicle.warranty_vehicle || null,
+        vehicle.battery_capacity_kwh || null, vehicle.range_km || null, vehicle.motor_power_kw || null, vehicle.motor_torque_nm || null, vehicle.top_speed_kmh || null,
+        vehicle.acceleration_0_100 || null, vehicle.charging_time_dc_fast || null, vehicle.charging_time_ac_home || null, vehicle.charging_port || null,
+        vehicle.engine_displacement_cc || null, vehicle.transmission || null, vehicle.fuel_economy_kmpl || null, vehicle.ground_clearance_mm,
+        vehicle.seating_capacity, vehicle.boot_space_liters || null, vehicle.airbags_count || null, vehicle.ncap_rating || null, vehicle.annual_road_tax_npr || null,
+        vehicle.verdict_nepal || null, vehicle.rating, vehicle.score_overall, vehicle.auto_loan_min_downpayment_npr || null, vehicle.auto_loan_est_monthly_emi || null,
+        vehicle.test_drive_url || null, vehicle.brochure_url || null, vehicle.is_featured, vehicle.is_active
+      ).run();
+    } catch (e) {
+      console.error('Error inserting vehicle into D1:', e);
+    }
+  }
+
+  return { id: vehicle.id, slug: vehicle.slug };
+}
+
+export async function updateVehicle(id: number, data: Partial<Vehicle>, db?: D1Database): Promise<{ success: boolean }> {
+  const idx = IN_MEMORY_VEHICLES.findIndex((v) => v.id === id);
+  if (idx > -1) {
+    const existing = IN_MEMORY_VEHICLES[idx];
+    const priceNpr = data.price_npr !== undefined ? Number(data.price_npr) : existing.price_npr;
+    const isEv = (data.fuel_type || existing.fuel_type) === 'ev';
+    const downPayment = isEv ? Math.round(priceNpr * 0.2) : Math.round(priceNpr * 0.5);
+    const loanAmount = priceNpr - downPayment;
+    const monthlyRate = 0.10 / 12;
+    const nMonths = 84;
+    const estEmi = loanAmount > 0
+      ? Math.round((loanAmount * monthlyRate * Math.pow(1 + monthlyRate, nMonths)) / (Math.pow(1 + monthlyRate, nMonths) - 1))
+      : 0;
+
+    IN_MEMORY_VEHICLES[idx] = {
+      ...existing,
+      ...data,
+      price_npr: priceNpr,
+      auto_loan_min_downpayment_npr: downPayment,
+      auto_loan_est_monthly_emi: estEmi
+    };
+  }
+
+  if (db) {
+    try {
+      if (data.price_npr !== undefined) {
+        await db.prepare('UPDATE vehicles SET price_npr = ? WHERE id = ?').bind(data.price_npr, id).run();
+      }
+      if (data.name) {
+        await db.prepare('UPDATE vehicles SET name = ? WHERE id = ?').bind(data.name, id).run();
+      }
+    } catch (e) {
+      console.error('Error updating vehicle in D1:', e);
+    }
+  }
+
+  return { success: true };
+}
+
+export async function deleteVehicle(id: number, db?: D1Database): Promise<{ success: boolean }> {
+  const idx = IN_MEMORY_VEHICLES.findIndex((v) => v.id === id);
+  if (idx > -1) {
+    IN_MEMORY_VEHICLES.splice(idx, 1);
+  }
+  if (db) {
+    try {
+      await db.prepare('DELETE FROM vehicles WHERE id = ?').bind(id).run();
+    } catch (e) {
+      console.error('Error deleting vehicle in D1:', e);
+    }
+  }
+  return { success: true };
+}
+
+export async function getVehicleInquiries(db?: D1Database): Promise<VehicleInquiry[]> {
+  if (!db) return IN_MEMORY_VEHICLE_INQUIRIES;
+  try {
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS vehicle_inquiries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        vehicle_id INTEGER NOT NULL,
+        vehicle_name TEXT NOT NULL,
+        customer_name TEXT NOT NULL,
+        customer_phone TEXT NOT NULL,
+        customer_email TEXT,
+        city TEXT NOT NULL,
+        inquiry_type TEXT NOT NULL,
+        preferred_date TEXT,
+        message TEXT,
+        status TEXT DEFAULT 'new',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `).run();
+
+    const res = await db.prepare('SELECT * FROM vehicle_inquiries ORDER BY created_at DESC').all<VehicleInquiry>();
+    if (res.results && res.results.length > 0) {
+      return res.results;
+    }
+  } catch (err) {
+    console.error('D1 inquiries error:', err);
+  }
+  return IN_MEMORY_VEHICLE_INQUIRIES;
+}
+
+export async function createVehicleInquiry(data: {
+  vehicle_id: number;
+  vehicle_name: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email?: string;
+  city: string;
+  inquiry_type: 'test_drive' | 'price_quote' | 'bank_loan_assist' | 'exchange';
+  preferred_date?: string;
+  message?: string;
+}, db?: D1Database): Promise<{ id: number; success: boolean }> {
+  const newId = IN_MEMORY_VEHICLE_INQUIRIES.length > 0 ? Math.max(...IN_MEMORY_VEHICLE_INQUIRIES.map((i) => i.id)) + 1 : 1;
+  const inquiry: VehicleInquiry = {
+    id: newId,
+    vehicle_id: data.vehicle_id,
+    vehicle_name: data.vehicle_name,
+    customer_name: data.customer_name,
+    customer_phone: data.customer_phone,
+    customer_email: data.customer_email,
+    city: data.city,
+    inquiry_type: data.inquiry_type,
+    preferred_date: data.preferred_date,
+    message: data.message,
+    status: 'new',
+    created_at: new Date().toISOString()
+  };
+
+  IN_MEMORY_VEHICLE_INQUIRIES.unshift(inquiry);
+
+  if (db) {
+    try {
+      await db.prepare(`
+        INSERT INTO vehicle_inquiries (vehicle_id, vehicle_name, customer_name, customer_phone, customer_email, city, inquiry_type, preferred_date, message, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        inquiry.vehicle_id, inquiry.vehicle_name, inquiry.customer_name, inquiry.customer_phone, inquiry.customer_email || null, inquiry.city, inquiry.inquiry_type, inquiry.preferred_date || null, inquiry.message || null, inquiry.status
+      ).run();
+    } catch (e) {
+      console.error('Error inserting inquiry into D1:', e);
+    }
+  }
+
+  return { id: newId, success: true };
+}
+
+export async function updateVehicleInquiryStatus(id: number, status: 'new' | 'contacted' | 'test_drive_scheduled' | 'closed', db?: D1Database): Promise<{ success: boolean }> {
+  const item = IN_MEMORY_VEHICLE_INQUIRIES.find((i) => i.id === id);
+  if (item) {
+    item.status = status;
+  }
+  if (db) {
+    try {
+      await db.prepare('UPDATE vehicle_inquiries SET status = ? WHERE id = ?').bind(status, id).run();
+    } catch {}
+  }
+  return { success: true };
+}
+
+export function getCuratedVehicleCollections(): VehicleCuratedCollection[] {
+  return CURATED_COLLECTIONS;
+}
+

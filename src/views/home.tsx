@@ -8,6 +8,7 @@ import {
   FlashSaleSection,
   CouponsStrip,
   ProductCard,
+  ProductGridSkeleton,
   NepalCityDeliveryEstimator,
   NepalShoppingFaq,
   EditorialBanner,
@@ -183,6 +184,9 @@ export const HomePage: FC<{
               </div>
             </div>
 
+            {/* Skeleton Loading Screen for Product Grid */}
+            <ProductGridSkeleton count={8} id="productGridSkeleton" hidden={true} />
+
             {products.length > 0 ? (
               <div
                 id="productGrid"
@@ -352,13 +356,31 @@ export const HomePage: FC<{
     sorted.forEach(el => productGrid.appendChild(el));
   }
 
+  const gridSkeleton = document.getElementById('productGridSkeleton');
+  let filterSkeletonTimer = null;
+
+  function runWithSkeletonTransition(actionFn, delay = 160) {
+    if (gridSkeleton && productGrid) {
+      gridSkeleton.style.display = 'grid';
+      productGrid.style.display = 'none';
+      if (noResults) noResults.style.display = 'none';
+      clearTimeout(filterSkeletonTimer);
+      filterSkeletonTimer = setTimeout(() => {
+        gridSkeleton.style.display = 'none';
+        actionFn();
+      }, delay);
+    } else {
+      actionFn();
+    }
+  }
+
   // Filter pills click
   filterPills.forEach(pill => {
     pill.addEventListener('click', () => {
       filterPills.forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       currentFilter = pill.getAttribute('data-filter') || 'all';
-      applyFilters();
+      runWithSkeletonTransition(applyFilters, 150);
     });
   });
 
@@ -368,16 +390,26 @@ export const HomePage: FC<{
       storeFilterPills.forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       currentStoreFilter = pill.getAttribute('data-store') || 'all';
-      applyFilters();
+      runWithSkeletonTransition(applyFilters, 150);
     });
   });
 
-  // Search Input
+  // Search Input with Debounced Skeleton Transition
+  let searchInputDebounce = null;
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value.toLowerCase().trim();
       if (clearBtn) clearBtn.style.display = searchQuery ? 'inline-block' : 'none';
-      applyFilters();
+      clearTimeout(searchInputDebounce);
+      if (gridSkeleton && productGrid) {
+        gridSkeleton.style.display = 'grid';
+        productGrid.style.display = 'none';
+        if (noResults) noResults.style.display = 'none';
+      }
+      searchInputDebounce = setTimeout(() => {
+        if (gridSkeleton) gridSkeleton.style.display = 'none';
+        applyFilters();
+      }, 200);
     });
   }
 
@@ -388,7 +420,7 @@ export const HomePage: FC<{
         searchInput.value = '';
         searchQuery = '';
         clearBtn.style.display = 'none';
-        applyFilters();
+        runWithSkeletonTransition(applyFilters, 120);
         searchInput.focus();
       }
     });
@@ -402,7 +434,7 @@ export const HomePage: FC<{
         searchInput.value = q;
         searchQuery = q.toLowerCase();
         if (clearBtn) clearBtn.style.display = 'inline-block';
-        applyFilters();
+        runWithSkeletonTransition(applyFilters, 180);
         productGrid?.scrollIntoView({ behavior: 'smooth' });
       }
     });
@@ -411,7 +443,7 @@ export const HomePage: FC<{
   // Sort dropdown change
   if (sortSelect) {
     sortSelect.addEventListener('change', () => {
-      applySorting();
+      runWithSkeletonTransition(applySorting, 140);
     });
   }
 
@@ -431,10 +463,24 @@ export const HomePage: FC<{
       currentStoreFilter = 'all';
 
       if (sortSelect) sortSelect.value = 'featured';
-      applyFilters();
-      applySorting();
+      runWithSkeletonTransition(() => {
+        applyFilters();
+        applySorting();
+      }, 160);
     });
   }
+
+  // Handle URL query param 'q' on initial load
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQuery = urlParams.get('q');
+    if (initialQuery && searchInput) {
+      searchInput.value = initialQuery;
+      searchQuery = initialQuery.toLowerCase().trim();
+      if (clearBtn) clearBtn.style.display = 'inline-block';
+      runWithSkeletonTransition(applyFilters, 220);
+    }
+  } catch (e) {}
 
   // REHub View Mode Switcher
   const viewBtns = document.querySelectorAll('.view-btn');

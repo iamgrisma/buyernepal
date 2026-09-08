@@ -55,12 +55,13 @@ export interface Product {
   emi_starting_price?: number;
   flash_deal?: number;
   claimed_percentage?: number;
-  price_history?: { month: string; price: number }[];
+  price_history?: { month: string; price: number; recorded_at?: string }[];
   specs?: Record<string, string>;
   pros?: string[];
   cons?: string[];
   delivery_info?: string;
   verdict?: string;
+  direct_sell?: number;
   product_type?: 'affiliate' | 'physical' | 'digital';
   digital_file_url?: string;
   digital_license_info?: string;
@@ -71,6 +72,13 @@ export interface Product {
   temperature?: number;
   variants?: ProductVariant[];
   scores?: ProductScore;
+  score_display?: number;
+  score_performance?: number;
+  score_camera?: number;
+  score_battery?: number;
+  score_value?: number;
+  score_overall?: number;
+  score_verdict?: string;
   store_offers?: StoreOffer[];
 }
 
@@ -151,6 +159,7 @@ export interface Review {
   rating: number;
   comment: string;
   status: 'pending' | 'approved' | 'rejected';
+  is_approved?: number | boolean;
   created_at: string;
   helpful_count?: number;
   unhelpful_count?: number;
@@ -211,6 +220,8 @@ export interface SiteSettings {
   theme_accent_color?: string;
   theme_font?: string;
   theme_container_width?: string;
+  theme_border_radius?: string;
+  sticky_header_enabled?: string;
   card_style?: 'modern' | 'bordered' | 'compact';
   catalog_default_view?: 'grid' | 'list' | 'table';
 
@@ -229,8 +240,10 @@ export interface SiteSettings {
   trending_section_enabled?: string;
   brands_strip_enabled?: string;
   newsletter_section_enabled?: string;
+  top_charts_enabled?: string;
 
   // 3. Navigation Menu Manager
+  menu_show_vehicles?: string;
   menu_show_deals?: string;
   menu_show_compare?: string;
   menu_show_charts?: string;
@@ -242,6 +255,8 @@ export interface SiteSettings {
   custom_nav_1_url?: string;
   custom_nav_2_label?: string;
   custom_nav_2_url?: string;
+  custom_nav_3_label?: string;
+  custom_nav_3_url?: string;
 
   // 4. Header Badges Microcopy (3 pills on right of nav strip)
   nav_highlight_1?: string;
@@ -292,10 +307,19 @@ export interface SiteSettings {
   faq_kicker?: string;
   faq_title?: string;
 
-  // 9. Footer & Disclosures
+  // 9. REHub Single Product Page Controls
+  product_scores_enabled?: string;
+  product_emi_calculator_enabled?: string;
+  product_price_history_enabled?: string;
+  product_reviews_enabled?: string;
+  whatsapp_chat_enabled?: string;
+  affiliate_cloaking_prefix?: string;
+
+  // 10. Footer, Custom Code & Disclosures
   footer_about_text?: string;
   footer_disclosure_text?: string;
   copyright_text?: string;
+  custom_css?: string;
 }
 
 export interface Order {
@@ -364,3 +388,90 @@ export interface OutboundClick {
   ip_country?: string;
   created_at?: string;
 }
+
+export interface Vehicle {
+  id: number;
+  name: string;
+  slug: string;
+  brand: string;
+  vehicle_type: 'car' | 'suv' | 'hatchback' | 'sedan' | 'bike' | 'scooter' | 'pickup';
+  fuel_type: 'ev' | 'petrol' | 'diesel' | 'hybrid';
+  price_npr: number;
+  original_price_npr?: number;
+  badge?: string;
+  image_url: string;
+  gallery_images?: string[];
+  distributor_nepal: string;
+  showroom_location?: string;
+  warranty_battery?: string;
+  warranty_vehicle?: string;
+  battery_capacity_kwh?: number;
+  range_km?: number;
+  motor_power_kw?: number;
+  motor_torque_nm?: number;
+  top_speed_kmh?: number;
+  acceleration_0_100?: number;
+  charging_time_dc_fast?: string;
+  charging_time_ac_home?: string;
+  charging_port?: string;
+  engine_displacement_cc?: number;
+  transmission?: string;
+  fuel_economy_kmpl?: number;
+  fuel_tank_liters?: number;
+  ground_clearance_mm: number;
+  seating_capacity: number;
+  boot_space_liters?: number;
+  airbags_count?: number;
+  ncap_rating?: string;
+  annual_road_tax_npr?: number;
+  verdict_nepal: string;
+  pros?: string[];
+  cons?: string[];
+  rating: number;
+  score_overall: number;
+  scores?: {
+    range_efficiency?: number;
+    performance?: number;
+    ground_clearance?: number;
+    nepal_value?: number;
+    charging_network?: number;
+  };
+  auto_loan_min_downpayment_npr?: number;
+  auto_loan_est_monthly_emi?: number;
+  test_drive_url?: string;
+  brochure_url?: string;
+  is_featured?: number;
+  is_active: number;
+  created_at?: string;
+}
+
+export interface VehicleInquiry {
+  id: number;
+  vehicle_id: number;
+  vehicle_name: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email?: string;
+  city: string;
+  inquiry_type: 'test_drive' | 'price_quote' | 'bank_loan_assist' | 'exchange';
+  preferred_date?: string;
+  message?: string;
+  status: 'new' | 'contacted' | 'test_drive_scheduled' | 'closed';
+  created_at: string;
+}
+
+export interface VehicleCuratedCollection {
+  id: string;
+  title: string;
+  subtitle: string;
+  slug: string;
+  icon: string;
+  filter_fuel?: string;
+  filter_type?: string;
+  max_price?: number;
+  min_price?: number;
+  min_range?: number;
+  min_ground_clearance?: number;
+  description: string;
+}
+

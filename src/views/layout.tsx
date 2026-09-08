@@ -11,6 +11,7 @@ interface LayoutProps {
   jsonLd?: Record<string, any>;
   customHead?: string;
   settings?: SiteSettings;
+  activeSlug?: string;
 }
 
 export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
@@ -420,8 +421,16 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                   });
 
                   if (count > 0) {
-                    if (compareDock) compareDock.classList.add('open');
+                    const isDismissed = sessionStorage.getItem('bn_compare_dock_dismissed') === 'true';
+                    if (compareDock) {
+                      if (!isDismissed) {
+                        compareDock.classList.add('open');
+                      } else {
+                        compareDock.classList.remove('open');
+                      }
+                    }
                   } else {
+                    sessionStorage.removeItem('bn_compare_dock_dismissed');
                     if (compareDock) compareDock.classList.remove('open');
                   }
 
@@ -479,6 +488,8 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                       showToast('Comparison limit reached (max 3 items)');
                       return;
                     }
+                    // User explicitly added a new product: un-dismiss dock so it shows the addition
+                    sessionStorage.removeItem('bn_compare_dock_dismissed');
                     compareItems.push({ id, name, price, image, store, warranty });
                     showToast('Added "' + name.slice(0, 20) + '..." to comparison ⚖️');
                   }
@@ -488,6 +499,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
 
                 if (closeCompareDockBtn) {
                   closeCompareDockBtn.addEventListener('click', () => {
+                    sessionStorage.setItem('bn_compare_dock_dismissed', 'true');
                     if (compareDock) compareDock.classList.remove('open');
                   });
                 }
@@ -704,10 +716,48 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
                       searchDropdown.innerHTML = '';
                       return;
                     }
+
+                    // Render skeleton loading screen immediately for perceived performance
+                    searchDropdown.innerHTML =
+                      '<div class="search-skeleton-dropdown" aria-busy="true" aria-live="polite">' +
+                        '<div class="search-skeleton-group-title skeleton-shimmer"></div>' +
+                        '<div class="search-skeleton-item">' +
+                          '<div class="search-skeleton-thumb skeleton-shimmer"></div>' +
+                          '<div class="search-skeleton-details">' +
+                            '<div class="search-skeleton-line skeleton-shimmer" style="width: 76%; height: 13px; margin-bottom: 7px;"></div>' +
+                            '<div class="search-skeleton-line skeleton-shimmer" style="width: 44%; height: 11px;"></div>' +
+                          '</div>' +
+                        '</div>' +
+                        '<div class="search-skeleton-item">' +
+                          '<div class="search-skeleton-thumb skeleton-shimmer"></div>' +
+                          '<div class="search-skeleton-details">' +
+                            '<div class="search-skeleton-line skeleton-shimmer" style="width: 86%; height: 13px; margin-bottom: 7px;"></div>' +
+                            '<div class="search-skeleton-line skeleton-shimmer" style="width: 38%; height: 11px;"></div>' +
+                          '</div>' +
+                        '</div>' +
+                        '<div class="search-skeleton-item">' +
+                          '<div class="search-skeleton-thumb skeleton-shimmer"></div>' +
+                          '<div class="search-skeleton-details">' +
+                            '<div class="search-skeleton-line skeleton-shimmer" style="width: 65%; height: 13px; margin-bottom: 7px;"></div>' +
+                            '<div class="search-skeleton-line skeleton-shimmer" style="width: 50%; height: 11px;"></div>' +
+                          '</div>' +
+                        '</div>' +
+                        '<div class="search-skeleton-group-title skeleton-shimmer" style="width: 140px; margin-top: 10px;"></div>' +
+                        '<div class="search-skeleton-item">' +
+                          '<div class="search-skeleton-thumb skeleton-shimmer"></div>' +
+                          '<div class="search-skeleton-details">' +
+                            '<div class="search-skeleton-line skeleton-shimmer" style="width: 80%; height: 13px; margin-bottom: 7px;"></div>' +
+                            '<div class="search-skeleton-line skeleton-shimmer" style="width: 35%; height: 11px;"></div>' +
+                          '</div>' +
+                        '</div>' +
+                      '</div>';
+                    searchDropdown.classList.add('open');
+
                     searchDebounceTimer = setTimeout(async () => {
                       try {
                         const res = await fetch('/api/search/live?q=' + encodeURIComponent(q));
                         if (!res.ok) return;
+                        if (searchInput.value.trim() !== q) return; // Discard if user continued typing
                         const data = await res.json();
                         const { products = [], articles = [], stores = [] } = data;
 
